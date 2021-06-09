@@ -121,3 +121,41 @@ void LST_delete(List_t* l) {
 	free(l->elts);
 	free(l);
 }
+
+/******************************/
+
+List_p* LST2_init() {
+	
+	List_p* list = malloc(sizeof(List_p));
+	list->premier = NULL;
+	
+	return list;
+}
+
+// Ajout au début
+void LST2_addElement(List_p* list, int depart, int arrivee) {
+	
+	Element* elem = malloc(sizeof(Element));
+	
+	elem->depart = depart;
+	elem->arrivee = arrivee;
+	elem->suivant = list->premier;
+	
+	list->premier = elem;
+}
+
+void LST2_removeFirst(List_p* list) {
+	
+	Element* suppr = list->premier;
+	list->premier = list->premier->suivant;
+	free(suppr);
+}
+
+void LST2_delete(List_p* list) {
+
+	while (list->premier)
+	{
+		LST2_removeFirst(list);
+	}
+	free(list);
+}

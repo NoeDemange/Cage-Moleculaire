@@ -94,7 +94,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	if (flag(atom(m,indice)) < 2)
 		flag(atom(m,indice)) = 1;
 
-	//Position du troisième : (rotation de normal, 120, -dir) + coords(v)
+	//Position du troisième : (rotation de normal, -120, -dir) + coords(v)
 	new_coords = addPoint(coords(v), rotation(normal, -120, dir));
 	indice = SHL_addAtom(m, new_coords, -1);
 
@@ -103,7 +103,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	if (flag(atom(m,indice)) < 2)
 		flag(atom(m,indice)) = 1;
 
-	//Rattacher les nouvaux sommets à ceux de la liste l.
+	//Rattacher les nouveaux sommets à ceux de la liste l.
 	SHL_linkBorder(m, idv, l);
 
 	LST_delete(l);

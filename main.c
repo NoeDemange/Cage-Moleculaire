@@ -4,6 +4,7 @@
 #include "generation.h"
 #include "output.h"
 #include "utile.h"
+#include "assembly.h"
 
 #include <R.h>
 #include <Rinternals.h>
@@ -36,7 +37,7 @@ int main(int argc, char** argv) {
 
 	//Vérification qu'une entrée est passée en paramètre
 	if (argc < 2) {
-		printf("Veillez rentrer le nom du fichier de la molécule et/ou l'alpha\n");
+		printf("Veuillez rentrer le nom du fichier de la molécule et/ou l'alpha\n");
 		exit(1);
 	}
 
@@ -52,9 +53,19 @@ int main(int argc, char** argv) {
 	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
 	generationMoc(m);
 
-	
 	//SHL_write(envelope);
 	//SHL_write(moc(m,0));
+	
+	
+	/********** Assemblage des motifs **********/
+	
+	double alpha2 = 20.0;
+	Shell_t* envelope2 = createShell(substrat(m), alpha2);
+	
+	assemblage(m, envelope2);
+	
+	
+	
 
 	/********** Écriture des résultats dans des fichiers **********/
 

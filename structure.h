@@ -69,6 +69,22 @@ typedef struct {
 
 } List_t;
 
+// Liste des sommets a relier
+typedef struct Element Element;
+struct Element {
+	
+	int depart;
+	int arrivee;
+	Element *suivant;	
+
+};
+
+typedef struct {
+	
+	Element *premier;	
+
+} List_p;
+
 /**************************************/
 /* GRAPHE *****************************/
 /**************************************/
@@ -193,12 +209,18 @@ List_t* LST_copy(List_t*);
 List_t* LST_addList(List_t*, List_t*);
 void LST_delete(List_t*);
 
+List_p* LST2_init();
+void LST2_addElement(List_p* list, int depart, int arrivee);
+void LST2_removeFirst(List_p* list);
+void LST2_delete(List_p* list);
+
 //Graphe
 
 void GPH_addNeighbor(Vertex_t*, unsigned);
 void GPH_removeNeighbor(Vertex_t*, unsigned);
 int GPH_nbVertex(Graph_t*);
 void GPH_addAlloc(Graph_t*, unsigned);
+int GPH_getIndice(Graph_t* g, unsigned id);
 unsigned GPH_addVertex(Graph_t*, unsigned);
 void GPH_removeVertex(Graph_t*, unsigned);
 void GPH_addEdge(Graph_t*, unsigned, unsigned);
