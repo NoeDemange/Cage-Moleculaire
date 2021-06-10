@@ -10,45 +10,76 @@ void genererChemin(){
 	
 }
 
-// Parcours en profondeur en fonction des indices
+// Vérifie si le sommet se situe en bordure de motif
+int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
+	
+	for (int i = 0; i < neighborhoodSize(sommet); i++) // Pour tous les voisins du sommet
+	{
+		// Si ce sommet est dans un motif et qu'un de ses voisins est de l'enveloppe
+		if (flag(atom(s, neighbor(sommet, i))) == 0 && flag(sommet) != 0 ) /*&& flag(sommet) != 4*/
+		{
+			return 1; 
+		}
+	}
+	
+	return 0;
+}
+
+// Parcours en profondeur en fonction des indices sur les sommets des motifs uniquement
 int parcours(Shell_t* s, List_t* marquer, int indice1, int indice2) {
-	printf("DEBUT");
+	
+	printf("marquer : ");
+	for (int i = 0; i < size(marquer); i++)
+	{
+		printf("%d ", elts(marquer,i));
+
+	}
+	printf("\n");
 	AtomShl_t* a = atom(s, indice1);
+	LST_addElement(marquer, indice1);
+	
+	printf("Voisins de %d :\n", indice1);
+	for (int i = 0; i < neighborhoodSize(a); i++) {
+        printf("%d, ", neighbor(a, i));
+    }
+    printf("\n");
 	if (neighborhoodSize(a) == 0)
 	{
+		printf("Pas de voisin\n");
 		return 0;
 	}
 	else
 	{
 		for (int i = 0; i < neighborhoodSize(a); i++) // Pour tous les voisins de a
 		{
-			if (neighbor(a, i) == indice2) // S'il l'identifiant recherché est trouvé
+			if (neighbor(a, i) != -1 && flag(atom(s, neighbor(a, i))) != 0) // Si le sommet est dans un motif donc de priorité != 0
 			{
-				return 1;
-			}
-			else
-			{
-				if (LST_getIndice(marquer, neighbor(a, i) != -1 )) // Si l'identifiant de ce sommet est déjà marqué
+				if (neighbor(a, i) == indice2) // Si l'identifiant recherché est trouvé
 				{
-					return 0;
+					printf("%d atteint\n",neighbor(a, i));
+					return 1;
 				}
 				else
 				{
-					printf("\n %d -> %d \n", indice1, indice2);
-					LST_addElement(marquer, neighbor(a, i));
-					int valide = parcours(s, marquer, neighbor(a, i), indice2);
-					if (valide)
+					if (!LST_check(marquer, neighbor(a, i))) // Si l'identifiant de ce sommet n'est pas déjà marqué
 					{
-						return 1;
+						printf("\n %d -> %d \n", indice1, neighbor(a, i));
+						int valide = parcours(s, marquer, neighbor(a, i), indice2);
+						if (valide)
+						{
+							return 1;
+						}
 					}
 				}
 			}
+			
+			
 		}
 	}
 	return 0;
 }
 
-// Vérifie s'il existe un chemin passant seulement par des sommets de priorité 1 ou 3
+// Vérifie s'il existe un chemin passant seulement par des sommets qui appartiennent aux motifs donc de priorité != 0
 // donc si les 2 sommets sont du même groupement
 int existeChemin(Shell_t* s, int indice1, int indice2){
 	
@@ -65,14 +96,13 @@ int existeChemin(Shell_t* s, int indice1, int indice2){
 // Vérifier s'il existe plusieurs groupements de motifs non relié
 int checkGroupement(Shell_t* s){
 	
-	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets de priorité 1
+	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets en bordure
 	{
-		printf("\n %d -> flag : %d\n", i, flag(atom(s, i)));
-		if (atom(s, i)->flag == 1)
+		if ( bordureCheck(s, atom(s, i)) )
 		{
 			for (int j = i+1; j < SHL_nbAtom(s); j++)
 			{
-				if (atom(s, j)->flag == 1)
+				if ( bordureCheck(s, atom(s, j)) )
 				{
 					if (!existeChemin(s, i, j))
 					{
@@ -91,7 +121,7 @@ List_p* choixSommets(Shell_t* s){
 	
 	List_p* sommets = LST2_init();
 	
-	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets de priorité 1
+	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets den bordure
 	{
 		if (atom(s, i)->flag == 1)
 		{
@@ -115,6 +145,20 @@ List_p* choixSommets(Shell_t* s){
 		e = e->suivant;
 	}
 	
+	return sommets;
+}
+
+void affichage(Shell_t* s) {
+	
+	for (int i = 0; i < SHL_nbAtom(s); i++)
+	{
+		printf("Atome %d : ", i+1);
+		for (int j = 0; j < neighborhoodSize(atom(s,i)); j++)
+		{
+			printf("%d ",neighbor(atom(s,i),j)+1);
+		}
+		printf("flag %d\n",flag(atom(s,i)));
+	}
 }
 
 // Fonction principale
@@ -122,7 +166,8 @@ void assemblage(Main_t* m, Shell_t* envelope2){
 	
 	for (int i=0; i</*mocSize(m)*/1	; i++) //Pour tous les mocs
 	{
-		while (checkGroupement(moc(m, i))) // Tant qu'il existe au moins 2 groupements de motifs
+		checkGroupement(moc(m, i));
+		/*while (checkGroupement(moc(m, i))) // Tant qu'il existe au moins 2 groupements de motifs
 		{
 			printf("1111111");
 			List_p* sommets = choixSommets(moc(m, i));
@@ -141,6 +186,6 @@ void assemblage(Main_t* m, Shell_t* envelope2){
 				
 			}
 			
-		}
+		}*/
 	}
 }
