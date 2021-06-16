@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 	assemblage(m, envelope2);
 	
 	
-	
+	//printf("\nEXIT\n");
 
 	/********** Écriture des résultats dans des fichiers **********/
 

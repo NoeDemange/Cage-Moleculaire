@@ -186,6 +186,25 @@ typedef struct {
 	double* alpha;
 }Ashape_t;
 
+/**************************************/
+/* LISTE MOC **************************/
+/**************************************/
+
+// Liste des mocs a traiter
+typedef struct Elem Elem;
+struct Elem {
+	
+	Shell_t* moc;
+	Elem *suivant;	
+
+};
+
+typedef struct {
+	
+	Elem *premier;	
+
+} List_m;
+
 //Point
 Point_t PT_init();
 Point_t PT_add(Point_t, Point_t);
@@ -213,6 +232,11 @@ List_p* LST2_init();
 void LST2_addElement(List_p* list, int depart, int arrivee);
 void LST2_removeFirst(List_p* list);
 void LST2_delete(List_p* list);
+
+List_m* LSTm_init();
+void LSTm_addElement(List_m* list, Shell_t* moc);
+void LSTm_removeFirst(List_m* list);
+void LSTm_delete(List_m* list);
 
 //Graphe
 
@@ -273,6 +297,7 @@ Graph_t* ShlToGph(Shell_t*);
 Ashape_t* ASP_create();
 void ASP_delete(Ashape_t*);
 
+unsigned MN_getIndiceFree(Main_t* m);
 unsigned MN_copyMoc(Main_t*, Shell_t*);
 Main_t* MN_create();
 void MN_delete(Main_t*);

@@ -159,3 +159,41 @@ void LST2_delete(List_p* list) {
 	}
 	free(list);
 }
+
+/******************************/
+
+List_m* LSTm_init() {
+	
+	List_m* list = malloc(sizeof(List_m));
+	list->premier = NULL;
+	
+	return list;
+}
+
+// Ajout au début
+void LSTm_addElement(List_m* list, Shell_t* moc) {
+	
+	Elem* elem = malloc(sizeof(Elem));
+	
+	elem->moc = moc;
+	elem->suivant = list->premier;
+	
+	list->premier = elem;
+}
+
+void LSTm_removeFirst(List_m* list) {
+	
+	Elem* suppr = list->premier;
+	list->premier = list->premier->suivant;
+	SHL_delete(suppr->moc);
+	free(suppr);
+}
+
+void LSTm_delete(List_m* list) {
+
+	while (list->premier)
+	{
+		LSTm_removeFirst(list);
+	}
+	free(list);
+}

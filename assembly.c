@@ -95,6 +95,9 @@ int existeChemin(Shell_t* s, int indice1, int indice2){
 	return existe;
 }
 
+/**********/
+/*Inutile*/
+/********/
 // Vérifier s'il existe plusieurs groupements de motifs non relié
 int checkGroupement(Shell_t* s){
 	
@@ -163,56 +166,66 @@ void affichage(Shell_t* s) {
 	}
 }
 
-// Fonction principale
-void assemblage(Main_t* m, Shell_t* envelope2){
+// Cree une liste de moc a traiter et vide le tableau de solutions finales
+List_m* initMocAtt(Main_t* m){
+	List_m* mocAtt = LSTm_init();
 	
-	for (int i=0; i</*mocSize(m)*/1	; i++) //Pour tous les mocs
+	for (int i=0; i<mocSize(m); i++) //Pour tous les mocs
 	{
-		checkGroupement(moc(m, i));
-		/*while (checkGroupement(moc(m, i))) // Tant qu'il existe au moins 2 groupements de motifs
+		if (moc(m,i) != NULL)
 		{
-			printf("1111111");
-			List_p* sommets = choixSommets(moc(m, i));
-			printf("2222222");
-			printf("\n %p \n",sommets);
-			while (sommets->premier) // Pour tous les couples de sommets à relier
-			{
-				printf("33333333");
-				int depart = sommets->premier->depart;
-				int arrivee = sommets->premier->arrivee;
-				printf("444444444");
-				LST2_removeFirst(sommets);
-				printf("555555555");
-				// Choix sommets intermédiaire et generer directions
-				// genererChemin();
-				
-			}
+			LSTm_addElement(mocAtt, moc(m, i)); // Les mettre dans la liste a traiter
+			//moc(m, i) = NULL; // Les supprimer du tableau de solutions finales
 			
-		}*/
-	}
-}
-
-void assemblage2(Main_t* m, Shell_t* envelope2){
-	
-	for (int i=0; i</*mocSize(m)*/1	; i++) //Pour tous les mocs
-	{
-		List_p* sommets = choixSommets(moc(m, i));
-		
-		while (sommets->premier) // Tant qu'il existe au moins 2 groupements de motifs
-		{
-			while (sommets->premier) // Pour tous les couples de sommets à relier
+			/*for (int j = 0; j <mocSize(m) ; j++)
 			{
-				printf("33333333");
-				int depart = sommets->premier->depart;
-				int arrivee = sommets->premier->arrivee;
-				printf("444444444");
-				LST2_removeFirst(sommets);
-				printf("555555555");
-				
-				// Choix sommets intermédiaire et generer directions
-				// genererChemin();
+				printf("\nMocs : %p", moc(m, j));
 			}
-			sommets = choixSommets(moc(m, i));
+			printf("\nTaille moc : %d \n", mocSize(m));*/
 		}
 	}
+	//free(m->mocs);
+	//m->mocs = NULL;
+	//mocSize(m) = 0;
+	
+	return mocAtt;
+}
+
+// Fonction principale
+void assemblage(Main_t* m, Shell_t* envelope2){
+	List_m* mocAtt = initMocAtt(m);
+	
+	/*while (mocAtt->premier) // Tant qu'il existe un moc a traiter
+	{
+		List_p* sommets = choixSommets(mocAtt->premier->moc);
+		
+		if (!sommets->premier) // S'il n'y qu'un groupement de motifs
+		{
+			m->mocs[MN_getIndiceFree(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
+			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
+		}
+		else // S'il y a au moins 2 groupements de motifs
+		{
+			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
+			mocAtt->premier = mocAtt->premier->suivant; // Supprime de la liste à traiter
+			
+			while (sommets->premier) // Pour tous les couples de sommets à relier
+			{
+				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
+				printf("33333333");
+				int depart = sommets->premier->depart;
+				int arrivee = sommets->premier->arrivee;
+				printf("444444444");
+				LST2_removeFirst(sommets);
+				printf("555555555");
+					
+				// Choix sommets intermédiaire et generer directions
+				// genererChemin();
+				
+				LSTm_addElement(mocAtt, mocTraite2); // Ajout dans la liste a traiter
+			}
+			SHL_delete(mocTraite);
+		}
+	}
+	free(mocAtt);*/
 }
