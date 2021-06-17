@@ -1,4 +1,5 @@
 #include "assembly.h"
+#include <float.h>
 
 // Insertion du motif passé en argument
 void insererMotif(){
@@ -8,6 +9,100 @@ void insererMotif(){
 // Génère le chemin entre 2 groupements de motifs
 void genererChemin(){
 	
+}
+
+void initDijkstra(Shell_t* s, int depart, float** dist, int** predecesseur, List_d** Q) {
+	
+	*dist = malloc(sizeof(float) * size(s));
+	for (int i = 0; i < size(s); i++)
+	{
+		*dist[i] = FLT_MAX;
+	}
+	*dist[depart] = 0;
+	
+	predecesseur = malloc(sizeof(int) * size(s));
+	for (int i = 0; i < size(s); i++)
+	{
+		*predecesseur[i] = -1;
+	}
+	
+	*Q = LSTd_init();
+	for (int i = 0; i < size(s) ; i++)
+	{
+		if (flag(atom(s, i)) == 0)
+		{
+			LSTd_addElement(*Q, i);
+		}
+	}
+}
+
+int trouveMin(float* dist, List_d* Q) {
+	float mini = FLT_MAX;
+	int sommet = -1;
+	Elem_d* cursor = Q->premier;
+	while (cursor)
+	{
+		if (dist[cursor->sommet] < mini)
+		{
+			mini = dist[cursor->sommet];
+			sommet = cursor->sommet;
+		}
+		cursor = cursor->suivant;
+	}
+	
+	return sommet;
+}
+ 
+void majDistances(Shell_t* s, float* dist, int* predecesseur, int s1, int s2) {
+	float poids = PT_distance(coords(atom(s, s1)), coords(atom(s, s2)));
+	if (dist[s2] > dist[s1] + poids)
+	{
+		dist[s2] = dist[s1] + poids;
+		predecesseur[s2] = s1;
+	}
+}
+
+// Plus court chemin
+int* dijkstra(Shell_t* s, int depart) {
+	float* dist;
+	int* predecesseur;
+	List_d* Q;
+	
+	initDijkstra(s, depart, &dist, &predecesseur, &Q);
+	
+	while (Q->premier) {
+		int s1 = trouveMin(dist, Q);
+		LSTd_removeSommet(Q, s1);
+		
+		for (int i = 0; i < neighborhoodSize(atom(s,s1)); i++)
+		{
+			int s2 = neighbor(atom(s,s1), i);
+			majDistances(s, dist, predecesseur, s1, s2);
+		}
+	}
+	
+	free(dist);
+	LSTd_delete(Q);
+	
+	return predecesseur;
+}
+
+// Determine les sommets intermédiaires du chemin 
+List_s* sommetIntermediaire(Shell_t* s, int depart, int arrivee) {
+	
+	int* predecesseur = dijkstra(s, depart);
+	
+	List_s* sommets = LSTs_init();
+	
+	int si = arrivee;
+	while (si != depart)
+	{
+		LSTs_addElement(sommets, coords(atom(s, si)));
+		si = predecesseur[si];
+	}
+	
+	free(predecesseur);
+	return sommets;
 }
 
 // Vérifie si le sommet se situe en bordure de motif
@@ -93,32 +188,6 @@ int existeChemin(Shell_t* s, int indice1, int indice2){
 	LST_delete(marquer);
 	
 	return existe;
-}
-
-/**********/
-/*Inutile*/
-/********/
-// Vérifier s'il existe plusieurs groupements de motifs non relié
-int checkGroupement(Shell_t* s){
-	
-	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets en bordure
-	{
-		if ( bordureCheck(s, atom(s, i)) )
-		{
-			for (int j = i+1; j < SHL_nbAtom(s); j++)
-			{
-				if ( bordureCheck(s, atom(s, j)) )
-				{
-					if (!existeChemin(s, i, j)) // Si i et j sont de groupements différents
-					{
-						return 1; // Il existe plusieurs groupements
-					}
-				}
-			}
-		}
-	}
-	
-	return 0;
 }
 
 // Génère tous les couples de sommets à relier possible entre des groupements

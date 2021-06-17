@@ -85,6 +85,36 @@ typedef struct {
 
 } List_p;
 
+// Liste des sommets intermediaires
+typedef struct Elem_s Elem_s;
+struct Elem_s {
+	
+	Point_t sommet;
+	Elem_s *suivant;	
+
+};
+
+typedef struct {
+	
+	Elem_s *premier;	
+
+} List_s;
+
+// Liste d'entiers
+typedef struct Elem_d Elem_d;
+struct Elem_d {
+	
+	int sommet;
+	Elem_d *suivant;	
+
+};
+
+typedef struct {
+	
+	Elem_d *premier;	
+
+} List_d;
+
 /**************************************/
 /* GRAPHE *****************************/
 /**************************************/
@@ -205,6 +235,7 @@ typedef struct {
 
 } List_m;
 
+
 //Point
 Point_t PT_init();
 Point_t PT_add(Point_t, Point_t);
@@ -237,6 +268,18 @@ List_m* LSTm_init();
 void LSTm_addElement(List_m* list, Shell_t* moc);
 void LSTm_removeFirst(List_m* list);
 void LSTm_delete(List_m* list);
+
+List_s* LSTs_init();
+void LSTs_addElement(List_s* list, Point_t sommet);
+void LSTs_removeFirst(List_s* list);
+void LSTs_delete(List_s* list);
+
+List_d* LSTd_init();
+void LSTd_addElement(List_d* list, int sommet);
+void LSTd_removeFirst(List_d* list);
+void LSTd_removeSommet(List_d* list, int sommet);
+void LSTd_delete(List_d* list);
+
 
 //Graphe
 

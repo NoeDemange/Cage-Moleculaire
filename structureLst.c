@@ -197,3 +197,101 @@ void LSTm_delete(List_m* list) {
 	}
 	free(list);
 }
+
+/******************************/
+
+List_s* LSTs_init() {
+	
+	List_s* list = malloc(sizeof(List_s));
+	list->premier = NULL;
+	
+	return list;
+}
+
+// Ajout au début
+void LSTs_addElement(List_s* list, Point_t sommet) {
+	
+	Elem_s* elem = malloc(sizeof(Elem_s));
+	
+	elem->sommet.x = sommet.x;
+	elem->sommet.y = sommet.y;
+	elem->sommet.z = sommet.z;
+	elem->suivant = list->premier;
+	
+	list->premier = elem;
+}
+
+void LSTs_removeFirst(List_s* list) {
+	
+	Elem_s* suppr = list->premier;
+	list->premier = list->premier->suivant;
+	free(suppr);
+}
+
+void LSTs_delete(List_s* list) {
+
+	while (list->premier)
+	{
+		LSTs_removeFirst(list);
+	}
+	free(list);
+}
+
+/******************************/
+
+List_d* LSTd_init() {
+	
+	List_d* list = malloc(sizeof(List_d));
+	list->premier = NULL;
+	
+	return list;
+}
+
+// Ajout au début
+void LSTd_addElement(List_d* list, int sommet) {
+	
+	Elem_d* elem = malloc(sizeof(Elem_d));
+	
+	elem->sommet = sommet;
+	elem->suivant = list->premier;
+	
+	list->premier = elem;
+}
+
+void LSTd_removeFirst(List_d* list) {
+	
+	Elem_d* suppr = list->premier;
+	list->premier = list->premier->suivant;
+	free(suppr);
+}
+
+void LSTd_removeSommet(List_d* list, int sommet) {
+	Elem_d* cursor = list->premier;
+	Elem_d* suppr = NULL;
+	if (cursor)
+	{
+		while (cursor->suivant && !suppr)
+		{
+			if (cursor->suivant->sommet == sommet)
+			{
+				suppr = cursor->suivant;
+				cursor->suivant = cursor->suivant->suivant;
+			}
+			cursor = cursor->suivant;
+		}
+	}
+	if (suppr)
+	{
+		free(suppr);
+	}
+	
+}
+
+void LSTd_delete(List_d* list) {
+
+	while (list->premier)
+	{
+		LSTd_removeFirst(list);
+	}
+	free(list);
+}
