@@ -3,6 +3,7 @@
 
 #include "structure.h"
 
-void assemblage(Main_t* m, Shell_t* envelope2);
+void assemblage(Main_t* m);
+void assemblage2(Main_t* m);
 
 #endif

@@ -59,10 +59,10 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 	
-	double alpha2 = 20.0;
-	Shell_t* envelope2 = createShell(substrat(m), alpha2);
+	//double alpha2 = 20.0;
+	//Shell_t* envelope2 = createShell(substrat(m), alpha2);
 	
-	assemblage(m, envelope2);
+	assemblage2(m);
 	
 	
 	//printf("\nEXIT\n");

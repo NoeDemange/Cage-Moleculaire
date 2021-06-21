@@ -270,15 +270,23 @@ void LSTd_removeSommet(List_d* list, int sommet) {
 	Elem_d* suppr = NULL;
 	if (cursor)
 	{
-		while (cursor->suivant && !suppr)
+		if (cursor->sommet == sommet)
 		{
-			if (cursor->suivant->sommet == sommet)
-			{
-				suppr = cursor->suivant;
-				cursor->suivant = cursor->suivant->suivant;
-			}
-			cursor = cursor->suivant;
+			LSTd_removeFirst(list);
 		}
+		else
+		{
+			while (cursor->suivant && !suppr)
+			{
+				if (cursor->suivant->sommet == sommet)
+				{
+					suppr = cursor->suivant;
+					cursor->suivant = cursor->suivant->suivant;
+				}
+				else cursor = cursor->suivant;
+			}
+		}
+		
 	}
 	if (suppr)
 	{
