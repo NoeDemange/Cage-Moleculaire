@@ -1,14 +1,74 @@
 #include "assembly.h"
 #include <float.h>
 
+#define NB_MOTIF 4
+#define MIN_DIST 3
+
+
 // Insertion du motif passé en argument
-void insererMotif(){
+int insererMotif(int numMotif, Point_t* nvDepart){
+	
+	
+	
+	return 1;
+}
+
+// Calcule si le nouveau depart est plus loin de l'arrivée que l'ancien départ
+int eloigne(Point_t depart, Point_t nvDepart, Point_t arrivee){
+	
+	float d1 = dist(depart, arrivee);
+	float d2 = dist(nvDepart, arrivee);
+	
+	if (d1 > d2)
+	{
+		return 0; // L'ancien est plus eloigné
+	}
+	else
+	{
+		return 1; // Le nouveau est plus eloigné
+	}
 	
 }
 
 // Génère le chemin entre 2 groupements de motifs
-void genererChemin(){
+void genererChemin(List_m* mocAtt, Shell_t* mocTraite, Point_t depart, Point_t arrivee, Elem_s* sommetInter){
 	
+	for (int i = 0; i < NB_MOTIF; i++)
+	{
+		Point_t nvDepart;
+		Shell_t* moc = SHL_copy(mocTraite);
+		
+		int inserer = insererMotif(i, &nvDepart);
+		
+		if (!inserer) // Si l'insertion est impossible
+		{
+			SHL_delete(moc); // Supprimer cette solution
+		}
+		else if (eloigne(depart, nvDepart, arrivee)) // Si le nv depart est plus éloigné 
+		{
+			if (sommetInter->suivant != NULL) // Si ce n'est pas la derniere arrivee
+			{
+				genererChemin(mocAtt, moc, nvDepart, arrivee, sommetInter->suivant);
+			}
+			else // C'est la derniere arrivee
+			{
+				if (dist(nvDepart, arrivee) < MIN_DIST) // Proche de l'arrivée 
+				{
+					// Ajout lien entre dernier sommet du chemin et arrivee
+					LSTm_addElement(mocAtt, moc); // Ajout dans la liste a traiter
+				}
+				else
+				{
+					// Modifier angles
+				}
+			}
+		}
+		else
+		{
+			genererChemin(mocAtt, moc, nvDepart, arrivee, sommetInter);
+		}
+	}
+	SHL_delete(mocTraite);
 }
 
 void initDijkstra(Shell_t* s, int depart, int arrivee, float** dist, int** predecesseur, List_d** Q) {
@@ -369,7 +429,7 @@ void assemblage2(Main_t* m){
 				List_s* sommetInter = sommetIntermediaire(mocTraite2, depart, arrivee); // Choix sommets intermédiaires
 				
 				
-				// genererChemin();
+				// genererChemin( , sommetInter->premier);
 				
 				LSTm_addElement(mocAtt, mocTraite2); // Ajout dans la liste a traiter
 				LSTs_delete(sommetInter); // Supprime la liste des sommets intermediaires
