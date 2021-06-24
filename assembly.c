@@ -4,13 +4,88 @@
 #define NB_MOTIF 4
 #define MIN_DIST 3
 
+// Donne le type de l'atome inserer
+int typeInsert(int numMotif){
+	if (numMotif == 0) // Oxygene
+	{
+		return 1;
+	}
+	else if (numMotif == 1) // Azote
+	{
+		return 3;
+	}
+	else //Carbone
+	{
+		return 4;
+	}
+}
+
+// Ajout l'atome projeté a l'enveloppe
+void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Point_t positionNvDprt) {
+	Shell_t* moc = SHL_copy(mocTraite);
+	
+	int id = SHL_addAtom(moc, positionNvDprt, -1);
+	flag(atom(moc, id)) = typeInsert(numMotif);
+	SHL_addEdge(moc, depart, id);
+	
+	LSTm_addElement(mocAtt, moc);
+	LSTd_addElement(nvDepart, id);
+}
+
+// Determine la position de l'atome a inserer
+// et l'ajoute a l'enveloppe si c'est possible
+int projection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif) {
+	
+	Point_t positionNvDprt = PT_init();
+	
+	// Si le point n'est pas dans l'enveloppe
+	ajoutProjection(mocTraite, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout dans l'enveloppe
+	
+	return -1;
+}
 
 // Insertion du motif passé en argument
-int insererMotif(int numMotif, Point_t* nvDepart){
+void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Point_t arrivee){
+	
+	if ( flag(atom(moc, depart)) == 1 || ( flag(atom(moc, depart)) == 4 && LST_nbElements(neighborhood(atom(moc, depart))) == 1 ) ) // Oxygene ou Carbone avec 1 voisin
+	{
+		//Expansion
+		//Diff rotations
+		
+	}
+	else if (flag(atom(moc, depart)) == 3) // Azote
+	{
+		if (LST_nbElements(neighborhood(atom(moc, depart))) == 1) // 1 voisin
+		{
+			// 2 expansions
+		}
+		else // 2 voisins
+		{
+			//Expansion
+		}
+	}
+	else if (flag(atom(moc, depart)) == 4) // Carbone
+	{
+		if (LST_nbElements(neighborhood(atom(moc, depart))) == 2) // 2 voisins
+		{
+			if (flag(atom(moc, neighbor(atom(moc, depart), 0))) == 1 || flag(atom(moc, neighbor(atom(moc, depart), 1))) == 1) // Si 1 des 2 voisins est un oxygene
+			{
+				//Expansion
+			}
+			else
+			{
+				// 2 expansions
+			}
+		}
+		else // 3 voisins
+		{
+			//Expansion
+		}
+		
+	}
 	
 	
-	
-	return 1;
+	// Si motif 4 choix position O en plus
 }
 
 // Calcule si le nouveau depart est plus loin de l'arrivée que l'ancien départ
@@ -31,41 +106,42 @@ int eloigne(Point_t depart, Point_t nvDepart, Point_t arrivee){
 }
 
 // Génère le chemin entre 2 groupements de motifs
-void genererChemin(List_m* mocAtt, Shell_t* mocTraite, Point_t depart, Point_t arrivee, Elem_s* sommetInter){
+void genererChemin(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, Elem_s* sommetInter){
 	
 	for (int i = 0; i < NB_MOTIF; i++)
 	{
-		Point_t nvDepart;
-		Shell_t* moc = SHL_copy(mocTraite);
+		List_m* moc = LSTm_init();
+		List_d* nvDepart = LSTd_init();
 		
-		int inserer = insererMotif(i, &nvDepart);
+		insererMotif(mocTraite, moc, depart, nvDepart, i, sommetInter->sommet);
 		
-		if (!inserer) // Si l'insertion est impossible
+		while (moc->premier)
 		{
-			SHL_delete(moc); // Supprimer cette solution
-		}
-		else if (eloigne(depart, nvDepart, arrivee)) // Si le nv depart est plus éloigné 
-		{
-			if (sommetInter->suivant != NULL) // Si ce n'est pas la derniere arrivee
+			if (eloigne( coords(atom(mocTraite, depart)), coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) )) // Si le nv depart est plus éloigné 
 			{
-				genererChemin(mocAtt, moc, nvDepart, arrivee, sommetInter->suivant);
+				if (sommetInter->suivant != NULL) // Si ce n'est pas la derniere arrivee
+				{
+					genererChemin(mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter->suivant);
+				}
+				else // C'est la derniere arrivee
+				{
+					if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
+					{
+						// Ajout lien entre dernier sommet du chemin et arrivee
+						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
+					}
+					else
+					{
+						// Modifier angles
+					}
+				}
 			}
-			else // C'est la derniere arrivee
+			else
 			{
-				if (dist(nvDepart, arrivee) < MIN_DIST) // Proche de l'arrivée 
-				{
-					// Ajout lien entre dernier sommet du chemin et arrivee
-					LSTm_addElement(mocAtt, moc); // Ajout dans la liste a traiter
-				}
-				else
-				{
-					// Modifier angles
-				}
+				genererChemin(mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter);
 			}
-		}
-		else
-		{
-			genererChemin(mocAtt, moc, nvDepart, arrivee, sommetInter);
+			LSTm_removeFirst(moc);
+			LSTd_removeFirst(nvDepart);
 		}
 	}
 	SHL_delete(mocTraite);
