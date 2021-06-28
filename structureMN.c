@@ -31,8 +31,9 @@ unsigned MN_getIndiceFree(Main_t* m) {
 		if (moc(m,i) == NULL)
 			return i;
 	}
-
+	//printf("%p\n", m->mocs);
 	MN_addAlloc(m, REALLOCSIZE);
+	//printf("%p\n", m->mocs);
 	return i;
 }
 

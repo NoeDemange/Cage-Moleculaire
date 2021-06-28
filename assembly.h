@@ -5,6 +5,6 @@
 #include "utile.h"
 
 void assemblage(Main_t* m);
-void assemblage2(Main_t* m);
+void assemblage2(Main_t* m, int alpha);
 
 #endif

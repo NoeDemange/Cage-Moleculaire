@@ -1,4 +1,5 @@
 #include "assembly.h"
+#include "interface.h"
 #include <float.h>
 
 #define NB_MOTIF 4
@@ -34,14 +35,17 @@ void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 
 // Determine la position de l'atome a inserer
 // et l'ajoute a l'enveloppe si c'est possible
-int projection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif) {
+int projection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Point_t arrivee) {
 	
 	Point_t positionNvDprt = PT_init();
+	//Emplacement a refaire
+	positionNvDprt = vector(arrivee, coords(atom(mocTraite, depart)));
+	positionNvDprt = normalization(positionNvDprt, SIMPLE);
 	
 	// Si le point n'est pas dans l'enveloppe
-	ajoutProjection(mocTraite, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout dans l'enveloppe
+	ajoutProjection(mocTraite, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout a l'enveloppe
 	
-	return -1;
+	return 1; //-1; // Si l'ajout n'a pas pu se faire
 }
 
 // Insertion du motif passé en argument
@@ -49,19 +53,22 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 	
 	if ( flag(atom(moc, depart)) == 1 || ( flag(atom(moc, depart)) == 4 && LST_nbElements(neighborhood(atom(moc, depart))) == 1 ) ) // Oxygene ou Carbone avec 1 voisin
 	{
-		//Expansion
+		//Projection
 		//Diff rotations
+		projection(moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 		
 	}
 	else if (flag(atom(moc, depart)) == 3) // Azote
 	{
 		if (LST_nbElements(neighborhood(atom(moc, depart))) == 1) // 1 voisin
 		{
-			// 2 expansions
+			// 2 Projections
+			projection(moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 		}
 		else // 2 voisins
 		{
-			//Expansion
+			//Projection
+			projection(moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 		}
 	}
 	else if (flag(atom(moc, depart)) == 4) // Carbone
@@ -70,16 +77,19 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 		{
 			if (flag(atom(moc, neighbor(atom(moc, depart), 0))) == 1 || flag(atom(moc, neighbor(atom(moc, depart), 1))) == 1) // Si 1 des 2 voisins est un oxygene
 			{
-				//Expansion
+				//Projection
+				projection(moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 			}
 			else
 			{
-				// 2 expansions
+				// 2 Projections
+				projection(moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 			}
 		}
 		else // 3 voisins
 		{
-			//Expansion
+			//Projection
+			projection(moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 		}
 		
 	}
@@ -127,12 +137,14 @@ void genererChemin(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, 
 				{
 					if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
 					{
-						// Ajout lien entre dernier sommet du chemin et arrivee
+						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);// Ajout lien entre dernier sommet du chemin et arrivee
 						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
 					}
 					else
 					{
+						//printf("Modifier angles\n");
 						// Modifier angles
+						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
 					}
 				}
 			}
@@ -144,7 +156,6 @@ void genererChemin(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, 
 			LSTd_removeFirst(nvDepart);
 		}
 	}
-	SHL_delete(mocTraite);
 }
 
 void initDijkstra(Shell_t* s, int depart, int arrivee, float** dist, int** predecesseur, List_d** Q) {
@@ -159,13 +170,13 @@ void initDijkstra(Shell_t* s, int depart, int arrivee, float** dist, int** prede
 	}
 	(*dist)[depart] = 0;
 	
-	printf("Dist\n");
+	//printf("Dist\n");
 	*predecesseur = malloc(sizeof(int) * SHL_nbAtom(s));
 	for (int i = 0; i < SHL_nbAtom(s); i++)
 	{
 		(*predecesseur)[i] = -1;
 	}
-	printf("Pred\n");
+	//printf("Pred\n");
 	*Q = LSTd_init();
 	for (int i = 0; i < SHL_nbAtom(s) ; i++)
 	{
@@ -174,7 +185,7 @@ void initDijkstra(Shell_t* s, int depart, int arrivee, float** dist, int** prede
 			LSTd_addElement(*Q, i);
 		}
 	}
-	printf("Q\n");
+	//printf("Q\n");
 }
 
 int trouveMin(float* dist, List_d* Q) {
@@ -183,7 +194,7 @@ int trouveMin(float* dist, List_d* Q) {
 	Elem_d* cursor = Q->premier;
 	while (cursor)
 	{
-		printf("%f %d \n", dist[cursor->sommet], cursor->sommet);
+		//printf("%f %d \n", dist[cursor->sommet], cursor->sommet);
 		
 		if (dist[cursor->sommet] <= mini)
 		{
@@ -210,14 +221,14 @@ int* dijkstra(Shell_t* s, int depart, int arrivee) {
 	float* dist = NULL;
 	int* predecesseur = NULL;
 	List_d* Q = NULL;
-	printf("\nDijkstra %d\n", depart);
+	//printf("\nDijkstra %d\n", depart);
 	initDijkstra(s, depart, arrivee, &dist, &predecesseur, &Q);
-	printf("%p %p %p \n", dist, predecesseur, Q);
+	//printf("%p %p %p \n", dist, predecesseur, Q);
 	
 	while (Q->premier) {
 		//printf("TMin\n");
 		int s1 = trouveMin(dist, Q);
-		printf("\nS1 : %d\n",s1);
+		//printf("\nS1 : %d\n",s1);
 		//printf("RmvSommet\n");
 		LSTd_removeSommet(Q, s1);
 		//printf("for\n");
@@ -246,7 +257,7 @@ int* dijkstra(Shell_t* s, int depart, int arrivee) {
 List_s* sommetIntermediaire(Shell_t* s, int depart, int arrivee) {
 	
 	int* predecesseur = dijkstra(s, depart, arrivee);
-	printf("Pred : %p\n", predecesseur);
+	//printf("Pred : %p\n", predecesseur);
 	
 	List_s* sommets = LSTs_init();
 	
@@ -369,14 +380,14 @@ List_p* choixSommets(Shell_t* s){
 		}
 	}
 	
-	printf("%d\n", SHL_nbAtom(s));
+	/*printf("%d\n", SHL_nbAtom(s));
 	printf("%d\n", size(s));
 	Element* e = sommets->premier;
 	while (e)
 	{
 		printf("\n%d %d\n", e->depart+1, e->arrivee+1);
 		e = e->suivant;
-	}
+	}*/
 	
 	return sommets;
 }
@@ -403,16 +414,16 @@ List_m* initMocAtt(Main_t* m){
 		if (moc(m,i) != NULL)
 		{
 			LSTm_addElement(mocAtt, moc(m, i)); // Les mettre dans la liste a traiter
-			//moc(m, i) = NULL; // Les supprimer du tableau de solutions finales
+			moc(m, i) = NULL; // Les supprimer du tableau de solutions finales
 			
-			printf("\n");
+			/*printf("\n");
 			for (int j = 0; j <mocSize(m) ; j++)
 			{
 				printf("Mocs : %p \n", moc(m, j));
 			}
 			printf("\nTaille moc : %d \n", mocSize(m));
 			
-			/*Elem* e = mocAtt->premier;
+			Elem* e = mocAtt->premier;
 			while (e)
 			{
 				printf("%p ", e->moc);
@@ -422,15 +433,15 @@ List_m* initMocAtt(Main_t* m){
 		}
 	}
 	
-	Elem* e = mocAtt->premier;
+	/*Elem* e = mocAtt->premier;
 	while (e)
 	{
 		printf("%p ", e->moc);
 		e = e->suivant;
-	}
-	//free(m->mocs);
-	//m->mocs = NULL;
-	//mocSize(m) = 0;
+	}*/
+	free(m->mocs);
+	m->mocs = NULL;
+	mocSize(m) = 0;
 	
 	return mocAtt;
 }
@@ -474,10 +485,10 @@ void assemblage(Main_t* m){
 	free(mocAtt);*/
 }
 
-void assemblage2(Main_t* m){
+void assemblage2(Main_t* m, int alpha){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
 	
-	if (mocAtt->premier) // Tant qu'il existe un moc a traiter
+	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		printf("111111");
@@ -492,7 +503,7 @@ void assemblage2(Main_t* m){
 			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
 			mocAtt->premier = mocAtt->premier->suivant; // Supprime de la liste à traiter
 			
-			if (sommets->premier) // Pour tous les couples de sommets à relier
+			while (sommets->premier) // Pour tous les couples de sommets à relier
 			{
 				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
 				printf("33333333");
@@ -504,8 +515,32 @@ void assemblage2(Main_t* m){
 					
 				List_s* sommetInter = sommetIntermediaire(mocTraite2, depart, arrivee); // Choix sommets intermédiaires
 				
+				/*Ashape_t* as3d = Cashape3d(envelope(m), alpha);
+				double* point = malloc(2 * 3* sizeof(double));
+				point[0] = 5.2408;     
+				point[2] = -2.1055;
+				point[4] = 2.4206;
+				point[1] = 7;
+				point[3] = -4;
+				point[5] = 2;
+				Point_t p = PT_init();
+				p.x = point[0];
+				p.y = point[2];
+				p.z = point[4];
+				Point_t p2 = PT_init();
+				p2.x = point[1];
+				p2.y = point[3];
+				p2.z = point[5];
+				int id = SHL_addAtom(moc(m,0), p, -1);
+				flag(atom(moc(m,0),id)) = 2;
+				id = SHL_addAtom(moc(m,0), p2, -1);
+				flag(atom(moc(m,0),id)) = 2;
+				Cinashape3d(as3d, point, 6);
+				*/
 				
-				// genererChemin( , sommetInter->premier);
+				printf("666666");
+				genererChemin(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier);
+				printf("777777777");
 				
 				LSTm_addElement(mocAtt, mocTraite2); // Ajout dans la liste a traiter
 				LSTs_delete(sommetInter); // Supprime la liste des sommets intermediaires
@@ -513,5 +548,5 @@ void assemblage2(Main_t* m){
 			//SHL_delete(mocTraite);
 		}
 	}
-	//free(mocAtt);
+	free(mocAtt);
 }

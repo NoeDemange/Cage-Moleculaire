@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 	//double alpha2 = 20.0;
 	//Shell_t* envelope2 = createShell(substrat(m), alpha2);
 	
-	assemblage2(m);
+	assemblage2(m, alpha);
 	
 	
 	//printf("\nEXIT\n");
