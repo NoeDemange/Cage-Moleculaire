@@ -238,6 +238,7 @@ typedef struct {
 
 //Point
 Point_t PT_init();
+Point_t PT_alea();
 Point_t PT_add(Point_t, Point_t);
 Point_t PT_sub(Point_t, Point_t);
 Point_t PT_mul(Point_t, float);
@@ -273,6 +274,8 @@ List_s* LSTs_init();
 void LSTs_addElement(List_s* list, Point_t sommet);
 void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
+void LSTs_removeElement(List_s* list, Point_t p);
+Point_t distMin(List_s* list, Point_t p) ;
 
 List_d* LSTd_init();
 void LSTd_addElement(List_d* list, int sommet);

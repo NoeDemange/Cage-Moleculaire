@@ -212,7 +212,7 @@ Point_t normalPerpendiculaire(Point_t a, Point_t x1, Point_t normal, float lengt
 
 	v1 = normalization(vector(a, x1), 1);
 
-	return addPoint(a, normalization(rotation(normal, 180, v1), length));
+	return addPoint(a, normalization(rotation(normal, 90, v1), length));
 }
 
 Point_t rotation30(Point_t a, Point_t x1, Point_t normal, float length) {

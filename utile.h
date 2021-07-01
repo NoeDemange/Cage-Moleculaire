@@ -28,4 +28,7 @@ Point_t AX3E1(Point_t, Point_t, Point_t, Point_t, float);
 Point_t AX2E2(Point_t, Point_t, Point_t, float);
 Point_t AX1E3(Point_t, Point_t, Point_t, float);
 
+Point_t normalPerpendiculaire(Point_t a, Point_t x1, Point_t normal, float length);
+Point_t rotation30(Point_t a, Point_t x1, Point_t normal, float length);
+
 #endif

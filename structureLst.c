@@ -1,4 +1,6 @@
 #include "structure.h"
+#include "utile.h"
+#include <limits.h>
 
 /**************************************/
 /* LISTE ******************************/
@@ -235,6 +237,54 @@ void LSTs_delete(List_s* list) {
 		LSTs_removeFirst(list);
 	}
 	free(list);
+}
+
+void LSTs_removeElement(List_s* list, Point_t p) {
+	
+	Elem_s* cursor = list->premier;
+	Elem_s* suppr = NULL;
+	if (cursor)
+	{
+		if (cursor->sommet.x == p.x && cursor->sommet.y == p.y && cursor->sommet.z == p.z)
+		{
+			LSTs_removeFirst(list);
+		}
+		else
+		{
+			while (cursor->suivant && !suppr)
+			{
+				if (cursor->suivant->sommet.x == p.x && cursor->suivant->sommet.y == p.y && cursor->suivant->sommet.z == p.z)
+				{
+					suppr = cursor->suivant;
+					cursor->suivant = cursor->suivant->suivant;
+				}
+				else cursor = cursor->suivant;
+			}
+		}
+		
+	}
+	if (suppr)
+	{
+		free(suppr);
+	}
+}
+
+// Retourne le point de la liste le plus proche du point en argument
+Point_t distMin(List_s* list, Point_t p) {
+	Point_t min = PT_init();
+	int distanceMin = INT_MAX;
+	Elem_s* l = list->premier;
+	
+	while (l)
+	{
+		if (dist(l->sommet, p) < distanceMin)
+		{
+			min = l->sommet;
+			distanceMin = dist(l->sommet, p);
+		}
+		l = l->suivant;
+	}
+	return min;
 }
 
 /******************************/
