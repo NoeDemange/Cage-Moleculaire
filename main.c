@@ -11,6 +11,8 @@
 #include <Rembedded.h>
 
 #include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
 
 #define PATHNAME "alphashape.R"
 
@@ -59,11 +61,8 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 	
-	//double alpha2 = 20.0;
-	//Shell_t* envelope2 = createShell(substrat(m), alpha2);
-	
+	srandom(getpid() + time(NULL));
 	assemblage2(m, alpha);
-	
 	
 	//printf("\nEXIT\n");
 

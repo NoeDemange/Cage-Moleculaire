@@ -205,3 +205,21 @@ Point_t AX1E3(Point_t a, Point_t x1, Point_t normal, float length) {
 
 	return addPoint(a, normalization(rotation(normal, 109.47, v1), length));
 }
+
+Point_t normalPerpendiculaire(Point_t a, Point_t x1, Point_t normal, float length) {
+
+	Point_t v1;
+
+	v1 = normalization(vector(a, x1), 1);
+
+	return addPoint(a, normalization(rotation(normal, 180, v1), length));
+}
+
+Point_t rotation30(Point_t a, Point_t x1, Point_t normal, float length) {
+
+	Point_t v1;
+
+	v1 = normalization(vector(a, x1), 1);
+
+	return addPoint(a, normalization(rotation(normal, 30, v1), length));
+}
