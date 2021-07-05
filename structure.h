@@ -238,7 +238,6 @@ typedef struct {
 
 //Point
 Point_t PT_init();
-Point_t PT_alea();
 Point_t PT_add(Point_t, Point_t);
 Point_t PT_sub(Point_t, Point_t);
 Point_t PT_mul(Point_t, float);
@@ -344,6 +343,7 @@ Ashape_t* ASP_create();
 void ASP_delete(Ashape_t*);
 
 unsigned MN_getIndiceFree(Main_t* m);
+unsigned MN_getIndiceFree2(Main_t* m);
 unsigned MN_copyMoc(Main_t*, Shell_t*);
 Main_t* MN_create();
 void MN_delete(Main_t*);

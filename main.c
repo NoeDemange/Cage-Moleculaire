@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 	
-	srandom(getpid() + time(NULL));
 	assemblage2(m, alpha);
 	
 	//printf("\nEXIT\n");

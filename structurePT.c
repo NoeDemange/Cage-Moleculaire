@@ -12,17 +12,6 @@ Point_t PT_init() {
 	return _new;
 }
 
-Point_t PT_alea() {
-
-	Point_t _new;
-
-	_new.x = (random() * 20.0 / RAND_MAX) - 10;
-	_new.y = (random() * 20.0 / RAND_MAX) - 10;
-	_new.z = (random() * 20.0 / RAND_MAX) - 10;
-
-	return _new;
-}
-
 Point_t PT_add(Point_t A, Point_t B) {
 
 	Point_t _new;

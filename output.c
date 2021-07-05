@@ -257,7 +257,6 @@ void output(char* InputFile, Main_t* m) {
   sprintf(outputname, "%s/%s_aro.mol2", dirName, name);
   SHL_writeMol2(outputname, envarom(m));
 
-
  for (i=0; i</*mocSize(m)*/1; i++) { 
   //printf("GDD de %d\n", i);
   //GPH_write(bond(moc(m,i)));

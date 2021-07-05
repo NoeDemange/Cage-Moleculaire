@@ -68,13 +68,22 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 	Point_t dpt = coords(atom(moc, depart));
 	Point_t arv = coords(atom(moc, arrivee));
 	Point_t v1 = coords(atom(moc, neighbor(atom(moc, depart), 0)));
+	Point_t x2; // Voisin du voisin
 	
-	Point_t normal = normalization(PT_alea(), 1);//normalPerpendiculaire(dpt, v1, PT_alea(), 1);
+	//Point_t normal = normalization(PT_alea(), 1);
+	if (neighbor(atom(moc,neighbor(atom(moc,depart),0)),0) == depart)
+		x2 = coords(atom(moc,neighbor(atom(moc,neighbor(atom(moc,depart),0)),1)));
+	else
+		x2 = coords(atom(moc,neighbor(atom(moc,neighbor(atom(moc,depart),0)),0)));
+
+	Point_t normal = planNormal(dpt, v1, x2);
 	
 	Point_t positionNvDprt = AX1E3(dpt, v1, normal, SIMPLE);
+	LSTs_addElement(positions, positionNvDprt);
+	//printf("%f\n", angle(positionNvDprt, dpt, v1));
 	//ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout a l'enveloppe
 	
-	for (int i = 0; i < 12; i++) // Rotation a 360
+	for (int i = 0; i < 11; i++) // Rotation a 360
 	{
 		// Rotation de 30° de la normal
 		normal = rotation(normalization(vector(dpt, v1), 1),  30, normal);
@@ -97,6 +106,8 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 	positionNvDprt = rotation( addPoint(atom(moc, depart), normal , 30, positionNvDprt );
 	positionNvDprt = rotation30(coords(atom(moc, depart)), positionNvDprt, normal, SIMPLE);
 	*/
+	
+	LSTs_delete(positions);
 }
 
 // Projection pour un azote avec 2 voisins
@@ -262,7 +273,7 @@ void genererChemin2(Molecule_t* mol, List_m* mocAtt, Shell_t* mocTraite, int dep
 					{
 						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);// Ajout lien entre dernier sommet du chemin et arrivee
 						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-						return;
+						printf("AJOUT\n");
 					}
 					else
 					{
@@ -270,7 +281,7 @@ void genererChemin2(Molecule_t* mol, List_m* mocAtt, Shell_t* mocTraite, int dep
 						// Modifier angles
 						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);
 						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-						return;
+						printf("AJOUT\n");
 					}
 				}
 			}
@@ -281,6 +292,8 @@ void genererChemin2(Molecule_t* mol, List_m* mocAtt, Shell_t* mocTraite, int dep
 			LSTm_removeFirst(moc);
 			LSTd_removeFirst(nvDepart);
 		}
+		LSTm_delete(moc);
+		LSTd_delete(nvDepart);
 	}
 }
 
@@ -426,7 +439,7 @@ List_d* sommetIntermediaire(Main_t* m, Shell_t* s, int depart, int arrivee) {
 // Vérifie si le sommet se situe en bordure de motif
 int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
 	
-	for (int i = 0; i < neighborhoodSize(sommet); i++) // Pour tous les voisins du sommet
+	for (int i = 0; i < LST_nbElements(neighborhood(sommet)); i++) // Pour tous les voisins du sommet
 	{
 		// Si ce sommet est dans un motif et qu'un de ses voisins est de l'enveloppe
 		if (flag(atom(s, neighbor(sommet, i))) == 0 && flag(sommet) != 0 )
@@ -559,12 +572,18 @@ void affichage(Shell_t* s) {
 List_m* initMocAtt(Main_t* m){
 	List_m* mocAtt = LSTm_init();
 	
-	for (int i=0; i</*mocSize(m)*/1; i++) //Pour tous les mocs
+	for (int i=0; i<mocSize(m); i++) //Pour tous les mocs
 	{
 		if (moc(m,i) != NULL)
 		{
-			LSTm_addElement(mocAtt, moc(m, i)); // Les mettre dans la liste a traiter
-			moc(m, i) = NULL; // Les supprimer du tableau de solutions finales
+			if (i == 0) // Traite juste le premier mocs
+			{
+				LSTm_addElement(mocAtt, moc(m, i)); // Les mettre dans la liste a traiter
+			}
+			if (i != 0)
+			{
+				SHL_delete(moc(m,i)); // Les supprimer du tableau de solutions finales
+			}
 			
 			/*printf("\n");
 			for (int j = 0; j <mocSize(m) ; j++)
@@ -637,16 +656,16 @@ void assemblage(Main_t* m){
 
 void assemblage2(Main_t* m, int alpha){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
-	int sol = 1;
-	if (mocAtt->premier && sol) // Tant qu'il existe un moc a traiter
+	int sol = 0;
+	if (mocAtt->premier && sol<3) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		printf("111111");
 		if (!sommets->premier) // S'il n'y qu'un groupement de motifs
 		{
 			printf("222222");
-			sol = 0;
-			m->mocs[MN_getIndiceFree(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
+			sol++;
+			m->mocs[MN_getIndiceFree2(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
 			mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
 		}
 		else // S'il y a au moins 2 groupements de motifs
@@ -710,13 +729,19 @@ void assemblage2(Main_t* m, int alpha){
 				printf("777777777\n");
 				
 				LSTd_delete(sommetInter); // Supprime la liste des sommets intermediaires
+				SHL_delete(mocTraite2);
 			}
-			//SHL_delete(mocTraite);
+			SHL_delete(mocTraite);
 		}
+		LST2_delete(sommets);
 	}
-	int id = MN_getIndiceFree(m);
-	//printf("%p %d\n", m->mocs, id);
-	m->mocs[id] = mocAtt->premier->moc;
+	for (int i = 0; i < 1; i++) // Ajout de 3 solutions temporaires
+	{
+		int id = MN_getIndiceFree2(m);
+		//printf("%p %d\n", m->mocs, id);
+		m->mocs[id] = mocAtt->premier->moc;
+		mocAtt->premier = mocAtt->premier->suivant;
+	}
 	
 	free(mocAtt);
 }
