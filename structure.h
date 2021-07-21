@@ -335,6 +335,7 @@ Shell_t* SHL_create();
 Shell_t* SHL_copy(Shell_t*);
 Shell_t* SHL_avoir(Shell_t*);
 void SHL_delete(Shell_t*);
+void SHL_deleteAtom(AtomShl_t* a);
 
 Graph_t* MolToGph(Molecule_t*);
 Graph_t* ShlToGph(Shell_t*);

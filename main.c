@@ -61,9 +61,10 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 	
-	assemblage2(m, alpha);
+	assemblage2(name, m, alpha);
+	//testEnveloppe(m, alpha);
 	
-	//printf("\nEXIT\n");
+	printf("\nEXIT\n");
 
 	/********** Écriture des résultats dans des fichiers **********/
 

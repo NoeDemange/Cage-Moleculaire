@@ -12,5 +12,6 @@ void GPH_write(Graph_t*) ;
 void MOL_writeMol2(char*, Molecule_t*);
 void SHL_writeMol2(char*, Shell_t*);
 void output(char*, Main_t*);
+void outputShell(char* InputFile, Shell_t* s);
 
 #endif

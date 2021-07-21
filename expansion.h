@@ -4,5 +4,6 @@
 #include "structure.h"
 
 Shell_t* createShell(Molecule_t*, double);
+void expansion(Molecule_t* m, Shell_t* s);
 
 #endif

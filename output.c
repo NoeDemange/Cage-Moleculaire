@@ -236,12 +236,39 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   free(indice);
 }
 
+void outputShell(char* InputFile, Shell_t* s) {
+	char outputname[512];
+	char* name = getBasename (InputFile);
+	char* dirName = createDir(name);
+	static int i = 0;
+	
+	//Sortie avec enveloppe
+	sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
+	SHL_writeMol2(outputname, s);
+	
+	//Sortie sans enveloppe
+	Shell_t* s2 = SHL_copy(s);
+	for (int j = 0; j < SHL_nbAtom(s2); j++)
+	{
+		if (flag(atom(s2,j)) == 0)
+		{
+			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
+		}
+		
+	}
+	
+	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
+	SHL_writeMol2(outputname, s2);
+	SHL_delete(s2);
+	
+	i++;
+}
 
 void output(char* InputFile, Main_t* m) {
   char outputname[512];
   char* name = getBasename (InputFile);
   char* dirName = createDir(name);
-  int i;
+  //int i;
 
   printf("taille de %s = %d\n", dirName, (int)strlen(dirName));
 
@@ -257,12 +284,12 @@ void output(char* InputFile, Main_t* m) {
   sprintf(outputname, "%s/%s_aro.mol2", dirName, name);
   SHL_writeMol2(outputname, envarom(m));
 
- for (i=0; i</*mocSize(m)*/1; i++) { 
+ //for (i=0; i</*mocSize(m)*/1; i++) { // Neutralisé pour avoir une sortie adaptée à une cage finie
   //printf("GDD de %d\n", i);
   //GPH_write(bond(moc(m,i)));
-  sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
-  SHL_writeMol2(outputname, moc(m,i));
-}
+  //sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
+  //SHL_writeMol2(outputname, moc(m,i));
+//}
 
   //Ecrire les générés
   /*Shell_t* out = SHL_avoir(moc);

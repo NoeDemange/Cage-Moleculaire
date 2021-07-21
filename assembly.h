@@ -5,6 +5,7 @@
 #include "utile.h"
 
 void assemblage(Main_t* m);
-void assemblage2(Main_t* m, int alpha);
+void assemblage2(char* InputFile, Main_t* m, double alpha);
+void testEnveloppe(Main_t* m, double alpha);
 
 #endif
