@@ -323,8 +323,8 @@ Shell_t* SHL_copy(Shell_t* s) {
 	return copy;
 }
 
-//approxiation des distance
-//Créaction d'un shell de sommets.
+//Approxiation des distances
+//Création d'un shell de sommets.
 Shell_t* SHL_avoir(Shell_t* s) {
 	int i, j, k, nb;
 	float AB, dis;

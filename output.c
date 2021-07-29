@@ -259,7 +259,10 @@ void outputShell(char* InputFile, Shell_t* s) {
 	
 	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
 	SHL_writeMol2(outputname, s2);
+	printf("Result : %d\n", i);
 	SHL_delete(s2);
+	free(name);
+	free(dirName);
 	
 	i++;
 }

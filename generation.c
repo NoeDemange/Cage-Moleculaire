@@ -304,7 +304,7 @@ void generationCycle(Shell_t* s) {
 
 				//si autre sommet trop proche newCoord == coords(sommet)
 
-				//add les arêtes entre le nouveau sommet et i	
+				//Ajoute les arêtes entre le nouveau sommet et i	
 				SHL_addEdge(s, elts(atomT,i), id);
 			}
 

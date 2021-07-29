@@ -4,10 +4,27 @@
 #include "output.h"
 #include <float.h>
 
-#define NB_MOTIF 3
+#define NB_MOTIF 5
 #define MIN_DIST 3
 
-// Donne le type de l'atome inserer
+void affichage(Shell_t* s) {
+	
+	for (int i = 0; i < SHL_nbAtom(s); i++)
+	{
+		printf("Atome %d : ", i/*+1*/);
+		for (int j = 0; j < neighborhoodSize(atom(s,i)); j++)
+		{
+			printf("%d ",neighbor(atom(s,i),j)/*+1*/);
+		}
+		printf("flag %d\n",flag(atom(s,i)));
+	}
+}
+
+/**************************************/
+/* Ajout des motifs *******************/
+/**************************************/
+
+// Donne le type de l'atome inseré
 int typeInsert(int numMotif){
 	if (numMotif == 0) // Oxygene
 	{
@@ -23,58 +40,199 @@ int typeInsert(int numMotif){
 	}
 }
 
-// Ajout du motif 3 dans le plan avec son voisin
+// Ajout du motif 4 (cycle aromatique) perpendiculaire au plan avec son voisin
+void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t positionNvDprt) {
+	
+	for (int i = 0; i < neighborhoodSize(atom(mocTraite,depart)); i++) // Pour tous les plans possibles avec les voisins
+	{
+		if (neighbor(atom(mocTraite, depart), i) != -1)
+		{
+			int idSuiv, idCycle;
+			Point_t posSuiv;
+			Shell_t* moc = SHL_copy(mocTraite);
+			
+			// Visualisation
+			Point_t v = positionNvDprt;
+			v.z += 0.5;
+			int id2 = SHL_addAtom(mocTraite, v, -1);
+			flag(atom(mocTraite, id2)) = 3; // Bleu
+			int id3 = SHL_addAtom(moc, v, -1);
+			flag(atom(moc, id3)) = 1; // Rouge
+			
+			printf("MocTraite : %f %f %f\n", atomX(atom(mocTraite, id2)), atomY(atom(mocTraite, id2)), atomZ(atom(mocTraite, id2)));
+			printf("Moc : %f %f %f\n", atomX(atom(moc, id3)), atomY(atom(moc, id3)), atomZ(atom(moc, id3)));
+			
+			Point_t v1 = coords(atom(moc, neighbor(atom(moc, depart), i)));
+			Point_t dpt = coords(atom(moc, depart));
+			
+			// Ajouter le premier atome du cycle dont on a déjà la position
+			int id = SHL_addAtom(moc, positionNvDprt, -1);
+			flag(atom(moc, id)) = 4;
+			SHL_addEdge(moc, depart, id);
+			printf("Moc : %f %f %f\n", atomX(atom(moc, id)), atomY(atom(moc, id)), atomZ(atom(moc, id)));
+			
+			// Cherche la normal pour positionné le cycle
+			Point_t normal = planNormal(positionNvDprt, dpt, v1);
+			normal = rotation(normalization(vector(positionNvDprt, dpt), 1),  90, normal); // Perpendiculaire
+			
+			// Positionner les autres atomes du cycle
+			v1 = AX1E2(positionNvDprt, coords(atom(moc, depart)), normal, SIMPLE); // Voisin
+			positionNvDprt = AX2E1(positionNvDprt, coords(atom(moc, depart)), v1, SIMPLE); 
+			idCycle = SHL_addAtom(moc, positionNvDprt, -1);
+			flag(atom(moc, idCycle)) = 4;
+			SHL_addEdge(moc, id, idCycle);
+			
+			int idVoisin = idCycle;
+			for (int i = 0; i < 4; i++) 
+			{
+				v1 = coords(atom(moc, neighbor(atom(moc, idVoisin), 0)));
+				positionNvDprt = AX1E2(positionNvDprt, v1, normal, SIMPLE);
+				
+				idCycle = SHL_addAtom(moc, positionNvDprt, -1);
+				flag(atom(moc, idCycle)) = 4;
+				SHL_addEdge(moc, idVoisin, idCycle);
+				
+				if ( i == 1 ) // Position du prochain depart pour continuer le chemin
+				{
+					posSuiv = positionNvDprt;
+					idSuiv = idCycle;
+				}
+				
+				idVoisin = idCycle;
+			}
+			
+			SHL_addEdge(moc, id, idCycle);
+			
+			// Positionner atome qui suit le cycle
+			v1 = coords(atom(moc, neighbor(atom(moc, idSuiv), 0)));
+			Point_t v2 = coords(atom(moc, neighbor(atom(moc, idSuiv), 1)));
+			positionNvDprt = AX2E1(posSuiv, v1, v2, SIMPLE); 
+			int idSuiv2 = SHL_addAtom(moc, positionNvDprt, -1);
+			flag(atom(moc, idCycle)) = 4;
+			SHL_addEdge(moc, idSuiv, idSuiv2);
+			
+			// Si tous les atomes du cycle sont hors de l'enveloppe
+			LSTm_addElement(mocAtt, moc);
+			LSTd_addElement(nvDepart, idSuiv2);
+		}
+	}
+}
+
+/*void aff(Shell_t* mocTraite, Point_t point) {
+	
+	Point_t a = point;
+	a.x += 0.5;
+	int id = SHL_addAtom(mocTraite, a, -1);
+	flag(atom(mocTraite,id)) = 2;
+}*/
+
+// Ajout seulement du 0 sur un C d'un motif 3
+List_m* ajoutOMotif3(Shell_t* mocTraite, int depart) {
+	
+	List_m* mAtt = LSTm_init();
+	Point_t dpt = coords(atom(mocTraite, depart));
+	int voisin1 = neighbor(atom(mocTraite, depart), 0); // Voisin
+	Point_t v1 = coords(atom(mocTraite, voisin1));
+	
+	for (int i = 0; i < neighborhoodSize(atom(mocTraite,voisin1)); i++) // Pour tous les plans possibles avec les voisins
+	{
+		if (neighbor(atom(mocTraite, voisin1), i) != -1 && neighbor(atom(mocTraite, voisin1), i) != depart)
+		{
+			Shell_t* moc = SHL_copy(mocTraite);
+			Shell_t* moc2 = SHL_copy(mocTraite);
+			
+			Point_t v2 = coords(atom(moc, neighbor(atom(moc, voisin1), i)));
+						
+			// Cherche la normal pour positionné le O
+			Point_t normal = planNormal(dpt, v1, v2);
+			
+			// Atome O
+			//Premier position
+			Point_t positionO = AX1E2(dpt, v1, normal, SIMPLE);
+			
+			//Si le point n'est pas dans l'enveloppe
+			int id3 = SHL_addAtom(moc, positionO, -1);
+			flag(atom(moc, id3)) = 1;
+			SHL_addEdge(moc, depart, id3);
+			
+			LSTm_addElement(mAtt, moc);
+						
+			//Seconde position
+			positionO = AX2E1(dpt, v1, positionO, SIMPLE);
+			
+			//Si le point n'est pas dans l'enveloppe
+			int id4 = SHL_addAtom(moc2, positionO, -1);
+			flag(atom(moc2, id4)) = 1;
+			SHL_addEdge(moc2, depart, id4);
+			
+			LSTm_addElement(mAtt, moc2);
+		}
+	}
+	
+	return mAtt;
+}
+
+// Ajout du motif 3 (C = O) dans le plan avec son voisin
 void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t positionNvDprt) {
-	Shell_t* moc = SHL_copy(mocTraite);
-	Shell_t* moc2 = SHL_copy(mocTraite);
 	
-	Point_t dpt = coords(atom(moc, depart));
-	Point_t v1 = coords(atom(moc, neighbor(atom(moc, depart), 0)));
-	
-	
-	// Atome C
-	int id = SHL_addAtom(moc, positionNvDprt, -1);
-	flag(atom(moc, id)) = 4;
-	SHL_addEdge(moc, depart, id);
-	
-	int id2 = SHL_addAtom(moc2, positionNvDprt, -1);
-	flag(atom(moc2, id2)) = 4;
-	SHL_addEdge(moc2, depart, id2);
-	
-	// Cherche la normal pour positionné le O
-	Point_t normal = planNormal(positionNvDprt, dpt, v1);
-	
-	// Atome O
-	//Premier position
-	Point_t positionO = AX1E2(positionNvDprt, dpt, normal, SIMPLE);
-	
-	//Si le point n'est pas dans l'enveloppe
-	int id3 = SHL_addAtom(moc, positionO, -1);
-	flag(atom(moc, id3)) = 1;
-	SHL_addEdge(moc, id, id3);
-	
-	LSTm_addElement(mocAtt, moc);
-	LSTd_addElement(nvDepart, id);
-	
-	//Seconde position
-	positionO = AX2E1(positionNvDprt, dpt, positionO, SIMPLE);
-	
-	//Si le point n'est pas dans l'enveloppe
-	int id4 = SHL_addAtom(moc2, positionO, -1);
-	flag(atom(moc2, id4)) = 1;
-	SHL_addEdge(moc2, id2, id4);
-	
-	LSTm_addElement(mocAtt, moc2);
-	LSTd_addElement(nvDepart, id2);
-	
+	for (int i = 0; i < neighborhoodSize(atom(mocTraite,depart)); i++) // Pour tous les plans possibles avec les voisins
+	{
+		if (neighbor(atom(mocTraite, depart), i) != -1)
+		{
+			Shell_t* moc = SHL_copy(mocTraite);
+			Shell_t* moc2 = SHL_copy(mocTraite);
+			
+			Point_t v1 = coords(atom(moc, neighbor(atom(moc, depart), i)));
+			Point_t dpt = coords(atom(moc, depart));
+			
+			// Atome C
+			int id = SHL_addAtom(moc, positionNvDprt, -1);
+			flag(atom(moc, id)) = 4;
+			SHL_addEdge(moc, depart, id);
+			
+			int id2 = SHL_addAtom(moc2, positionNvDprt, -1);
+			flag(atom(moc2, id2)) = 4;
+			SHL_addEdge(moc2, depart, id2);
+			
+			// Cherche la normal pour positionné le O
+			Point_t normal = planNormal(positionNvDprt, dpt, v1);
+			
+			// Atome O
+			//Premier position
+			Point_t positionO = AX1E2(positionNvDprt, dpt, normal, SIMPLE);
+			
+			//Si le point n'est pas dans l'enveloppe
+			int id3 = SHL_addAtom(moc, positionO, -1);
+			flag(atom(moc, id3)) = 1;
+			SHL_addEdge(moc, id, id3);
+			
+			LSTm_addElement(mocAtt, moc);
+			LSTd_addElement(nvDepart, id);
+			
+			//Seconde position
+			positionO = AX2E1(positionNvDprt, dpt, positionO, SIMPLE);
+			
+			//Si le point n'est pas dans l'enveloppe
+			int id4 = SHL_addAtom(moc2, positionO, -1);
+			flag(atom(moc2, id4)) = 1;
+			SHL_addEdge(moc2, id2, id4);
+			
+			LSTm_addElement(mocAtt, moc2);
+			LSTd_addElement(nvDepart, id2);
+		}
+	}
 }
 
 // Ajout l'atome projeté a l'enveloppe
 void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Point_t positionNvDprt) {
 	
-	if (numMotif == 3)
+	if (numMotif == 3) // C = 0
 	{
 		ajoutMotif3(mocTraite, mocAtt, depart, nvDepart, positionNvDprt);
+	}
+	else if (numMotif == 4)
+	{		
+		ajoutMotif4(mocTraite, mocAtt, depart, nvDepart, positionNvDprt);
 	}
 	else
 	{
@@ -96,26 +254,9 @@ void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 	
 }
 
-// Determine la position de l'atome a inserer
-// et l'ajoute a l'enveloppe si c'est possible
-void projection(Molecule_t* mol, Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, int arrivee) {
-	
-	Point_t dpt = coords(atom(mocTraite, depart));
-	Point_t arv = coords(atom(mocTraite, arrivee));
-	
-	//Emplacement a refaire
-	Point_t positionNvDprt = addPoint(dpt, normalization(vector(dpt, arv), SIMPLE));
-	printf("%d %d\n", parentAtom(atom(mocTraite, arrivee)), size(mol));
-	if (parentAtom(atom(mocTraite, arrivee)) != -1) // Derniere arrivee
-	{
-		Point_t parent = coords( atom(mol, parentAtom(atom(mocTraite, arrivee))) );
-		positionNvDprt = addPoint(positionNvDprt, normalization(vector(parent, arv), 0.5)); // Décalage vers exterieur
-		positionNvDprt = addPoint(dpt, normalization(vector(dpt, positionNvDprt), SIMPLE)); // Remet à la taille SIMPLE
-	}
-	
-	// Si le point n'est pas dans l'enveloppe
-	ajoutProjection(mocTraite, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout a l'enveloppe
-}
+/**************************************/
+/* Projection emplacement *************/
+/**************************************/
 
 // Projection pour un atome avec 1 voisin
 void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, List_d* nvDepart, int numMotif) {
@@ -178,6 +319,13 @@ void projectionN_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 void projectionC_AX2E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif) {
 	
 	Point_t positionNvDprt = AX2E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
+	
+	// Visualisation
+	/*Point_t v = positionNvDprt;
+	v.z += 0.5;
+	int id2 = SHL_addAtom(moc, v, -1);
+	flag(atom(moc, id2)) = 3;
+	*/
 	// Si le point n'est pas dans l'enveloppe
 	ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout a l'enveloppe
 }
@@ -202,6 +350,10 @@ void projectionC_AX3E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 	ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout a l'enveloppe
 }
 
+/**************************************/
+/* Générer chemin *********************/
+/**************************************/
+
 // Insertion du motif passé en argument
 void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, int arrivee){
 	
@@ -209,13 +361,11 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 	{
 		//Projection
 		//Diff rotations
-		//projection(mol, moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 		projectionOCN_AX1E3(moc, mocAtt, depart, arrivee, nvDepart, numMotif);
 	}
 	else if (flag(atom(moc, depart)) == 3 && LST_nbElements(neighborhood(atom(moc, depart))) == 2) // Azote avec 2 voisins
 	{
 		//Projection
-		//projection(mol, moc, mocAtt, depart, nvDepart, numMotif, arrivee);
 		projectionN_AX2E2(moc, mocAtt, depart, nvDepart, numMotif);
 	}
 	else if (flag(atom(moc, depart)) == 4) // Carbone
@@ -355,19 +505,24 @@ void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee,
 
 // Génère le chemin entre 2 groupements de motifs
 // Sans sommets intermediaires
-void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int premierDpt, int depart, int arrivee, int nbMotif3, char* InputFile){
+void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int premierDpt, int depart, int arrivee, int nbMotif3, int nbMotif4, char* InputFile){
 	
-	for (int i = 3; i < 4/*NB_MOTIF*/; i++)
+	// Visualisation
+	Point_t v = coords(atom(mocTraite, depart));
+	v.z += 0.5;
+	int id2 = SHL_addAtom(mocTraite, v, -1);
+	flag(atom(mocTraite, id2)) = 2;
+	
+	for (int i = 1; i < 2/*NB_MOTIF*/; i++)
 	{
 		List_m* moc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
 		
 		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee);
 		
-		if (moc->premier) // Pour toutes les solutions générées en generant le chemin
+		if (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
 		{
-			printf("%d\n", nbMotif3);
-			// Compte le nombre de motif 3 d'affilée
+			// Compte le nombre de motif 3 d'affilée (C = O)
 			if (i == 3)
 			{
 				nbMotif3++;
@@ -377,6 +532,12 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int premierDp
 				nbMotif3 = 0;
 			}
 			
+			// Compte le nombre de motif 4 (Cycle) 
+			if (i == 4) 
+			{
+				nbMotif4++;
+			}
+			
 			if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
 			{
 				//printf("Modifier angles\n");
@@ -384,13 +545,15 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int premierDp
 				SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
 				LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
 				printf("AJOUT\n");
+				outputShell(InputFile, moc->premier->moc); // A RETIRER
 			}
-			else if (nbMotif3 < 4)
+			else if (nbMotif3 < 4 && nbMotif4 < 2) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 			{
-				genererChemin3(m, mocAtt, moc->premier->moc, premierDpt, nvDepart->premier->sommet, arrivee, nbMotif3, InputFile);
+				genererChemin3(m, mocAtt, moc->premier->moc, premierDpt, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile);
 			}
-			else
+			else // A retirer
 			{
+				//printf("SORTIE\n");
 				outputShell(InputFile, moc->premier->moc);
 			}
 			
@@ -401,6 +564,10 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int premierDp
 		LSTd_delete(nvDepart);
 	}
 }
+
+/***********************************************/
+/* Chemins avec sommets intermédiaires *********/
+/***********************************************/
 
 void initDijkstra(Shell_t* s, int depart, int arrivee, float** dist, int** predecesseur, List_d** Q) {
 	
@@ -541,6 +708,10 @@ List_d* sommetIntermediaire(Main_t* m, Shell_t* s, int depart, int arrivee) {
 	return sommets;
 }
 
+/*************************************************/
+/* Sommets départ et arrivée du chemin ***********/
+/*************************************************/
+
 // Vérifie si le sommet se situe en bordure de motif
 int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
 	
@@ -660,20 +831,7 @@ List_p* choixSommets(Shell_t* s){
 	return sommets;
 }
 
-void affichage(Shell_t* s) {
-	
-	for (int i = 0; i < SHL_nbAtom(s); i++)
-	{
-		printf("Atome %d : ", i+1);
-		for (int j = 0; j < neighborhoodSize(atom(s,i)); j++)
-		{
-			printf("%d ",neighbor(atom(s,i),j)+1);
-		}
-		printf("flag %d\n",flag(atom(s,i)));
-	}
-}
-
-// Cree une liste de moc a traiter et vide le tableau de solutions finales
+// Crée une liste de moc a traiter et vide le tableau de solutions finales
 List_m* initMocAtt(Main_t* m){
 	List_m* mocAtt = LSTm_init();
 	
@@ -720,6 +878,10 @@ List_m* initMocAtt(Main_t* m){
 	return mocAtt;
 }
 
+/**************************************/
+/* Fonction principale ****************/
+/**************************************/
+
 // Fonction principale
 void assemblage(Main_t* m){
 	List_m* mocAtt = initMocAtt(m);
@@ -761,8 +923,8 @@ void assemblage(Main_t* m){
 
 void assemblage2(char* InputFile, Main_t* m, double alpha){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
-	int sol = 0;
-	if (mocAtt->premier && sol<3) // Tant qu'il existe un moc a traiter
+	
+	if (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		printf("111111");
@@ -772,9 +934,10 @@ void assemblage2(char* InputFile, Main_t* m, double alpha){
 			// Ecrire directement les solutions
 			
 			outputShell(InputFile, mocAtt->premier->moc); // Ecriture de la sortie
-			mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
+			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
+			//mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
 			
-			/*sol++;
+			/*
 			m->mocs[MN_getIndiceFree2(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
 			mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
 			*/
@@ -829,22 +992,46 @@ void assemblage2(char* InputFile, Main_t* m, double alpha){
 				*/
 				
 				printf("666666");
+				//printf("NB : %d\n", LST_nbElements(neighborhood(atom(mocTraite2, depart))));
 				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
 				{
+					//printf("%d : %d\n", i, flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))));
 					if (flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))) == 0)
 					{
-						SHL_removeEdge(mocTraite2, depart, i);
+						SHL_removeEdge(mocTraite2, depart, neighbor(atom(mocTraite2, depart), i));
 					}
 				}
 				
-				for (int i = 1; i < 5 ; i++) // Atome de départ (sommet en bordure) est de n'importe quel type
+				/*printf("NB : %d\n", LST_nbElements(neighborhood(atom(mocTraite2, depart))));
+				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++)
 				{
-					if (i != 2)
+					printf("%d : %d\n", i, flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))));
+				}*/
+				
+				for (int i = 0; i < 4 ; i++) // Atome de départ (sommet en bordure) est de n'importe quel type
+				{
+					flag(atom(mocTraite2, depart)) = typeInsert(i);
+					
+					if (i == 3)
 					{
-						flag(atom(mocTraite2, depart)) = i;
-						//genererChemin2(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier);
-						genererChemin3(m, mocAtt, mocTraite2, depart, depart, arrivee, 0, InputFile);
+						List_m* mAtt = ajoutOMotif3(mocTraite2, depart); // Ajout du O du motif 3 ( C = O )
+						
+						while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
+						{
+							//affichage(mAtt->premier->moc);
+							genererChemin3(m, mocAtt, mAtt->premier->moc, depart, depart, arrivee, 0, 0, InputFile);
+							LSTm_removeFirst(mAtt);
+							//printf("O ajouter\n");
+						}
+						LSTm_delete(mAtt);
 					}
+					else
+					{
+						//genererChemin2(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier);
+						genererChemin3(m, mocAtt, mocTraite2, depart, depart, arrivee, 0, 0, InputFile);
+
+					}
+					
 				}
 				
 				printf("777777777\n");
@@ -871,14 +1058,16 @@ void assemblage2(char* InputFile, Main_t* m, double alpha){
 void testEnveloppe(Main_t* m, double alpha) {
 	Shell_t* sh = SHL_create();
 	expansion(substrat(m), sh);
-	Ashape_t* as3d = Cashape3d(sh, alpha); //envelope(m) 1
-	double* point = malloc(2 * 3* sizeof(double));
+	Ashape_t* as3d = Cashape3d(sh, alpha); //alphaShape2(sh, alpha); //Cashape3d(envelope(m), 0);//(sh, alpha); //envelope(m) 1
+	
+	
+	double* point = malloc(/*2 * */3* sizeof(double));
 	// Point dans l'enveloppe
 	point[0] = 3.6434;
-	point[2] = -2.5436;
-	point[4] = 2.6012;
+	point[1] = -2.5436;
+	point[2] = 2.6012;
 	// Point hors de l'enveloppe
-	point[1] = 7;
+	/*point[1] = 7;
 	point[3] = -4;
 	point[5] = 2;
 	
@@ -890,10 +1079,99 @@ void testEnveloppe(Main_t* m, double alpha) {
 	p2.x = point[1];
 	p2.y = point[3];
 	p2.z = point[5];
+	
 	int id = SHL_addAtom(moc(m,0), p, -1);
 	flag(atom(moc(m,0),id)) = 3; // Bleue
 	id = SHL_addAtom(moc(m,0), p2, -1);
 	flag(atom(moc(m,0),id)) = 2; // Jaune
+	*/
+	Cinashape3d(as3d, point, 3);
+}
+
+void testEnveloppe2(Main_t* m, double alpha) {
+	Shell_t* sh = SHL_create();
+	Point_t p = PT_init();
+	p.x = -1;
+	p.y = -1;
+	p.z = -1;
+	int id = SHL_addAtom(sh, p, -1);
+	
+	p.x = 1;
+	int id2 = SHL_addAtom(sh, p, -1);
+	
+	p.y = 1;
+	int id3 = SHL_addAtom(sh, p, -1);
+	
+	p.x = -1;
+	int id4 = SHL_addAtom(sh, p, -1);
+
+	p.z = 1;
+	int id5 = SHL_addAtom(sh, p, -1);
+
+	p.y = -1;
+	int id6 = SHL_addAtom(sh, p, -1);
+	
+	p.x = 1;
+	int id7 = SHL_addAtom(sh, p, -1);
+	
+	p.y = 1;
+	int id8 = SHL_addAtom(sh, p, -1);
+	
+	SHL_addEdge(sh, id, id2);
+	SHL_addEdge(sh, id, id4);
+	SHL_addEdge(sh, id, id6);
+	SHL_addEdge(sh, id2, id3);
+	SHL_addEdge(sh, id2, id7);
+	SHL_addEdge(sh, id3, id4);
+	SHL_addEdge(sh, id3, id8);
+	SHL_addEdge(sh, id4, id5);
+	SHL_addEdge(sh, id6, id5);
+	SHL_addEdge(sh, id6, id7);
+	SHL_addEdge(sh, id8, id5);
+	SHL_addEdge(sh, id8, id7);
+	
+
+	Ashape_t* as3d = Cashape3d(sh, alpha); //envelope(m) 1
+
+	double* point = malloc(2 * 3* sizeof(double));
+	// Point dans l'enveloppe
+	point[0] = 0;
+	point[2] = 0;
+	point[4] = 0;
+	
+	// Point hors de l'enveloppe
+	point[1] = 7;
+	point[3] = -4;
+	point[5] = 2;
 	
 	Cinashape3d(as3d, point, 6);
+}
+
+void testEnveloppe3(Main_t* m, double alpha, Ashape_t* as3d) {
+	
+	double* point = malloc(/*2 * */3* sizeof(double));
+	// Point dans l'enveloppe
+	point[0] = 3.6434;
+	point[1] = -2.5436;
+	point[2] = 2.6012;
+	// Point hors de l'enveloppe
+	/*point[1] = 7;
+	point[3] = -4;
+	point[5] = 2;
+	
+	Point_t p = PT_init();
+	p.x = point[0];
+	p.y = point[2];
+	p.z = point[4];
+	Point_t p2 = PT_init();
+	p2.x = point[1];
+	p2.y = point[3];
+	p2.z = point[5];
+	
+	int id = SHL_addAtom(moc(m,0), p, -1);
+	flag(atom(moc(m,0),id)) = 3; // Bleue
+	id = SHL_addAtom(moc(m,0), p2, -1);
+	flag(atom(moc(m,0),id)) = 2; // Jaune
+	*/
+	Cinashape3d(as3d, point, 3);
 }
