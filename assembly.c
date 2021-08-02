@@ -41,7 +41,7 @@ int typeInsert(int numMotif){
 }
 
 // Ajout du motif 4 (cycle aromatique) perpendiculaire au plan avec son voisin
-void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t positionNvDprt) {
+void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t posNvDprt) {
 	
 	for (int i = 0; i < neighborhoodSize(atom(mocTraite,depart)); i++) // Pour tous les plans possibles avec les voisins
 	{
@@ -49,18 +49,8 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 		{
 			int idSuiv, idCycle;
 			Point_t posSuiv;
+			Point_t positionNvDprt = posNvDprt;
 			Shell_t* moc = SHL_copy(mocTraite);
-			
-			// Visualisation
-			Point_t v = positionNvDprt;
-			v.z += 0.5;
-			int id2 = SHL_addAtom(mocTraite, v, -1);
-			flag(atom(mocTraite, id2)) = 3; // Bleu
-			int id3 = SHL_addAtom(moc, v, -1);
-			flag(atom(moc, id3)) = 1; // Rouge
-			
-			printf("MocTraite : %f %f %f\n", atomX(atom(mocTraite, id2)), atomY(atom(mocTraite, id2)), atomZ(atom(mocTraite, id2)));
-			printf("Moc : %f %f %f\n", atomX(atom(moc, id3)), atomY(atom(moc, id3)), atomZ(atom(moc, id3)));
 			
 			Point_t v1 = coords(atom(moc, neighbor(atom(moc, depart), i)));
 			Point_t dpt = coords(atom(moc, depart));
@@ -69,7 +59,6 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			int id = SHL_addAtom(moc, positionNvDprt, -1);
 			flag(atom(moc, id)) = 4;
 			SHL_addEdge(moc, depart, id);
-			printf("Moc : %f %f %f\n", atomX(atom(moc, id)), atomY(atom(moc, id)), atomZ(atom(moc, id)));
 			
 			// Cherche la normal pour positionné le cycle
 			Point_t normal = planNormal(positionNvDprt, dpt, v1);
@@ -231,7 +220,7 @@ void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 		ajoutMotif3(mocTraite, mocAtt, depart, nvDepart, positionNvDprt);
 	}
 	else if (numMotif == 4)
-	{		
+	{
 		ajoutMotif4(mocTraite, mocAtt, depart, nvDepart, positionNvDprt);
 	}
 	else
@@ -319,13 +308,6 @@ void projectionN_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 void projectionC_AX2E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif) {
 	
 	Point_t positionNvDprt = AX2E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
-	
-	// Visualisation
-	/*Point_t v = positionNvDprt;
-	v.z += 0.5;
-	int id2 = SHL_addAtom(moc, v, -1);
-	flag(atom(moc, id2)) = 3;
-	*/
 	// Si le point n'est pas dans l'enveloppe
 	ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt); // Ajout a l'enveloppe
 }
@@ -454,7 +436,7 @@ void genererChemin(Molecule_t* mol, List_m* mocAtt, Shell_t* mocTraite, int depa
 }
 
 // Génère le chemin entre 2 groupements de motifs
-void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, Elem_d* sommetInter){
+void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, Elem_d* sommetInter, char* InputFile){
 	
 	for (int i = 0; i < 1/*NB_MOTIF*/; i++)
 	{
@@ -469,7 +451,7 @@ void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee,
 			{
 				if (sommetInter->suivant != NULL) // Si ce n'est pas la derniere arrivee
 				{
-					genererChemin2(mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter->suivant);
+					genererChemin2(mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter->suivant, InputFile);
 				}
 				else // C'est la derniere arrivee
 				{
@@ -480,6 +462,7 @@ void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee,
 						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);// Ajout lien entre dernier sommet du chemin et arrivee
 						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
 						printf("AJOUT\n");
+						outputShell(InputFile, moc->premier->moc); // A RETIRER
 					}
 					/*else
 					{
@@ -493,7 +476,7 @@ void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee,
 			}
 			else
 			{
-				genererChemin2(mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter);
+				genererChemin2(mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter, InputFile);
 			}
 			LSTm_removeFirst(moc);
 			LSTd_removeFirst(nvDepart);
@@ -513,7 +496,7 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int premierDp
 	int id2 = SHL_addAtom(mocTraite, v, -1);
 	flag(atom(mocTraite, id2)) = 2;
 	
-	for (int i = 1; i < 2/*NB_MOTIF*/; i++)
+	for (int i = 4; i < 5/*NB_MOTIF*/; i++)
 	{
 		List_m* moc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
@@ -921,7 +904,7 @@ void assemblage(Main_t* m){
 	free(mocAtt);*/
 }
 
-void assemblage2(char* InputFile, Main_t* m, double alpha){
+void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
 	
 	if (mocAtt->premier) // Tant qu'il existe un moc a traiter
@@ -1018,16 +1001,15 @@ void assemblage2(char* InputFile, Main_t* m, double alpha){
 						
 						while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 						{
-							//affichage(mAtt->premier->moc);
+							//genererChemin2(mocAtt, mAtt->premier->moc, depart, arrivee, sommetInter->premier, InputFile);
 							genererChemin3(m, mocAtt, mAtt->premier->moc, depart, depart, arrivee, 0, 0, InputFile);
 							LSTm_removeFirst(mAtt);
-							//printf("O ajouter\n");
 						}
 						LSTm_delete(mAtt);
 					}
 					else
 					{
-						//genererChemin2(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier);
+						//genererChemin2(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier, InputFile);
 						genererChemin3(m, mocAtt, mocTraite2, depart, depart, arrivee, 0, 0, InputFile);
 
 					}

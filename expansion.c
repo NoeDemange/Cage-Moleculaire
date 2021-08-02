@@ -234,15 +234,15 @@ void alphaShape(Shell_t* s, double alpha) {
 			GPH_removeVertex(bond(s),i);
 		}
 	}
-	
-	//double* point = malloc(/*2 * */3* sizeof(double));
+		
+	double* point = malloc(/*2 * */3* sizeof(double));
 	// Point dans l'enveloppe
-	/*point[0] = 3.6434;
+	point[0] = 3.6434;
 	point[1] = -2.5436;
 	point[2] = 2.6012;
 	
 	Cinashape3d(as3d, point, 3);
-	*/
+	
 	ASP_delete(as3d);
 }
 
@@ -260,7 +260,6 @@ Ashape_t* alphaShape2(Shell_t* s, double alpha) {
 			GPH_removeVertex(bond(s),i);
 		}
 	}
-	printf("NOMBRE TRIANG :%d\n", as3d->nb_triang);
 	return as3d;
 }
 
@@ -283,16 +282,15 @@ Shell_t* createShell(Molecule_t* m, double alpha) {
 	return s;
 }
 
-Shell_t* createShell2(Molecule_t* m, double alpha, Ashape_t* as3d) {
+Shell_t* createShell2(Molecule_t* m, double alpha, Ashape_t** as3d) {
 	Shell_t* s = SHL_create();
 	
 	expansion(m, s);
 	
 	SHL_writeMol2("Results/vec.mol2", s);
-	as3d = alphaShape2(s, alpha);
+	*as3d = alphaShape2(s, alpha);
 	printf("Graphe de dépendance de l'enveloppe.\n");
 	GPH_write(bond(s));	
-	printf("NOMBRE TRIANG :%d\n", as3d->nb_triang);
 
 	return s;
 }

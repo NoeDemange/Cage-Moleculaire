@@ -47,13 +47,12 @@ int main(int argc, char** argv) {
 	double alpha = atof(argv[2]);
 
 	Main_t* m = MN_create();
-	//Ashape_t* as3d = ASP_create();
+	Ashape_t* as3d = ASP_create();
 	
 	substrat(m) = initMolecule(name);
 	MOL_write(substrat(m));
-	envelope(m) = createShell(substrat(m), alpha);
-	//envelope(m) = createShell2(substrat(m), alpha, as3d);
-	//printf("NOMBRE TRIANG :%d\n", as3d->nb_triang);
+	//envelope(m) = createShell(substrat(m), alpha);
+	envelope(m) = createShell2(substrat(m), alpha, &as3d);
 
 	SHL_write(envelope(m));
 	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
@@ -65,8 +64,8 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 
-	assemblage2(name, m, alpha);
-	//testEnveloppe3(m, alpha, as3d);
+	//assemblage2(name, m, alpha, as3d);
+	testEnveloppe3(m, alpha, as3d);
 	//testEnveloppe2(m, alpha);
 	
 	printf("\nEXIT\n");
