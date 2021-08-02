@@ -64,10 +64,11 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 
-	//assemblage2(name, m, alpha, as3d);
-	testEnveloppe3(m, alpha, as3d);
+	assemblage2(name, m, alpha, as3d);
+	//testEnveloppe3(m, alpha, as3d);
 	//testEnveloppe2(m, alpha);
 	
+	ASP_delete(as3d);
 	printf("\nEXIT\n");
 
 	/********** Écriture des résultats dans des fichiers **********/

@@ -234,14 +234,6 @@ void alphaShape(Shell_t* s, double alpha) {
 			GPH_removeVertex(bond(s),i);
 		}
 	}
-		
-	double* point = malloc(/*2 * */3* sizeof(double));
-	// Point dans l'enveloppe
-	point[0] = 3.6434;
-	point[1] = -2.5436;
-	point[2] = 2.6012;
-	
-	Cinashape3d(as3d, point, 3);
 	
 	ASP_delete(as3d);
 }

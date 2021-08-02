@@ -68,7 +68,7 @@ Ashape_t* Cashape3d(Shell_t* s, double alpha) {
 	return as3d;
 }
 
-void Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
+int* Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
 	SEXP triang;
 	PROTECT(triang = allocVector(REALSXP, as3d->nb_triang));
 	memcpy (REAL(triang), as3d->triang, as3d->nb_triang*sizeof(double));
@@ -93,18 +93,12 @@ void Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
 	SEXP ret = R_tryEval(Rinashape3d_call, R_GlobalEnv, &errorOccurred);
 
 	if (!errorOccurred) {
-		//int* result = INTEGER(ret);
-		for (int i = 0; i < length(ret) ; i++)
+		/*for (int i = 0; i < length(ret) ; i++)
 		{
 			printf("SHAPE : %d %d\n", LOGICAL(ret)[i], length(ret));
-			/*if (result[i] == )
-			{
-				return ;
-			}*/
-			
-		}
-		
+		}*/
 	}
 
 	UNPROTECT(5);
+	return LOGICAL(ret);
 }
