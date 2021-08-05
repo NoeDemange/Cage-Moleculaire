@@ -69,7 +69,6 @@ int main(int argc, char** argv) {
 	//testEnveloppe2(m, alpha);
 	
 	ASP_delete(as3d);
-	printf("\nEXIT\n");
 
 	/********** Écriture des résultats dans des fichiers **********/
 
@@ -96,7 +95,6 @@ int main(int argc, char** argv) {
 
 	output(name, m);
 
-	
 
 	MN_delete(m);
 
