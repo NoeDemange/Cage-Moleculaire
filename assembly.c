@@ -343,7 +343,7 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 		//}
 	}
 	
-	for (int i = 0; i < 3 && positions->premier; i++) // 3 positions les mieux placés / distance min avec arrivée
+	for (int i = 0; i < 3 && positions->premier; i++) // 3 positions les mieux placés (distance min avec arrivée)
 	{
 		positionNvDprt = distMin(positions, arv); 
 		LSTs_removeElement(positions, positionNvDprt);
@@ -918,6 +918,7 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	if (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
+		
 		printf("111111");
 		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs
 		{
@@ -949,26 +950,16 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 				//List_d* sommetInter = sommetIntermediaire(m, mocTraite2, depart, arrivee); // Choix sommets intermédiaires
 				
 				printf("666666");
-				affichage(mocTraite2);
-				
-				printf("DPT : %d\n", depart);
-				int nbVoisin = LST_nbElements(neighborhood(atom(mocTraite2, depart)));
-				printf("NB : %d\n", LST_nbElements(neighborhood(atom(mocTraite2, depart))));
-				for (int i = 0; i < nbVoisin; i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
-				{
-					printf("%d : %d\n", neighbor(atom(mocTraite2, depart), i), flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))));
 
+				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
+				{
 					if (flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))) == 0)
 					{
 						SHL_removeEdge(mocTraite2, depart, neighbor(atom(mocTraite2, depart), i));
+						i--;
 					}
 				}
-				printf("NB : %d\n", LST_nbElements(neighborhood(atom(mocTraite2, depart))));
-				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++)
-				{
-					printf("%d : %d\n", neighbor(atom(mocTraite2, depart), i), flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))));
-				}
-				
+								
 				for (int i = 0; i < 4 ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
 				{
 					flag(atom(mocTraite2, depart)) = typeInsert(i);
