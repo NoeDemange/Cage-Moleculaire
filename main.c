@@ -25,6 +25,9 @@ void source (const char* name) {
 }
 
 int main(int argc, char** argv) {
+	
+	time_t debut = time(NULL);
+	
 	/************ Initialisation de l'environnement R ************/
 	//char * oldPath;
 	int r_argc = 2;
@@ -63,10 +66,11 @@ int main(int argc, char** argv) {
 	
 	
 	/********** Assemblage des motifs **********/
-
-	assemblage2(name, m, alpha, as3d);
+	
+	//alpha = 10;
+	//assemblage2(name, m, alpha, as3d);
 	//testEnveloppe3(m, alpha, as3d);
-	//testEnveloppe2(m, alpha);
+	testEnveloppe2(m, alpha);
 	
 	ASP_delete(as3d);
 
@@ -94,13 +98,21 @@ int main(int argc, char** argv) {
 	free(dirName);*/
 
 	output(name, m);
-
-
+	
 	MN_delete(m);
 
 	/************** Fermeture de l'environnement R ***************/
 	Rf_endEmbeddedR (0);
 	//setenv ("R_HOME", oldPath, 1);
-
+		
+	time_t fin = time(NULL);
+	long secondes = (long) difftime(fin, debut);
+		
+	int heure = secondes / 3600;
+	secondes -= heure * 3600;
+	int minute = secondes / 60;
+	secondes -= minute * 60;
+	printf("Temps d'execution : %d heure(s) %d minute(s) %ld seconde(s)\n", heure, minute, secondes);
+	
 	return 0;
 }
