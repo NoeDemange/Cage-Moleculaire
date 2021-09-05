@@ -926,8 +926,8 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 			
 			outputShell(InputFile, mocAtt->premier->moc); // Ecriture de la sortie
 			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
-			//mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
 			
+			//mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
 			//m->mocs[MN_getIndiceFree2(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
 			
 		}
@@ -1103,6 +1103,7 @@ void testEnveloppe2(Main_t* m, double alpha) {
 	
 	free(point);
 	ASP_delete(as3d);
+	SHL_delete(sh);
 }
 
 void testEnveloppe3(Main_t* m, double alpha, Ashape_t* as3d) {

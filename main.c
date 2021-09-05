@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 	double alpha = atof(argv[2]);
 
 	Main_t* m = MN_create();
-	Ashape_t* as3d = ASP_create();
+	Ashape_t* as3d = NULL;
 	
 	substrat(m) = initMolecule(name);
 	MOL_write(substrat(m));

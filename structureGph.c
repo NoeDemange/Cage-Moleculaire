@@ -225,6 +225,7 @@ Graph_t* GPH_copy(Graph_t* g) {
 	for (i=0; i<size(g); i++) {
 		if (id(vertex(g,i)) != -1) {
 			indice = GPH_addVertex(copy, id(vertex(g,i)));
+			LST_delete(neighborhood(vertex(copy, indice)));
 			neighborhood(vertex(copy, indice)) = LST_copy(neighborhood(vertex(g,i)));
 			nbNeighbors(vertex(copy, indice)) = nbNeighbors(vertex(g,i));
 		}
