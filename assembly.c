@@ -936,12 +936,6 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
 			mocAtt->premier = mocAtt->premier->suivant; // Supprime de la liste à traiter
 			
-			for (int i = 0; i < 30; i++)
-			{
-				LST2_removeFirst(sommets);
-			}
-			
-			
 			while (sommets->premier) // Pour tous les couples de sommets à relier
 			{
 				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
