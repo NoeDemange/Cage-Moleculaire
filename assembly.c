@@ -567,14 +567,14 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 	int id2 = SHL_addAtom(mocTraite, v, -1);
 	flag(atom(mocTraite, id2)) = 2;*/
 	
-	for (int i = 0; i < NB_MOTIF; i++)
+	for (int i = 0; i < 1 /*NB_MOTIF*/; i++)
 	{
 		List_m* moc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
 		
 		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee, as3d);
 		
-		while (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
+		if (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
 		{
 			// Compte le nombre de motif 3 d'affilée (C = O)
 			if (i == 3)
@@ -599,17 +599,17 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 				SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
 				LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
 				
-				//printf("AJOUT\n");
-				//outputShell(InputFile, moc->premier->moc); // A RETIRER
+				printf("AJOUT\n");
+				outputShell(InputFile, moc->premier->moc); // A RETIRER
 			}
 			else if (nbMotif3 < 4 && nbMotif4 < 2) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 			{
 				genererChemin3(m, mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d);
 			}
-			else // A retirer
+			else // A RETIRER
 			{
-				//printf("SORTIE\n");
-				//outputShell(InputFile, moc->premier->moc);
+				printf("SORTIE\n");
+				outputShell(InputFile, moc->premier->moc);
 			}
 			
 			LSTm_removeFirst(moc);
@@ -914,7 +914,7 @@ List_m* initMocAtt(Main_t* m){
 void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
 	
-	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
+	if (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		
@@ -936,7 +936,13 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
 			mocAtt->premier = mocAtt->premier->suivant; // Supprime de la liste à traiter
 			
-			while (sommets->premier) // Pour tous les couples de sommets à relier
+			for (int i = 0; i < 30; i++)
+			{
+				LST2_removeFirst(sommets);
+			}
+			
+			
+			if (sommets->premier) // Pour tous les couples de sommets à relier
 			{
 				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
 				printf("33333333");

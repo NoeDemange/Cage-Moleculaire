@@ -50,12 +50,12 @@ int main(int argc, char** argv) {
 	double alpha = atof(argv[2]);
 
 	Main_t* m = MN_create();
-	Ashape_t* as3d = NULL;
+	Ashape_t* as3d2 = NULL;
 	
 	substrat(m) = initMolecule(name);
 	MOL_write(substrat(m));
 	//envelope(m) = createShell(substrat(m), alpha);
-	envelope(m) = createShell2(substrat(m), alpha, &as3d);
+	envelope(m) = createShell2(substrat(m), alpha, &as3d2);
 
 	SHL_write(envelope(m));
 	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
@@ -67,12 +67,12 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 	
-	//alpha = 10;
-	assemblage2(name, m, alpha, as3d);
-	//testEnveloppe3(m, alpha, as3d);
+	printf("PRISCILLE\n");
+	assemblage2(name, m, alpha, as3d2);
+	//testEnveloppe3(m, alpha, as3d2);
 	//testEnveloppe2(m, alpha);
 	
-	ASP_delete(as3d);
+	ASP_delete(as3d2);
 
 	/********** Écriture des résultats dans des fichiers **********/
 

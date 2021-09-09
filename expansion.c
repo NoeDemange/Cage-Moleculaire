@@ -240,8 +240,16 @@ void alphaShape(Shell_t* s, double alpha) {
 
 Ashape_t* alphaShape2(Shell_t* s, double alpha) {
 	int i;
-	Ashape_t* as3d = Cashape3d(s, alpha);
-
+	Ashape_t* as3d2 = NULL;
+	Ashape_t* as3d = Cashape3d2(s, alpha, &as3d2);
+	
+	printf("ALPHASHAPE2\n");
+	for (int i = 0; i < as3d2->nb_triang ; i++)
+	{
+		printf("%f ", as3d2->triang[i]);
+	}
+	printf("\n");
+	
 	for (i=0; i<(as3d->nb_edge/2); i++) {
 		SHL_addEdge(s, as3d->edge[i]-1, as3d->edge[i+as3d->nb_edge/2]-1);
 	}
@@ -252,7 +260,9 @@ Ashape_t* alphaShape2(Shell_t* s, double alpha) {
 			GPH_removeVertex(bond(s),i);
 		}
 	}
-	return as3d;
+	ASP_delete(as3d);
+	
+	return as3d2;
 }
 
 /**
@@ -274,13 +284,13 @@ Shell_t* createShell(Molecule_t* m, double alpha) {
 	return s;
 }
 
-Shell_t* createShell2(Molecule_t* m, double alpha, Ashape_t** as3d) {
+Shell_t* createShell2(Molecule_t* m, double alpha, Ashape_t** as3d2) {
 	Shell_t* s = SHL_create();
 	
 	expansion(m, s);
 	
 	SHL_writeMol2("Results/vec.mol2", s);
-	*as3d = alphaShape2(s, alpha);
+	*as3d2 = alphaShape2(s, alpha);
 	printf("Graphe de dépendance de l'enveloppe.\n");
 	GPH_write(bond(s));	
 
