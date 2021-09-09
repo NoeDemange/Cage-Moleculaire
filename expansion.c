@@ -243,13 +243,6 @@ Ashape_t* alphaShape2(Shell_t* s, double alpha) {
 	Ashape_t* as3d2 = NULL;
 	Ashape_t* as3d = Cashape3d2(s, alpha, &as3d2);
 	
-	printf("ALPHASHAPE2\n");
-	for (int i = 0; i < as3d2->nb_triang ; i++)
-	{
-		printf("%f ", as3d2->triang[i]);
-	}
-	printf("\n");
-	
 	for (i=0; i<(as3d->nb_edge/2); i++) {
 		SHL_addEdge(s, as3d->edge[i]-1, as3d->edge[i+as3d->nb_edge/2]-1);
 	}

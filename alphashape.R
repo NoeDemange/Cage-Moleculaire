@@ -17,9 +17,9 @@ Rinashape3d <- function(triang, x, alpha, points) {
 	points = matrix(points, ncol=3)
 	as3d <- list(triang = triang, x = x, alpha = alpha)
 	#print(as3d)
-	print(points)
+	#print(points)
 	insh <- inashape3d(as3d, 1, points=points)
-	print(insh)
+	#print(insh)
 	return (insh) 
 }
 
