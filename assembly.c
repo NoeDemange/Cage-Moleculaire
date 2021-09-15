@@ -580,6 +580,12 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 		
 		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee, as3d);
 		
+		/*while (moc->premier->suivant)
+		{
+			LSTm_removeFirst(moc);
+		}*/
+		
+		
 		if (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
 		{
 			// Compte le nombre de motif 3 d'affilée (C = O)
@@ -940,7 +946,10 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 		else // S'il y a au moins 2 groupements de motifs
 		{
 			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
-			mocAtt->premier = mocAtt->premier->suivant; // Supprime de la liste à traiter
+			mocAtt->premier-moc = NULL;
+			LSTm_removeFirst(mocAtt);
+			
+			// mocAtt->premier-moc = mocAtt->premier->suivant; // Supprime de la liste à traiter
 			
 			/*for (int i = 0; i < 30; i++)
 			{

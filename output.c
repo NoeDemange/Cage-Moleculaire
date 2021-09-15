@@ -183,6 +183,12 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   int* indice = malloc(size(s)*sizeof(int));
 
   filestream = fopen(output, "w");
+  if (filestream == NULL)
+  {
+	  printf("Impossible d'ouvrir le fichier %s en écriture\n", output);
+	  return;
+  }
+  
   ret = fprintf(filestream, "@<TRIPOS>MOLECULE\n*****\n");
   ret = fprintf(filestream, " %d %d 0 0 0\n", SHL_nbAtom(s), SHL_nbEdges(s));
   ret = fprintf(filestream, "SMALL\nGASTEIGER\n\n");
@@ -254,7 +260,6 @@ void outputShell(char* InputFile, Shell_t* s) {
 		{
 			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
 		}
-		
 	}
 	
 	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
