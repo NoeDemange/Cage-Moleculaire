@@ -574,7 +574,7 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 		
 		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee, as3d);
 		
-		if (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
+		while (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
 		{
 			// Compte le nombre de motif 3 d'affilée (C = O)
 			if (i == 3)
@@ -914,7 +914,7 @@ List_m* initMocAtt(Main_t* m){
 void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
 	
-	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
+	if (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		
@@ -942,7 +942,7 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 			}*/
 			
 			
-			while (sommets->premier) // Pour tous les couples de sommets à relier
+			if (sommets->premier) // Pour tous les couples de sommets à relier
 			{
 				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
 				//printf("33333333");
