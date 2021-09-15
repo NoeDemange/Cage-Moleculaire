@@ -612,7 +612,7 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 				LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
 				
 				//printf("AJOUT\n");
-				//outputShell(InputFile, moc->premier->moc); // A RETIRER
+				outputShell(InputFile, moc->premier->moc); // A RETIRER
 			}
 			else if (nbMotif3 < 4 && nbMotif4 < 2) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 			{
