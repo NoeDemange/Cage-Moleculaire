@@ -946,7 +946,7 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 		else // S'il y a au moins 2 groupements de motifs
 		{
 			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
-			mocAtt->premier-moc = NULL;
+			mocAtt->premier->moc = NULL;
 			LSTm_removeFirst(mocAtt);
 			
 			// mocAtt->premier-moc = mocAtt->premier->suivant; // Supprime de la liste à traiter

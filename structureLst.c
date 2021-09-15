@@ -187,7 +187,7 @@ void LSTm_removeFirst(List_m* list) {
 	
 	Elem* suppr = list->premier;
 	list->premier = list->premier->suivant;
-	if(moc) SHL_delete(suppr->moc);
+	if(suppr->moc) SHL_delete(suppr->moc);
 	free(suppr);
 }
 
