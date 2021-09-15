@@ -186,6 +186,7 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   if (filestream == NULL)
   {
 	  printf("Impossible d'ouvrir le fichier %s en écriture\n", output);
+	  if(indice) free(indice);
 	  return;
   }
   
