@@ -573,7 +573,7 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 	}
 	
 	
-	for (int i = 0; i < 4/*NB_MOTIF*/; i++)
+	for (int i = 0; i < 3/*NB_MOTIF*/; i++)
 	{
 		List_m* moc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
