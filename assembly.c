@@ -573,17 +573,17 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 	}
 	
 	
-	for (int i = 0; i < 2/*NB_MOTIF*/; i++)
+	for (int i = 0; i < 4/*NB_MOTIF*/; i++)
 	{
 		List_m* moc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
 		
 		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee, as3d);
 		
-		/*while (moc->premier->suivant)
+		while (moc->premier->suivant)
 		{
 			LSTm_removeFirst(moc);
-		}*/
+		}
 		
 		
 		if (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations

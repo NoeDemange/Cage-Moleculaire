@@ -241,6 +241,7 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   }
 
   free(indice);
+  fclose(filestream);
 }
 
 void outputShell(char* InputFile, Shell_t* s) {
