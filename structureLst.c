@@ -94,7 +94,6 @@ List_t* LST_copy(List_t* l) {
 	List_t* copy = LST_create();
 
 	size(copy) = LST_nbElements(l);
-	//size(copy) = size(copy) + REALLOCSIZE - size(copy)%REALLOCSIZE;
 
 	copy->elts = malloc(size(copy)*sizeof(int));
 

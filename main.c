@@ -67,10 +67,7 @@ int main(int argc, char** argv) {
 	
 	/********** Assemblage des motifs **********/
 	
-	printf("PRISCILLE\n");
-	assemblage2(name, m, alpha, as3d2);
-	//testEnveloppe3(m, alpha, as3d2);
-	//testEnveloppe2(m, alpha);
+	assemblage(name, m, alpha, as3d2);
 	
 	ASP_delete(as3d2);
 

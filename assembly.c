@@ -31,7 +31,6 @@ int inAShape(Ashape_t* as3d, Point_t p) {
 	point[2] = p.z;
 	
 	int* res = Cinashape3d(as3d, point, 3);
-	//printf("InAShape : %d\n", res[0]);
 	
 	free(point);
 	return res[0];
@@ -463,50 +462,7 @@ int eloigne(Point_t depart, Point_t nvDepart, Point_t arrivee){
 }
 
 // Génère le chemin entre 2 groupements de motifs
-/*void genererChemin(Molecule_t* mol, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, Elem_d* sommetInter){
-	
-	for (int i = 0; i < 1; i++) // NB_MOTIF
-	{
-		List_m* moc = LSTm_init();
-		List_d* nvDepart = LSTd_init();
-		
-		insererMotif(mocTraite, moc, depart, nvDepart, i, sommetInter->sommet);
-		
-		while (moc->premier)
-		{
-			if (eloigne( coords(atom(mocTraite, depart)), coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) )) // Si le nv depart est plus éloigné 
-			{
-				if (sommetInter->suivant != NULL) // Si ce n'est pas la derniere arrivee
-				{
-					genererChemin(mol, mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter->suivant);
-				}
-				else // C'est la derniere arrivee
-				{
-					if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
-					{
-						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);// Ajout lien entre dernier sommet du chemin et arrivee
-						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-					}
-					else
-					{
-						printf("Modifier angles\n");
-						// Modifier angles
-						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);
-						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-					}
-				}
-			}
-			else
-			{
-				genererChemin(mol, mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, sommetInter);
-			}
-			LSTm_removeFirst(moc);
-			LSTd_removeFirst(nvDepart);
-		}
-	}
-}*/
-
-// Génère le chemin entre 2 groupements de motifs
+// Avec sommets intermediaires
 /*void genererChemin2(List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, Elem_d* sommetInter, char* InputFile){
 	
 	for (int i = 0; i < 1; i++) // NB_MOTIF
@@ -528,20 +484,13 @@ int eloigne(Point_t depart, Point_t nvDepart, Point_t arrivee){
 				{
 					if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
 					{
-						//printf("Modifier angles\n");
-						// Modifier angles
 						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);// Ajout lien entre dernier sommet du chemin et arrivee
 						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-						printf("AJOUT\n");
-						outputShell(InputFile, moc->premier->moc); // A RETIRER
 					}*/
 					/*else
 					{
-						//printf("Modifier angles\n");
-						// Modifier angles
 						SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee);
 						LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-						printf("AJOUT2\n");
 					}*/
 				/*}
 			}
@@ -559,7 +508,7 @@ int eloigne(Point_t depart, Point_t nvDepart, Point_t arrivee){
 
 // Génère le chemin entre 2 groupements de motifs
 // Sans sommets intermediaires
-void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* InputFile, Ashape_t* as3d){
+void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* InputFile, Ashape_t* as3d){
 	
 	// Visualisation
 	/*Point_t v = coords(atom(mocTraite, depart));
@@ -567,6 +516,7 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 	int id2 = SHL_addAtom(mocTraite, v, -1);
 	flag(atom(mocTraite, id2)) = 2;*/
 	
+	// Vérifier que la position d'ajout n'est pas dans l'enveloppe
 	if (inAShape(as3d, coords(atom(mocTraite, depart))))
 	{
 		return;
@@ -580,6 +530,7 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 		
 		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee, as3d);
 		
+		// Limiter le nombre de solutions générées (enlève les différents angles)
 		/*while (moc->premier->suivant)
 		{
 			LSTm_removeFirst(moc);
@@ -606,22 +557,12 @@ void genererChemin3(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, i
 			
 			if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
 			{
-				//printf("Modifier angles\n");
-				// Modifier angles
 				SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
 				LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
-				
-				//printf("AJOUT\n");
-				//outputShell(InputFile, moc->premier->moc); // A RETIRER
 			}
 			else if (nbMotif3 < 4 && nbMotif4 < 2) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 			{
-				genererChemin3(m, mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d);
-			}
-			else // A RETIRER
-			{
-				//printf("SORTIE\n");
-				//outputShell(InputFile, moc->premier->moc);
+				genererChemin(m, mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d);
 			}
 			
 			LSTm_removeFirst(moc);
@@ -885,62 +826,18 @@ List_m* initMocAtt(Main_t* m){
 /**************************************/
 
 // Fonction principale
-/*void assemblage(Main_t* m){
-	List_m* mocAtt = initMocAtt(m);
-	
-	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
-	{
-		List_p* sommets = choixSommets(mocAtt->premier->moc);
-		
-		if (!sommets->premier) // S'il n'y qu'un groupement de motifs
-		{
-			m->mocs[MN_getIndiceFree(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
-			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
-		}
-		else // S'il y a au moins 2 groupements de motifs
-		{
-			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
-			mocAtt->premier = mocAtt->premier->suivant; // Supprime de la liste à traiter
-			
-			while (sommets->premier) // Pour tous les couples de sommets à relier
-			{
-				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
-				printf("33333333");
-				int depart = sommets->premier->depart;
-				int arrivee = sommets->premier->arrivee;
-				printf("444444444");
-				LST2_removeFirst(sommets);
-				printf("555555555");
-					
-				// Choix sommets intermédiaire et generer directions
-				// genererChemin();
-				
-				LSTm_addElement(mocAtt, mocTraite2); // Ajout dans la liste a traiter
-			}
-			SHL_delete(mocTraite);
-		}
-	}
-	free(mocAtt);
-}*/
-
-void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
+void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
 	
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		
-		//printf("111111");
 		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs
 		{
-			//printf("222222");
 			// Ecrire directement les solutions
-			
 			outputShell(InputFile, mocAtt->premier->moc); // Ecriture de la sortie
 			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
-			
-			//mocAtt->premier = mocAtt->premier->suivant; // Suppression dans la liste a traiter
-			//m->mocs[MN_getIndiceFree2(m)] = mocAtt->premier->moc; // Ajout au tableau des solutions finales
 			
 		}
 		else // S'il y a au moins 2 groupements de motifs
@@ -949,27 +846,20 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 			mocAtt->premier->moc = NULL;
 			LSTm_removeFirst(mocAtt);
 			
-			// mocAtt->premier-moc = mocAtt->premier->suivant; // Supprime de la liste à traiter
-			
+			// Quand on ne veut traiter qu'un couple de sommet, permet de changer de sommet à relier
 			/*for (int i = 0; i < 30; i++)
 			{
 				LST2_removeFirst(sommets);
 			}*/
 			
-			
 			while (sommets->premier) // Pour tous les couples de sommets à relier
 			{
-				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Cree un nouveau moc dans la liste a traiter
-				//printf("33333333");
+				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Crée un nouveau moc dans la liste a traiter
 				int depart = sommets->premier->depart;
 				int arrivee = sommets->premier->arrivee;
-				//printf("444444444");
 				LST2_removeFirst(sommets);
-				//printf("555555555");
 					
 				//List_d* sommetInter = sommetIntermediaire(m, mocTraite2, depart, arrivee); // Choix sommets intermédiaires
-				
-				//printf("666666");
 
 				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
 				{
@@ -993,7 +883,7 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 							while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 							{
 								//genererChemin2(mocAtt, mAtt->premier->moc, depart, arrivee, sommetInter->premier, InputFile);
-								genererChemin3(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, as3d);
+								genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, as3d);
 								LSTm_removeFirst(mAtt);
 							}
 							LSTm_delete(mAtt);
@@ -1002,13 +892,11 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 					else
 					{
 						//genererChemin2(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier, InputFile);
-						genererChemin3(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, as3d);
+						genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, as3d);
 
 					}
 					
 				}
-				
-				//printf("777777777\n");
 				
 				//LSTd_delete(sommetInter); // Supprime la liste des sommets intermediaires
 				SHL_delete(mocTraite2);
@@ -1019,160 +907,4 @@ void assemblage2(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	}
 	
 	free(mocAtt);
-}
-
-// Fonction pour tester la fonction inashape3d
-void testEnveloppe2(Main_t* m, double alpha) {
-	Shell_t* sh = SHL_create();
-	Point_t p = PT_init();
-	p.x = -1;
-	p.y = -1;
-	p.z = -1;
-	int id = SHL_addAtom(sh, p, -1);
-	
-	p.x = 1;
-	int id2 = SHL_addAtom(sh, p, -1);
-	
-	p.y = 1;
-	int id3 = SHL_addAtom(sh, p, -1);
-	
-	p.x = -1;
-	int id4 = SHL_addAtom(sh, p, -1);
-
-	p.z = 1;
-	int id5 = SHL_addAtom(sh, p, -1);
-
-	p.y = -1;
-	int id6 = SHL_addAtom(sh, p, -1);
-	
-	p.x = 1;
-	int id7 = SHL_addAtom(sh, p, -1);
-	
-	p.y = 1;
-	int id8 = SHL_addAtom(sh, p, -1);
-	
-	p.x = 0;
-	p.y = -0.5;
-	p.z = 0;
-	int id9 = SHL_addAtom(sh, p, -1);
-
-	SHL_addEdge(sh, id, id2);
-	SHL_addEdge(sh, id, id4);
-	SHL_addEdge(sh, id, id6);
-	SHL_addEdge(sh, id2, id3);
-	SHL_addEdge(sh, id2, id7);
-	SHL_addEdge(sh, id3, id4);
-	SHL_addEdge(sh, id3, id8);
-	SHL_addEdge(sh, id4, id5);
-	SHL_addEdge(sh, id6, id5);
-	SHL_addEdge(sh, id6, id7);
-	SHL_addEdge(sh, id8, id5);
-	SHL_addEdge(sh, id8, id7);
-	SHL_addEdge(sh, id9, id7);
-	SHL_addEdge(sh, id9, id6);
-	SHL_addEdge(sh, id9, id);
-	SHL_addEdge(sh, id9, id2);
-
-
-	Ashape_t* as3d = Cashape3d(sh, alpha); //envelope(m) 1
-	
-	printf("TRIANGLE %d\n", as3d->nb_triang);
-	for (int i = 0; i < as3d->nb_triang/9 ; i++)
-	{
-		printf("%lf, ", as3d->triang[i]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*2]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*3]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*4]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*5]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*6]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*7]);
-		printf("%lf\n", as3d->triang[i+(as3d->nb_triang/9)*8]);
-	}
-	
-	double* point = malloc(2 * 3* sizeof(double));
-	// Point dans l'enveloppe
-	point[0] = 0;
-	point[2] = 0;
-	point[4] = 0;
-	
-	// Point hors de l'enveloppe
-	point[1] = 7;
-	point[3] = -4;
-	point[5] = 2;
-	
-	p.x = point[0];
-	p.y = point[2];
-	p.z = point[4];
-	Point_t p2 = PT_init();
-	p2.x = point[1];
-	p2.y = point[3];
-	p2.z = point[5];
-	
-	//Cinashape3d(as3d, point, 6);
-	
-	int a = inAShape(as3d, p);
-	int b = inAShape(as3d, p2);
-	
-	printf("A : %d B : %d\n", a, b);
-	
-	free(point);
-	ASP_delete(as3d);
-	SHL_delete(sh);
-}
-
-void testEnveloppe3(Main_t* m, double alpha, Ashape_t* as3d) {
-	/*printf("TRIANGLE %d\n", as3d->nb_triang);
-	for (int i = 0; i < as3d->nb_triang/9 ; i++)
-	{
-		printf("%lf, ", as3d->triang[i]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*2]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*3]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*4]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*5]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*6]);
-		printf("%lf, ", as3d->triang[i+(as3d->nb_triang/9)*7]);
-		printf("%lf\n", as3d->triang[i+(as3d->nb_triang/9)*8]);
-	}*/
-	
-	double* point = malloc(2 * 3* sizeof(double));
-	// Point dans l'enveloppe
-	/*point[0] = 3.6434;
-	point[2] = -2.5436;
-	point[4] = 2.6012;
-	*/
-	point[0] = -3.8818;
-	point[2] = 2.8605;
-	point[4] = 3.4921;
-	// Point hors de l'enveloppe
-	point[1] = 7;
-	point[3] = -4;
-	point[5] = 2;
-	
-	Point_t p = PT_init();
-	p.x = point[0];
-	p.y = point[2];
-	p.z = point[4];
-	Point_t p2 = PT_init();
-	p2.x = point[1];
-	p2.y = point[3];
-	p2.z = point[5];
-	
-	/*int id = SHL_addAtom(moc(m,0), p, -1);
-	flag(atom(moc(m,0),id)) = 3; // Bleue
-	id = SHL_addAtom(moc(m,0), p2, -1);
-	flag(atom(moc(m,0),id)) = 2; // Jaune
-	*/
-	//Cinashape3d(as3d, point, 6);
-	
-	printf("POUR A :\n");
-	int a = inAShape(as3d, p);
-	
-	printf("POUR B :\n");
-	int b = inAShape(as3d, p2);
-	
-	printf("A : %d B : %d\n", a, b);
-	
-	free(point);
 }

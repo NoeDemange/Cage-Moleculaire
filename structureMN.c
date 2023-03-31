@@ -20,7 +20,6 @@ void MN_addAlloc(Main_t* m, unsigned size) {
 	}
 
 	mocSize(m) += size;
-	//printf("size MN %d\n", mocSize(m));
 }
 
 unsigned MN_getIndiceFree(Main_t* m) {
@@ -31,9 +30,7 @@ unsigned MN_getIndiceFree(Main_t* m) {
 		if (moc(m,i) == NULL)
 			return i;
 	}
-	//printf("%p\n", m->mocs);
 	MN_addAlloc(m, REALLOCSIZE);
-	//printf("%p\n", m->mocs);
 	return i;
 }
 
@@ -45,16 +42,13 @@ unsigned MN_getIndiceFree2(Main_t* m) {
 		if (moc(m,i) == NULL)
 			return i;
 	}
-	//printf("%p\n", m->mocs);
 	MN_addAlloc(m, 1);
-	//printf("%p\n", m->mocs);
 	return i;
 }
 
 unsigned MN_copyMoc(Main_t* m, Shell_t* s) {
 
 	unsigned indice = MN_getIndiceFree(m);
-	//printf("test copyMoc indice %d\n", indice);
 	moc(m, indice) = SHL_copy(s);
 
 	return indice;

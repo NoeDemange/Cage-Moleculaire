@@ -177,10 +177,6 @@ int* Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
 	SEXP ret = R_tryEval(Rinashape3d_call, R_GlobalEnv, &errorOccurred);
 
 	if (!errorOccurred) {
-		/*for (int i = 0; i < length(ret) ; i++)
-		{
-			printf("SHAPE : %d %d\n", LOGICAL(ret)[i], length(ret));
-		}*/
 	}
 
 	UNPROTECT(5);
