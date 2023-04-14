@@ -847,10 +847,10 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 			LSTm_removeFirst(mocAtt);
 			
 			// Quand on ne veut traiter qu'un couple de sommet, permet de changer de sommet à relier
-			/*for (int i = 0; i < 30; i++)
+			for (int i = 0; i < 30; i++)
 			{
 				LST2_removeFirst(sommets);
-			}*/
+			}
 			
 			while (sommets->premier) // Pour tous les couples de sommets à relier
 			{
@@ -858,8 +858,6 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 				int depart = sommets->premier->depart;
 				int arrivee = sommets->premier->arrivee;
 				LST2_removeFirst(sommets);
-					
-				//List_d* sommetInter = sommetIntermediaire(m, mocTraite2, depart, arrivee); // Choix sommets intermédiaires
 
 				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
 				{
@@ -882,7 +880,6 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 							
 							while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 							{
-								//genererChemin2(mocAtt, mAtt->premier->moc, depart, arrivee, sommetInter->premier, InputFile);
 								genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, as3d);
 								LSTm_removeFirst(mAtt);
 							}
@@ -891,14 +888,12 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 					}
 					else
 					{
-						//genererChemin2(mocAtt, mocTraite2, depart, arrivee, sommetInter->premier, InputFile);
 						genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, as3d);
 
 					}
 					
 				}
 				
-				//LSTd_delete(sommetInter); // Supprime la liste des sommets intermediaires
 				SHL_delete(mocTraite2);
 			}
 			SHL_delete(mocTraite);
