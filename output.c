@@ -15,6 +15,14 @@ char* createDir(char *input) {
   return dirName;
 }
 
+/*char* createUnderDir(char *input, int nbmotif) {
+  char* dirName = malloc (256 * sizeof(char));
+  sprintf(dirName,"Results/%s/%d",input, nbmotif);
+  mkdir(dirName,0755);
+
+  return dirName;
+}*/
+
 /**
 */
 char* getBasename (char * in) {
@@ -248,11 +256,12 @@ void outputShell(char* InputFile, Shell_t* s) {
 	char outputname[512];
 	char* name = getBasename (InputFile);
 	char* dirName = createDir(name);
+  //char* dirName = createUnderDir(name, nbmotif);
 	static int i = 0;
 	
 	//Sortie avec enveloppe
-	sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
-	SHL_writeMol2(outputname, s);
+	//sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
+	//SHL_writeMol2(outputname, s);
 	
 	//Sortie sans enveloppe
 	Shell_t* s2 = SHL_copy(s);
