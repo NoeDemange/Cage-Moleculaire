@@ -112,7 +112,7 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			{
 				v1 = coords(atom(moc, neighbor(atom(moc, idVoisin), 0)));
 				positionNvDprt = AX1E2(positionNvDprt, v1, normal, SIMPLE);
-				if ((inAShape(as3d, positionNvDprt) == 1) /*|| (encombrement(moc, positionNvDprt) == 1)*/) // Si le point est dans l'enveloppe et n'est pas éloigné de 1.5 des autres atomes
+				if ((inAShape(as3d, positionNvDprt) == 1) || (encombrement(moc, positionNvDprt) == 1)) // Si le point est dans l'enveloppe et n'est pas éloigné de 1.5 des autres atomes
 				{
 					inASh++;
 				}
@@ -140,7 +140,7 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 				inASh++;
 			}
 			int idSuiv2 = SHL_addAtom(moc, positionNvDprt, -1);
-			flag(atom(moc, idCycle)) = 4;
+			flag(atom(moc, idSuiv2)) = 4;
 			SHL_addEdge(moc, idSuiv, idSuiv2);
 			
 			if (inASh == 0) // Si tous les atomes du motif sont hors de l'enveloppe
@@ -850,7 +850,7 @@ List_m* initMocAtt(Main_t* m){
 // Fonction principale
 void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
-	int tailleMocInit = size(mocAtt->premier->moc); //permet de récupérer la taille avant l'ajout des chemins, fonctionne car on garde qu'un moc ligne d'avant (à modifier sinon)
+	int tailleMocInit = SHL_nbAtom(mocAtt->premier->moc); //permet de récupérer la taille avant l'ajout des chemins, fonctionne car on garde qu'un moc ligne d'avant (à modifier sinon)
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{	
 		List_p* sommets = choixSommets(mocAtt->premier->moc);

@@ -286,7 +286,7 @@ void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
 	char outputname[512];
 	char* name = getBasename (InputFile);
 	/*char* dirName =*/ createDir(name);
-  int nbmotif = size(s) - tailleMocInit;
+  int nbmotif = SHL_nbAtom(s) - tailleMocInit;
   char* dirName = createUnderDir(name, nbmotif);
 	static int i = 0;
 	
