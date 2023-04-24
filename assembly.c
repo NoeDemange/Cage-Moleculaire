@@ -850,7 +850,7 @@ List_m* initMocAtt(Main_t* m){
 // Fonction principale
 void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
-
+	int tailleMocInit = size(mocAtt->premier->moc); //permet de récupérer la taille avant l'ajout des chemins, fonctionne car on garde qu'un moc ligne d'avant (à modifier sinon)
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{	
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
@@ -858,7 +858,8 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs
 		{
 			
-			outputShell(InputFile, mocAtt->premier->moc); // Ecriture de la sortie
+			//outputShell(InputFile, mocAtt->premier->moc);
+			outputShell2(InputFile, mocAtt->premier->moc, tailleMocInit); // Ecriture de la sortie
 			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
 			
 		}
@@ -889,7 +890,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 						i--;
 					}
 				}
-								
+
 				for (int i = 0; i < 4 ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
 				{
 					flag(atom(mocTraite2, depart)) = typeInsert(i);
@@ -899,7 +900,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d){
 						if (LST_nbElements(neighborhood(atom(mocTraite2, depart))) == 1) // Motif possible que si le depart n'a qu'un voisin
 						{
 							List_m* mAtt = ajoutOMotif3(mocTraite2, depart, as3d); // Ajout du O du motif 3 ( C = O )
-							
+
 							while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 							{
 								genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, as3d);

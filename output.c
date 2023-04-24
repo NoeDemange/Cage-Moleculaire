@@ -15,13 +15,13 @@ char* createDir(char *input) {
   return dirName;
 }
 
-/*char* createUnderDir(char *input, int nbmotif) {
+char* createUnderDir(char *input, int nbmotif) {
   char* dirName = malloc (256 * sizeof(char));
   sprintf(dirName,"Results/%s/%d",input, nbmotif);
   mkdir(dirName,0755);
 
   return dirName;
-}*/
+}
 
 /**
 */
@@ -256,7 +256,38 @@ void outputShell(char* InputFile, Shell_t* s) {
 	char outputname[512];
 	char* name = getBasename (InputFile);
 	char* dirName = createDir(name);
-  //char* dirName = createUnderDir(name, nbmotif);
+	static int i = 0;
+	
+	//Sortie avec enveloppe
+	//sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
+	//SHL_writeMol2(outputname, s);
+	
+	//Sortie sans enveloppe
+	Shell_t* s2 = SHL_copy(s);
+	for (int j = 0; j < SHL_nbAtom(s2); j++)
+	{
+		if (flag(atom(s2,j)) == 0)
+		{
+			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
+		}
+	}
+	
+	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
+	SHL_writeMol2(outputname, s2);
+	printf("Result : %d\n", i);
+	SHL_delete(s2);
+	free(name);
+	free(dirName);
+	
+	i++;
+}
+
+void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
+	char outputname[512];
+	char* name = getBasename (InputFile);
+	/*char* dirName =*/ createDir(name);
+  int nbmotif = size(s) - tailleMocInit;
+  char* dirName = createUnderDir(name, nbmotif);
 	static int i = 0;
 	
 	//Sortie avec enveloppe
