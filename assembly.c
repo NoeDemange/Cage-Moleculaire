@@ -98,7 +98,7 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			// Positionner les autres atomes du cycle
 			v1 = AX1E2(positionNvDprt, coords(atom(moc, depart)), normal, SIMPLE); // Voisin
 			positionNvDprt = AX2E1(positionNvDprt, coords(atom(moc, depart)), v1, SIMPLE); 
-			if ((inAShape(as3d, positionNvDprt) == 1) /*|| (encombrement(moc, positionNvDprt) == 1)*/) // Si le point est dans l'enveloppe et n'est pas éloigné de 1.5 des autres atomes
+			if ((inAShape(as3d, positionNvDprt) == 1) || (encombrement(moc, positionNvDprt) == 1)) // Si le point est dans l'enveloppe et n'est pas éloigné de 1.5 des autres atomes
 			{
 				inASh++;
 			}
@@ -545,12 +545,12 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 	}
 	
 	
-	for (int i = 0; i < 1/*3*//*NB_MOTIF*/; i++)
+	for (int i = 0; i < 5/*3*//*NB_MOTIF*/; i+=4)
 	{
-		List_m* moc = LSTm_init();
+		List_m* lMoc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
 		
-		insererMotif(mocTraite, moc, depart, nvDepart, i, arrivee, as3d);
+		insererMotif(mocTraite, lMoc, depart, nvDepart, i, arrivee, as3d);
 		
 		// Limiter le nombre de solutions générées (enlève les différents angles)
 		/*while (moc->premier->suivant)
@@ -559,7 +559,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 		}*/
 		
 		
-		while (moc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
+		while (lMoc->premier) // Pour toutes les solutions générées en générant le chemin / Diff rotations
 		{
 			// Compte le nombre de motif 3 d'affilée (C = O)
 			if (i == 3)
@@ -577,20 +577,20 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 				nbMotif4++;
 			}
 			
-			if (dist( coords(atom(moc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
+			if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST) // Proche de l'arrivée 
 			{
-				SHL_addEdge(moc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
-				LSTm_addElement(mocAtt, SHL_copy(moc->premier->moc)); // Ajout dans la liste a traiter
+				SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
+				LSTm_addElement(mocAtt, SHL_copy(lMoc->premier->moc)); // Ajout dans la liste a traiter
 			}
 			else if (nbMotif3 < 4 && nbMotif4 < 2) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 			{
-				genererChemin(m, mocAtt, moc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d);
+				genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d);
 			}
 			
-			LSTm_removeFirst(moc);
+			LSTm_removeFirst(lMoc);
 			LSTd_removeFirst(nvDepart);
 		}
-		LSTm_delete(moc);
+		LSTm_delete(lMoc);
 		LSTd_delete(nvDepart);
 	}
 }
