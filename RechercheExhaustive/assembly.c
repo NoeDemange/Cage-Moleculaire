@@ -445,11 +445,14 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 
 // Génère le chemin entre 2 groupements de motifs
 // Sans sommets intermediaires
-void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* InputFile, Ashape_t* as3d,int tailleMax, int tailleMocDep){
+void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* InputFile,
+ Ashape_t* as3d,int tailleMax, int tailleMocDep, int *nbChemS, int *TChemS, int *nbChemA, int *TChemA){
 
 	// Vérifier que la position d'ajout n'est pas dans l'enveloppe
 	if (inAShape(as3d, coords(atom(mocTraite, depart))))
 	{
+		(*TChemS) += (SHL_nbAtom(mocTraite)-tailleMocDep);
+		(*nbChemS)++;
 		return;
 	}
 
@@ -458,7 +461,11 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 		Point_t A = coords(atom(mocTraite, i));
 		Point_t B = coords(atom(mocTraite, depart));
 		if((A.x != B.x) && (A.y != B.y)&& (A.z != B.z)){
-			if(dist(A, B) < DIST_ECART) return;
+			if(dist(A, B) < DIST_ECART) {
+				(*TChemA) += (SHL_nbAtom(mocTraite)-tailleMocDep);
+				(*nbChemA)++;
+				return;
+			}
 		}
 	}
 	
@@ -498,7 +505,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 				}
 				else if (nbMotif3 < 5 && nbMotif4 < 3) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 				{
-					genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d, tailleMax, tailleMocDep);
+					genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, as3d, tailleMax, tailleMocDep, nbChemS, TChemS, nbChemA, TChemA);
 				}
 			}
 
@@ -639,6 +646,10 @@ List_m* initMocAtt(Main_t* m){
 
 // Fonction principale
 void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d, int tailleMax){
+	int nbChemS = 0;
+	int TChemS = 0;
+	int nbChemA = 0;
+	int TChemA = 0;
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
 	int tailleMocInit = SHL_nbAtom(mocAtt->premier->moc); //permet de récupérer la taille avant l'ajout des chemins, fonctionne car on garde qu'un moc ligne d'avant (à modifier sinon)
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
@@ -694,7 +705,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d, int ta
 
 							while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 							{
-								genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, as3d, tailleMax, tailleMocDep);
+								genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, as3d, tailleMax, tailleMocDep, &nbChemS, &TChemS, &nbChemA, &TChemA);
 								LSTm_removeFirst(mAtt);
 							}
 							LSTm_delete(mAtt);
@@ -702,7 +713,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d, int ta
 					}
 					else
 					{	
-						genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, as3d, tailleMax, tailleMocDep);
+						genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, as3d, tailleMax, tailleMocDep, &nbChemS, &TChemS, &nbChemA, &TChemA);
 
 					}
 					
@@ -716,4 +727,6 @@ void assemblage(char* InputFile, Main_t* m, double alpha, Ashape_t* as3d, int ta
 	}
 	
 	free(mocAtt);
+	printf("\nNombre de Chemin abandonné car \ndans enveloppe : %d pour taille moyenne : %f\ntrop proche atome : %d pour taille moyenne : %f\n",nbChemS,(float)TChemS/nbChemS,
+	nbChemA, (float)TChemA/nbChemA);
 }
