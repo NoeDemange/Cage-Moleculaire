@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc -fopenmp
 CFLAGS=-Wall -g
 LDFLAGS=-lR -lm
 MEMFLAGS=-fsanitize=address -static-libasan

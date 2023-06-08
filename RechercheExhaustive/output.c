@@ -296,7 +296,7 @@ void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
 	
 	//Sortie sans enveloppe
 	Shell_t* s2 = SHL_copy(s);
-	for (int j = 0; j < SHL_nbAtom(s2); j++)
+	for (int j = 0; j < /*SHL_nbAtom*/size(s2); j++)
 	{
 		if (flag(atom(s2,j)) == 0)
 		{
