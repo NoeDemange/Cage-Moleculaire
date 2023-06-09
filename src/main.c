@@ -12,17 +12,28 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+// #include <getopt.h>
 #include <time.h>
+
+// #define OPTSTR "i:a:s:h"
+// #define USAGE_FMT  "%s [-i inputfile] [-a alpha] [-s sizemax] [-h]"
 
 #define PATHNAME "alphashape.R"
 
-void source (const char* name) {
+// typedef struct {
+//   FILE         *input;
+//   double				alpha;
+// 	int					sizeMax;
+// } options_t;
+
+void source(const char* name) {
 	SEXP e;
 	int errorOccurred;
+
 	PROTECT(e = lang2(install("source"), mkString(name)));
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
 	if (errorOccurred) {
-		printf("an error has occured...\n");
+		printf("Une erreur est survenue lors de l'utilisation de R.\n");
   }
   UNPROTECT(1);
 }
@@ -30,18 +41,6 @@ void source (const char* name) {
 int main(int argc, char** argv) {
 	
 	time_t debut = time(NULL);
-	
-	/************ Initialisation de l'environnement R ************/
-	//char * oldPath;
-	int r_argc = 2;
-
-	//oldPath = getenv ("R_HOME");
-	setenv ("R_HOME", "/usr/lib/R", 1);
-
-	char *r_argv [] = {"R", "--silent"};
-	Rf_initEmbeddedR (r_argc, r_argv);
-
-	source (PATHNAME);
 
 	//Vérification qu'une entrée est passée en paramètre
 	if (argc < 4) {
@@ -57,11 +56,35 @@ int main(int argc, char** argv) {
 	
 	substrat(m) = initMolecule(name);
 	MOL_write(substrat(m));
-	envelope(m) = createShell(substrat(m), alpha);
+	
+	/************ Initialisation de l'environnement R ************/
+	int r_argc = 2;
 
+	setenv("R_HOME", "/usr/lib/R", 1);
+
+	char *r_argv [] = {"R", "--silent"};
+	Rf_initEmbeddedR (r_argc, r_argv);
+
+	SEXP e;
+	int errorOccurred;
+	PROTECT(e = lang2(install("setwd"), mkString("src")));
+  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+	if (errorOccurred) {
+		printf("Une erreur est survenue lors de l'utilisation de R.\n");
+  }
+  UNPROTECT(1);
+
+	source(PATHNAME);
+
+	/************ Génération de l'enveloppe et des motifs liants ************/
+	envelope(m) = createShell(substrat(m), alpha);
 	SHL_write(envelope(m));
 	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
+
 	generationMoc(m);
+
+	/************** Fermeture de l'environnement R ***************/
+	Rf_endEmbeddedR (0);
 	
 	/********** Assemblage des motifs **********/
 	
@@ -72,10 +95,6 @@ int main(int argc, char** argv) {
 	output(name, m);
 	
 	MN_delete(m);
-
-	/************** Fermeture de l'environnement R ***************/
-	Rf_endEmbeddedR (0);
-	//setenv ("R_HOME", oldPath, 1);
 		
 	time_t fin = time(NULL);
 	long secondes = (long) difftime(fin, debut);
@@ -86,5 +105,5 @@ int main(int argc, char** argv) {
 	secondes -= minute * 60;
 	printf("Temps d'execution : %d heure(s) %d minute(s) %ld seconde(s)\n", heure, minute, secondes);
 	
-	return 0;
+	return EXIT_SUCCESS;
 }

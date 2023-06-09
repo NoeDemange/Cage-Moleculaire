@@ -249,21 +249,8 @@ Shell_t* createShell(Molecule_t* m, double alpha) {
 	
 	expansion(m, s);
 	
-	SHL_writeMol2("../Results/vec.mol2", s);
+	SHL_writeMol2("../results/vec.mol2", s);
 	alphaShape(s, alpha);
-	printf("Graphe de dépendance de l'enveloppe.\n");
-	GPH_write(bond(s));	
-
-	return s;
-}
-
-Shell_t* createShell2(Molecule_t* m, double alpha, Ashape_t** as3d2) {
-	Shell_t* s = SHL_create();
-	
-	expansion(m, s);
-	
-	SHL_writeMol2("../Results/vec.mol2", s);
-	*as3d2 = alphaShape2(s, alpha);
 	printf("Graphe de dépendance de l'enveloppe.\n");
 	GPH_write(bond(s));	
 

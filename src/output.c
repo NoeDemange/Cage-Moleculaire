@@ -8,8 +8,8 @@
 char* createDir(char *input) {
   char* dirName = malloc (256 * sizeof(char));
   
-  mkdir("../Results", 0755);
-  sprintf(dirName,"../Results/%s",input);
+  mkdir("../results", 0755);
+  sprintf(dirName,"../results/%s",input);
   mkdir(dirName,0755);
 
   return dirName;
@@ -17,7 +17,7 @@ char* createDir(char *input) {
 
 char* createUnderDir(char *input, int nbmotif) {
   char* dirName = malloc (256 * sizeof(char));
-  sprintf(dirName,"../Results/%s/%d",input, nbmotif);
+  sprintf(dirName,"../results/%s/%d",input, nbmotif);
   mkdir(dirName,0755);
 
   return dirName;

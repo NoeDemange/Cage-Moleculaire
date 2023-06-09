@@ -3,18 +3,22 @@ LDFLAGS=-lR -lm
 MEMFLAGS=-fsanitize=address -static-libasan
 
 INCPATH=-I/usr/share/R/include
-INCDIR=-I../include
-OBJDIR=../obj
-SRCDIR=.
+INCDIR=-Iinclude
+OBJDIR=obj
+SRCDIR=src
+BINDIR=bin
 
 CC=gcc -fopenmp
-EXEC=clean dir test
+EXEC=clean dir $(BINDIR)/test
 SRC:=$(wildcard $(SRCDIR)/*.c)
 OBJ:=$(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: $(EXEC)
 
-test: $(OBJ)
+#run: $(BINDIR)/test
+#	./$(BINDIR)/test ../Exemples/ADENOS10.xyz 3 13
+
+$(BINDIR)/test: $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 $(OBJ) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
@@ -22,12 +26,14 @@ $(OBJ) : $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 dir:
 	mkdir $(OBJDIR)
+	mkdir $(BINDIR)
 
 .PHONY: clean mrproper all mem
 
 clean:
 	rm -rf $(OBJDIR)
+	rm -rf $(BINDIR)
 	ls -s
 
 mrproper: clean
-	rm -rf $(EXEC) ../Results
+	rm -rf results

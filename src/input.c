@@ -18,6 +18,11 @@ Molecule_t* readInput_xyz(char* inputname) {
 	Molecule_t* m;
 	
 	filestream = fopen(inputname, "r");
+
+  if(!filestream) {
+    printf("Problème lors de l'ouverture du fichier %s en lecture. Fermeture du programme...\n", inputname);
+    exit(EXIT_FAILURE);
+  }
 	
 	ret = fscanf(filestream, "%d", &size);
 	m = MOL_create(size);
@@ -48,7 +53,11 @@ void readCovalence(Molecule_t* m) {
   int i, j, number, ret;
   Atom_t* atoms;
   
-  filestream = fopen("../resources/rdc.dat", "r");
+  filestream = fopen("resources/rdc.dat", "r");
+
+  if(!filestream) {
+    printf("Erreur lors de l'ouverture du fichier de rayons de covalence. Fermeture du programme...\n");
+  }
   
   ret = fscanf(filestream, "%d", &number);
   atoms = malloc(number*sizeof(Atom_t));

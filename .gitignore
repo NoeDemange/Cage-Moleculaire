@@ -1,4 +1,5 @@
 .vscode
 Exemples/*
-*.o
+obj/*
+bin/*
 ResultsPriscille/*
