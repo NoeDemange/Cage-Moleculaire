@@ -238,26 +238,6 @@ void alphaShape(Shell_t* s, double alpha) {
 	ASP_delete(as3d);
 }
 
-Ashape_t* alphaShape2(Shell_t* s, double alpha) {
-	int i;
-	Ashape_t* as3d2 = NULL;
-	Ashape_t* as3d = Cashape3d2(s, alpha, &as3d2);
-	
-	for (i=0; i<(as3d->nb_edge/2); i++) {
-		SHL_addEdge(s, as3d->edge[i]-1, as3d->edge[i+as3d->nb_edge/2]-1);
-	}
-
-	for (i=0; i<size(s); i++) {
-		if (neighborhoodSize(atom(s,i)) == 0) {
-			SHL_removeAtom(s, i);
-			GPH_removeVertex(bond(s),i);
-		}
-	}
-	ASP_delete(as3d);
-	
-	return as3d2;
-}
-
 /**
 * Création complète de l'enveloppe à partir de la molécule.
 * 

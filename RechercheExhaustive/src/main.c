@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
 	source (PATHNAME);
 
 	//Vérification qu'une entrée est passée en paramètre
-	if (argc < 3) {
-		printf("Veuillez rentrer le nom du fichier de la molécule et/ou l'alpha et/ou la taille maximale d'un chemin en nombre d'atomes\n");
+	if (argc < 4) {
+		printf("Veuillez rentrer le nom du fichier de la molécule et/ou l'alpha et/ou la taille maximale d'un chemin en nombre d'atomes et taille max du chemin\n");
 		exit(1);
 	}
 
@@ -54,50 +54,20 @@ int main(int argc, char** argv) {
 	int tailleMax = atoi(argv[3]);
 
 	Main_t* m = MN_create();
-	Ashape_t* as3d2 = NULL;
 	
 	substrat(m) = initMolecule(name);
 	MOL_write(substrat(m));
-	//envelope(m) = createShell(substrat(m), alpha);
-
-	envelope(m) = createShell2(substrat(m), alpha, &as3d2);
+	envelope(m) = createShell(substrat(m), alpha);
 
 	SHL_write(envelope(m));
 	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
 	generationMoc(m);
-
-	//SHL_write(envelope);
-	//SHL_write(moc(m,0));
-	
 	
 	/********** Assemblage des motifs **********/
 	
-	assemblage(name, m, alpha, as3d2, tailleMax);
-	
-	ASP_delete(as3d2);
+	assemblage(name, m, alpha, tailleMax);
 
 	/********** Écriture des résultats dans des fichiers **********/
-
-	//Création du dossier de sortie.
-	/*char* name = getBasename (name);
-  char* dirName = createDir(name);
-  char outputname[512];
-
-  printf("Écriture de la molécule %s.\n", name);
-  sprintf(outputname, "%s/%s.mol2", dirName, name);
-  MOL_writeMol2(outputname, substrat(m));
-
-  printf("Écriture de l'enveloppe.\n");
-  sprintf(outputname, "%s/%s_shell.mol2", dirName, name);
-  SHL_writeMol2(outputname, envelope(m));
-
-  printf("Écriture de l'enveloppe après insertion des motifs aromatique.\n");
-  sprintf(outputname, "%s/%s_aro.mol2", dirName, name);
-  SHL_writeMol2(outputname, envarom(m));
-
-  //Suppression des stuctures.
-	free(name);
-	free(dirName);*/
 
 	output(name, m);
 	
