@@ -48,7 +48,7 @@ void readCovalence(Molecule_t* m) {
   int i, j, number, ret;
   Atom_t* atoms;
   
-  filestream = fopen("rdc.dat", "r");
+  filestream = fopen("../resources/rdc.dat", "r");
   
   ret = fscanf(filestream, "%d", &number);
   atoms = malloc(number*sizeof(Atom_t));

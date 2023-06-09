@@ -18,9 +18,12 @@
 
 void source (const char* name) {
 	SEXP e;
-
+	int errorOccurred;
 	PROTECT(e = lang2(install("source"), mkString(name)));
-  R_tryEval(e, R_GlobalEnv, NULL);
+  R_tryEval(e, R_GlobalEnv, &errorOccurred);
+	if (errorOccurred) {
+		printf("an error has occured...\n");
+  }
   UNPROTECT(1);
 }
 
@@ -56,6 +59,7 @@ int main(int argc, char** argv) {
 	substrat(m) = initMolecule(name);
 	MOL_write(substrat(m));
 	//envelope(m) = createShell(substrat(m), alpha);
+
 	envelope(m) = createShell2(substrat(m), alpha, &as3d2);
 
 	SHL_write(envelope(m));
