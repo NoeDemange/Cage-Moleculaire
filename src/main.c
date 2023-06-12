@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 	printf("####### Fin de génération de l'enveloppe avec motifs liants #######\n");
 	/********** Assemblage des motifs **********/
 	
-	printf("####### Début de génération des chemins #######\n");
+	printf("\n####### Début de génération des chemins #######\n");
 	assemblage(name, m, alpha, tailleMax);
 	
 	MN_delete(m);
