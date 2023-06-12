@@ -104,8 +104,8 @@ Molecule_t* initMolecule(char* name) {
 
 	MOL_createBond(m);
 
-	printf("Graphe de dépendance du sustrat.\n");
-	GPH_write(bond(m));
+	//printf("Graphe de dépendance du sustrat.\n");
+	//GPH_write(bond(m));
   
   return m;
 }

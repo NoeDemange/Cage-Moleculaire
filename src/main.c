@@ -52,10 +52,15 @@ int main(int argc, char** argv) {
 	double alpha = atof(argv[2]);
 	int tailleMax = atoi(argv[3]);
 
+	printf("\n####### Informations #######\n");
+	printf("- Substrat : %s\n- Alpha : %f\n- Taille maximum d'un chemin (en atomes) : %d\n",name,alpha,tailleMax);
+
+	printf("\n####### Début de génération de l'enveloppe avec motifs liants #######\n");
+
 	Main_t* m = MN_create();
 	
 	substrat(m) = initMolecule(name);
-	MOL_write(substrat(m));
+	//MOL_write(substrat(m));
 	
 	/************ Initialisation de l'environnement R ************/
 	
@@ -80,8 +85,8 @@ int main(int argc, char** argv) {
 	/************ Génération de l'enveloppe et des motifs liants ************/
 
 	envelope(m) = createShell(substrat(m), alpha);
-	SHL_write(envelope(m));
-	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
+	//SHL_write(envelope(m));
+	//printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
 
 	generationMoc(m);
 
@@ -93,8 +98,10 @@ int main(int argc, char** argv) {
 
 	output(name, m);
 	
+	printf("####### Fin de génération de l'enveloppe avec motifs liants #######\n");
 	/********** Assemblage des motifs **********/
 	
+	printf("####### Début de génération des chemins #######\n");
 	assemblage(name, m, alpha, tailleMax);
 	
 	MN_delete(m);

@@ -31,7 +31,7 @@ void generationDep(Main_t* m) {
 		}
 		
 	}
-	printf("mocSize %d\n", mocSize(m));
+	//printf("mocSize %d\n", mocSize(m));
 
 	//Création des différents moc en fonction des types de D/A.
 }
@@ -329,11 +329,11 @@ void generationMoc(Main_t* m) {
 	//SHL_write(moc(m, idMoc));
 	envarom(m) = SHL_copy(envelope(m));
 	//generationDep(m);
-	printf("Génération des motifs aromatiques.\n");
+	printf("### Génération des motifs aromatiques ###\n");
 	generationCycle(envarom(m));
 	//SHL_write(envarom(m));
 
-	printf("Génération des motifs hydrogènes.\n");
+	printf("### Génération des motifs hydrogènes ###\n");
 	MN_copyMoc(m, envarom(m));
 	generationDep(m);
 	generationHydro(m);
