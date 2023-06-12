@@ -519,7 +519,8 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 // Vérifie si le sommet se situe en bordure de motif
 int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
 	
-	for (int i = 0; i < LST_nbElements(neighborhood(sommet)); i++) // Pour tous les voisins du sommet
+	int vertexNumberOfNeighbors = LST_nbElements(neighborhood(sommet));
+	for (int i = 0; i < vertexNumberOfNeighbors; i++) // Pour tous les voisins du sommet
 	{
 		// Si ce sommet est dans un motif et qu'un de ses voisins est de l'enveloppe
 		if (flag(atom(s, neighbor(sommet, i))) == 0 && flag(sommet) != 0 )

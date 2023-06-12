@@ -34,6 +34,7 @@ void source(const char* name) {
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
 	if (errorOccurred) {
 		printf("Une erreur est survenue lors de l'utilisation de R.\n");
+		exit(EXIT_FAILURE);
   }
   UNPROTECT(1);
 }
@@ -77,6 +78,7 @@ int main(int argc, char** argv) {
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
 	if (errorOccurred) {
 		printf("Une erreur est survenue lors de l'utilisation de R.\n");
+		exit(EXIT_FAILURE);
   }
   UNPROTECT(1);
 
@@ -94,11 +96,12 @@ int main(int argc, char** argv) {
 
 	Rf_endEmbeddedR(0);
 
-	/********** Écriture des résultats dans des fichiers **********/
+	/********** Écriture du substrat et de l'enveloppe dans des fichiers **********/
 
 	output(name, m);
 	
 	printf("####### Fin de génération de l'enveloppe avec motifs liants #######\n");
+
 	/********** Assemblage des motifs **********/
 	
 	printf("\n####### Début de génération des chemins #######\n");

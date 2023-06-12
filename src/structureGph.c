@@ -119,30 +119,49 @@ void GPH_removeEdge(Graph_t* g, unsigned id1, unsigned id2) {
 	}
 }
 
+/**
+ * Détermine récursivement si un sommet donné appartient à un cycle.
+ * Le cycle ne doit pas contenir plus de 6 atomes.
+ * 
+ * @param g Le graphe auquel appartient le sommet id.
+ * @param l La liste des sommets visités au cours de la récursion.
+ * @param id Le numéro du sommet traité dans le graphe.
+ * @param idP Le numéro du sommet précédemment traité.
+ * @return (booléen) 1 si le sommet appartient à un cycle, 0 sinon. 
+*/
 int GPH_cycle(Graph_t* g, List_t* l, unsigned id, unsigned idP) {
 
 	int i, tmp = 0;
 	Vertex_t* v;
 
-	if (id == elts(l,0))
+	if (id == elts(l,0)) {
 		return 1;
-	if (LST_nbElements(l) > 5 || LST_check(l, id)) // MODIF, vérification que le sommet id n'a pas déjà été visité
+	}
+	if (LST_nbElements(l) > 5 || LST_check(l, id)) {
 		return 0;
-
+	}
 	LST_addElement(l, id);
 	v = vertex(g, GPH_getIndice(g, id));
 
-	for (i=0; i<nbNeighbors(v) && tmp == 0; i++) {
-		if (neighbor(v, i) != idP)
+	for (i = 0; i < nbNeighbors(v) && tmp == 0; i++) {
+		if (neighbor(v, i) != idP) {
 			tmp = GPH_cycle(g, l, neighbor(v, i), id);
+		}
 	}
-
 	LST_removeElement(l, id);
 	return tmp;
 }
 
+/**
+ * Détermine quels sont les sommets d'un graphe appartenant à un cycle.
+ * Le cycle ne peut pas faire plus de 6 sommets.
+ *
+ * @param g Le graphe dans lequel on cherche des cycles.
+ * @return La liste des sommets de g appartenant à un cycle.
+*/
 List_t* GPH_seekCycle(Graph_t* g) {
 
+	/********** Réduction du graphe ************/
 	int i;
 	List_t* out = LST_create();
 	List_t* l = LST_create();
@@ -157,18 +176,18 @@ List_t* GPH_seekCycle(Graph_t* g) {
 		v = vertex(g, GPH_getIndice(g, elts(l,0)));
 		n = vertex(g, GPH_getIndice(g, neighbor(v,0)));
 
-		if (nbNeighbors(n) == 2)
+		if (nbNeighbors(n) == 2) {
 			LST_addElement(l, id(n));
+		}
 		GPH_removeVertex(g, elts(l,0));
 		LST_removeElement(l, elts(l,0));
 	}
-	//chercher les cycles
+	/***** Recherche des sommets appartenant à un cycle *******/
 	for (i = 0; i < size(g); i++) {
 		if (id(vertex(g,i))!=-1 && GPH_cycle(g, l, id(vertex(g,i)), -1)) {
 			LST_addElement(out, id(vertex(g,i)));
 		}
 	}
-
 	LST_delete(l);
 
 	return out;
