@@ -157,7 +157,7 @@ typedef struct {
 typedef struct {
 	
 	Atom_t* atoms;
-	List_t* cycle;
+	List_t* cycle; // liste des sommets appartenant à un cycle
 	Graph_t* bond;
 	unsigned size;
 } Molecule_t;

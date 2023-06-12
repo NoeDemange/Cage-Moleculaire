@@ -5,13 +5,13 @@
 #include "output.h"
 
 /**
-* Expension de groupement atomique sterique 2.
-* Ajout d'un point dans l'enveloppe.
-* 
-* @param m Molécule (entrée)
-* @param s Enveloppe (sortie)
-* @param id Identifiant du sommet traité de la molécule.
-*/
+ * Expension de groupement atomique sterique 2.
+ * Ajout d'un point dans l'enveloppe.
+ * 
+ * @param m Molécule (entrée).
+ * @param s Enveloppe (sortie).
+ * @param id Identifiant du sommet traité de la molécule.
+ */
 void expansion_AX1E1(Molecule_t* m, Shell_t* s, unsigned id) {
 
 	unsigned indice;
@@ -27,13 +27,13 @@ void expansion_AX1E1(Molecule_t* m, Shell_t* s, unsigned id) {
 }
 
 /**
-* Expension de groupement atomique sterique 3.
-* Ajout de un à quatre points dans l'enveloppe.
-* 
-* @param m Molécule (entrée)
-* @param s Enveloppe (sortie)
-* @param id Identifiant du sommet traité de la molécule.
-*/
+ * Expension de groupement atomique sterique 3.
+ * Ajout de un à quatre points dans l'enveloppe.
+ *
+ * @param m Molécule (entrée).
+ * @param s Enveloppe (sortie).
+ * @param id Identifiant du sommet traité de la molécule.
+ */
 void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 
 	unsigned indice;
@@ -87,13 +87,13 @@ void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 }
 
 /**
-* Expension de groupement atomique sterique 4.
-* Ajout de zéro à trois points dans l'enveloppe.
-* 
-* @param m Molécule (entrée)
-* @param s Enveloppe (sortie)
-* @param id Identifiant du sommet traité de la molécule.
-*/
+ * Expension de groupement atomique sterique 4.
+ * Ajout de zéro à trois points dans l'enveloppe.
+ *
+ * @param m Molécule (entrée).
+ * @param s Enveloppe (sortie).
+ * @param id Identifiant du sommet traité de la molécule.
+ */
 void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 
 	unsigned indice;
@@ -147,13 +147,13 @@ void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 
 /********************* A refaire ************************/
 /**
-* Expension de groupement atomique avec un angle à 180°.
-* Ajout de quatre points dans l'enveloppe.
-* 
-* @param m Molécule (entrée)
-* @param s Enveloppe (sortie)
-* @param id Identifiant du sommet traité de la molécule.
-*/
+ * Expension de groupement atomique avec un angle à 180°.
+ * Ajout de quatre points dans l'enveloppe.
+ * 
+ * @param m Molécule (entrée)
+ * @param s Enveloppe (sortie)
+ * @param id Identifiant du sommet traité de la molécule.
+ */
 void expansion_AX2E0(Molecule_t* m, Shell_t* s, unsigned id) {
 	Point_t normal, newCoords;
 	Atom_t* a = atom(m,id),	*x1 = atom(m,neighbor(a,0)),
@@ -177,19 +177,19 @@ void expansion_AX2E0(Molecule_t* m, Shell_t* s, unsigned id) {
 }
 
 /**
-* Expansion de l'ensemble de la molécule.
-* Ajout de zéro à trois points dans l'enveloppe.
-* 
-* @param m Molécule (entrée) Déjà instanciée.
-* @param s Enveloppe (sortie) créée.
-*/
+ * Expansion de l'ensemble de la molécule.
+ * Ajout de zéro à trois points dans l'enveloppe.
+ * 
+ * @param m Molécule (entrée) Déjà instanciée.
+ * @param s Enveloppe (sortie) créée.
+ */
 void expansion(Molecule_t* m, Shell_t* s) {
 	int i, j;
 
 	//Création du nuage de points constituant l'enveloppe.
 	/*rajouter une liste pour être sur qu'ils soient fait dans le bon ordre*/
 	/*vérifier que toutes les donnés ont été calculé*/
-	for (i=0; i<size(m); i++) {
+	for (i = 0; i < size(m); i++) {
 		if (ligands(atom(m,i)) == 1 && lonePairs(atom(m,i)) == 1)
 			expansion_AX1E1(m, s, i);
 		else if (steric(atom(m,i)) == 3)
@@ -200,9 +200,9 @@ void expansion(Molecule_t* m, Shell_t* s) {
 			expansion_AX2E0(m, s, i);
 	}
 
-	//Construction d'arrêtes du graphe.
-	for (i=0; i<size(bond(s)) && id(vertex(bond(s),i)) != -1; i++)
-		for (j=i+1; j<size(bond(s)) && id(vertex(bond(s),j)) != -1; j++) {
+	//Construction d'arêtes du graphe.
+	for (i = 0; i < size(bond(s)) && id(vertex(bond(s),i)) != -1; i++)
+		for (j = i + 1; j < size(bond(s)) && id(vertex(bond(s),j)) != -1; j++) {
 			if (parentAtom(atom(s,id(vertex(bond(s),i)))) == parentAtom(atom(s,id(vertex(bond(s),j))))
 					|| checkBond(m,
 						parentAtom(atom(s,id(vertex(bond(s),i)))), 
@@ -214,36 +214,35 @@ void expansion(Molecule_t* m, Shell_t* s) {
 }
 
 /**
-* Construction des arêtes de l'enveloppe 
-* Appel à R.
-* 
-* @param s			Enveloppe possédant déjà un nuage de points.
-* @param alpha 	Paramètre de la sphère. (2 est souvent une bonne mesure, 3 sinon)
-*/
+ * Construction des arêtes de l'enveloppe.
+ * Appel à R.
+ * 
+ * @param s				Enveloppe possédant déjà un nuage de points.
+ * @param alpha 	Paramètre de la sphère. (2 est souvent une bonne mesure, 3 sinon)
+ */
 void alphaShape(Shell_t* s, double alpha) {
 	int i;
 	Ashape_t* as3d = Cashape3d(s, alpha);
 
-	for (i=0; i<(as3d->nb_edge/2); i++) {
+	for (i = 0; i < (as3d->nb_edge/2); i++) {
 		SHL_addEdge(s, as3d->edge[i]-1, as3d->edge[i+as3d->nb_edge/2]-1);
 	}
 
-	for (i=0; i<size(s); i++) {
+	for (i = 0; i < size(s); i++) {
 		if (neighborhoodSize(atom(s,i)) == 0) {
 			SHL_removeAtom(s, i);
 			GPH_removeVertex(bond(s),i);
 		}
 	}
-	
 	ASP_delete(as3d);
 }
 
 /**
-* Création complète de l'enveloppe à partir de la molécule.
-* 
-* @param m Molécule (entrée) Déjà instanciée.
-* @param s Enveloppe (sortie) créée.
-*/
+ *  Création complète de l'enveloppe à partir de la molécule.
+ *
+ * @param m Molécule (entrée) Déjà instanciée.
+ * @param s Enveloppe (sortie) créée.
+ */
 Shell_t* createShell(Molecule_t* m, double alpha) {
 	Shell_t* s = SHL_create();
 	

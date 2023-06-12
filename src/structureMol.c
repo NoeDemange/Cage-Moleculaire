@@ -5,13 +5,12 @@
 /* MOLECULE ***************************/
 /**************************************/
 
-/*
-*	Fonction qui ajoute l'identifiant d'un voisin à un atome
-*
-*	@param 	a 	Pointeur de l'atome
-* @param	id 	Identifiant à rajouter
-*
-*/
+/**
+ * 	Ajoute l'identifiant d'un voisin à un atome.
+ * 
+ * 	@param 	a 	Pointeur de l'atome.
+ *  @param	id 	Identifiant à rajouter.
+ */
 void MOL_addNeighbor(Atom_t* a, unsigned id) {
 
 	if (LST_getIndice(neighborhood(a), id) == -1) {
@@ -26,49 +25,48 @@ void MOL_addNeighbor(Atom_t* a, unsigned id) {
 	}
 }
 
-/*
-*	Fonction qui supprime un voisin d'un atome.
-*
-*	@param 	a 	Pointeur de l'atome
-* @param	id 	Identifiant à retirer
-*
-*/
+/**
+ * 	Supprime un voisin d'un atome.
+ *
+ * 	@param 	a 	Pointeur de l'atome.
+ *  @param	id 	Identifiant à retirer.
+ */
 void MOL_removeNeighbor(Atom_t* a, unsigned id) {
+
 	int indice = LST_getIndice(neighborhood(a), id);
 
 	if (indice != -1)
 		neighbor(a, indice) = -1;
 }
 
-/*
-*	Fonction qui calcule le nombre de doublets liants d'un atome.
-* Nombre de doublets liants = Nombre de voisins dans la molécule.
-*
-*	@param 	a 	Pointeur de l'atome.
-*
-*/
+/**
+ * 	Calcule le nombre de doublets liants d'un atome.
+ *  Nombre de doublets liants = Nombre de voisins dans la molécule.
+ *
+ *	@param 	a 	Pointeur de l'atome.
+ */
 void MOL_nbLigands(Atom_t* a) {
-	int i, cpt = 0;
-
-	for (i=0; i<4; i++)
-		if (neighbor(a,i) != -1)
+	
+	int cpt = 0;
+	for (int i = 0; i < 4; i++) {
+		if (neighbor(a,i) != -1) {
 			cpt++;
-
+		}
+	}
 	ligands(a) = cpt;
 }
 
-/*
-*	Fonction qui calcule le nombre de doublets non liants d'un atome.
-*
-*	@param 	a 			Pointeur de l'atome.
-* @param	alpha 	Moyenne dans angles formés par les voisins de l'atome.
-* @param	stericNeighbor	Nombre de doublets du voisin de l'atome (pour le cas où il n'en possède qu'un seul.
-*	@param	cycle 	Booléen qui indique si l'atome appartient à un cycle.
-*/
+/**
+ * 	Calcule le nombre de doublets non liants d'un atome.
+ *
+ * @param 	a 			Pointeur de l'atome.
+ * @param	alpha 	Moyenne dans angles formés par les voisins de l'atome.
+ * @param	stericNeighbor	Nombre de doublets du voisin de l'atome (pour le cas où il n'en possède qu'un seul.
+ * @param	cycle 	Booléen qui indique si l'atome appartient à un cycle.
+ */
 void MOL_nbLonePairs(Atom_t* a, float alpha, int stericNeighbor, unsigned cycle) {
 
-	if (ligands(a) == 1)
-	{
+	if (ligands(a) == 1) {
 		if (!strcmp(symbol(a), "H")) {
 			lonePairs(a) = 1;
 		}
@@ -99,43 +97,39 @@ void MOL_nbLonePairs(Atom_t* a, float alpha, int stericNeighbor, unsigned cycle)
 	}
 }
 
-/*
-* Fonction qui trouve tous les sommets appartenant à un cycle d'une molécule.
-*
-* @param	m 	Adresse de la molécule.
-*/
+/**
+ *  Trouve tous les sommets appartenant à un cycle d'une molécule.
+ *
+ *  @param	m 	Adresse de la molécule.
+ */
 void MOL_seekCycle(Molecule_t* m) {
 
 	Graph_t* g = MolToGph(m);
-
 	m->cycle = GPH_seekCycle(g);
-
 	GPH_delete(g);
 }
 
-/*
-*	Fonction qui calcule ne nombre d'arêtes (de liaisons) d'un molécule.
-*
-*	@param 	m 	Pointeur de la molécule.
-*
-*/
+/**
+ * Calcule le nombre d'arêtes (de liaisons) d'un molécule.
+ *
+ * 	@param 	m 	Pointeur de la molécule.
+ */
 int MOL_nbEdges(Molecule_t* m) {
-	int i, cpt = 0;
+	int cpt = 0;
 
-	for (i=0; i<size(m); i++)
+	for (int i = 0; i < size(m); i++) {
 		cpt += ligands(atom(m,i));
-
+	}
 	return cpt/2;
 }
 
-/*
-*	Fonction qui ajoute une arête entre deux sommets d'une molécule.
-*
-*	@param 	m 	Pointeur de la molécule.
-* @param	id1	Identifiant du premier sommet.
-* @param	id2	Identifiant du deuxième sommet.
-*
-*/
+/**
+ * 	Fonction qui ajoute une arête entre deux sommets d'une molécule.
+ *
+ * 	@param 	m 	Pointeur de la molécule.
+ *  @param	id1	Identifiant du premier sommet.
+ *  @param	id2	Identifiant du deuxième sommet.
+ */
 void MOL_addEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 	if (id1 != id2) {
 		MOL_addNeighbor(atom(m,id1), id2);
@@ -143,25 +137,24 @@ void MOL_addEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 	}
 }
 
-/*
-*	Fonction qui supprime une arête entre deux sommets d'une molécule.
-*
-*	@param 	m 	Pointeur de la molécule.
-* @param	id1	Identifiant du premier sommet.
-* @param	id2	Identifiant du deuxième sommet.
-*
-*/
+/**
+ * 	Supprime une arête entre deux sommets d'une molécule.
+ *
+ * 	@param 	m 	Pointeur de la molécule.
+ *  @param	id1	Identifiant du premier sommet.
+ *  @param	id2	Identifiant du deuxième sommet.
+ */
 void MOL_removeEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 	
 	MOL_removeNeighbor(atom(m,id1), id2);
 	MOL_removeNeighbor(atom(m,id2), id1);
 }
 
-/*
-*	Fonction qui initialise un nouvel atome.
-*
-*	@param 	a 	Pointeur de l'atome.
-*/
+/**
+ * 	Initialise un nouvel atome.
+ * 
+ * 	@param 	a 	Pointeur de l'atome.
+ */
 void MOL_createAtom(Atom_t* a) {
 
 	symbol(a)[0] = '\0';
@@ -176,14 +169,13 @@ void MOL_createAtom(Atom_t* a) {
 	neighborhood(a) = LST_create();
 }
 
-/*
-* Fonction qui crée le graphe de dépendance d'une molécule.
-* Le graphe de dépendance regroupe les atomes de la molécule qui peut participer à une liaison hydrogène.
-* Il y a une arête entre deux sommets s'ils ne peuvent pas participer à des liaisons hydrogènes en même temps.
-*
-*	@param	m 	Molécule.
-*
-*/
+/**
+ *  Crée le graphe de dépendance d'une molécule.
+ *  Le graphe de dépendance regroupe les atomes de la molécule qui peut participer à une liaison hydrogène.
+ *  Il y a une arête entre deux sommets s'ils ne peuvent pas participer à des liaisons hydrogènes en même temps.
+ *
+ * 	@param	m 	Molécule.
+ */
 void MOL_createBond(Molecule_t* m) {
 
 	int i, j, k;
@@ -221,15 +213,17 @@ Point_t MOL_seekNormal(Molecule_t* m, unsigned ida, unsigned dad){
 
 	Atom_t* a = atom(m,ida);
 
-	if (ligands(a) == 1)
+	if (ligands(a) == 1) {
 		return MOL_seekNormal(m, neighbor(a,0), ida);
-
+	}
 
 	if (steric(a) == 2) {
-		if (neighbor(a,0) != dad)
+		if (neighbor(a,0) != dad) {
 			return MOL_seekNormal(m, neighbor(a,0), ida);
-		else
+		}
+		else {
 			return MOL_seekNormal(m, neighbor(a,1), ida);
+		}
 	}
 
 	return planNormal(coords(a),
@@ -244,14 +238,15 @@ Point_t MOL_seekNormal(Molecule_t* m, unsigned ida, unsigned dad){
 * @return				Nouvelle molécule.
 */
 Molecule_t* MOL_create(unsigned size) {
-	int i;
+
 	Molecule_t *m = malloc(sizeof(Molecule_t));
 
 	size(m) = size;
 	m->atoms = malloc(size*sizeof(Atom_t));
 
-	for (i=0; i<size; i++)
+	for (int i = 0; i < size; i++) {
 		MOL_createAtom(atom(m,i));
+	}
 
 	m->cycle = NULL;
 	m->bond = GPH_create();
@@ -259,27 +254,27 @@ Molecule_t* MOL_create(unsigned size) {
 	return m;
 }
 
-/*
-*	Fonction qui supprime un atome d'une molécule.
-* Supprimer un atome revient à supprimer la liste de ses voisins.
-*
-*	@param 	a 	Atome à supprimer.
-*/
+/**
+ * 	Supprime un atome d'une molécule.
+ *  Supprimer un atome revient à supprimer la liste de ses voisins.
+ *
+ * 	@param 	a 	Atome à supprimer.
+ */
 void MOC_deleteAtom(Atom_t* a) {
 
 	LST_delete(neighborhood(a));
 }
 
-/*
-*	Fonction qui supprime une molécule.
-*
-*	@param 	m 	Molécule à supprimer.
-*/
+/**
+ * 	Supprime une molécule.
+ *
+ * @param 	m 	Molécule à supprimer.
+ */
 void MOL_delete(Molecule_t* m) {
 
-	int i;
-	for (i=0; i<size(m); i++)
+	for (int i = 0; i < size(m); i++) {
 		MOC_deleteAtom(atom(m,i));
+	}
 
 	free(m->atoms);
 	LST_delete(m->cycle);

@@ -126,7 +126,7 @@ int GPH_cycle(Graph_t* g, List_t* l, unsigned id, unsigned idP) {
 
 	if (id == elts(l,0))
 		return 1;
-	if (LST_nbElements(l) > 5)
+	if (LST_nbElements(l) > 5 || LST_check(l, id)) // MODIF, vérification que le sommet id n'a pas déjà été visité
 		return 0;
 
 	LST_addElement(l, id);
@@ -147,8 +147,7 @@ List_t* GPH_seekCycle(Graph_t* g) {
 	List_t* out = LST_create();
 	List_t* l = LST_create();
 	Vertex_t* v, *n;
-
-	for (i=0; i<size(g); i++) {
+	for (i = 0; i < size(g); i++) {
 		if (nbNeighbors(vertex(g, i)) == 1)
 			LST_addElement(l, id(vertex(g,i)));
 	}
@@ -160,16 +159,14 @@ List_t* GPH_seekCycle(Graph_t* g) {
 
 		if (nbNeighbors(n) == 2)
 			LST_addElement(l, id(n));
-
 		GPH_removeVertex(g, elts(l,0));
 		LST_removeElement(l, elts(l,0));
 	}
-
 	//chercher les cycles
-	for (i=0; i<size(g); i++) {
-
-		if (id(vertex(g,i))!=-1 && GPH_cycle(g, l, id(vertex(g,i)), -1))
+	for (i = 0; i < size(g); i++) {
+		if (id(vertex(g,i))!=-1 && GPH_cycle(g, l, id(vertex(g,i)), -1)) {
 			LST_addElement(out, id(vertex(g,i)));
+		}
 	}
 
 	LST_delete(l);

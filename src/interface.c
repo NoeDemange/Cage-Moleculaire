@@ -5,11 +5,12 @@
 #include <Rinternals.h>
 #include <Rembedded.h>
 
-/*
-* Appel à R.
-* @param s 		 Enveloppe possédant déjà un nuage de points.
-* @param alpha Paramètre de l'aphashape.
-*/
+/**
+ * Appel à R.
+ *
+ * @param s 		 Enveloppe possédant déjà un nuage de points.
+ * @param alpha  Paramètre de l'aphashape.
+ */
 Ashape_t* Cashape3d(Shell_t* s, double alpha) {
 	Ashape_t* as3d = ASP_create();
 	int i, j, size = SHL_nbAtom(s);

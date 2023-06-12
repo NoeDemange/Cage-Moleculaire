@@ -58,12 +58,13 @@ int main(int argc, char** argv) {
 	MOL_write(substrat(m));
 	
 	/************ Initialisation de l'environnement R ************/
+	
 	int r_argc = 2;
 
 	setenv("R_HOME", "/usr/lib/R", 1);
 
 	char *r_argv [] = {"R", "--silent"};
-	Rf_initEmbeddedR (r_argc, r_argv);
+	Rf_initEmbeddedR(r_argc, r_argv);
 
 	SEXP e;
 	int errorOccurred;
@@ -77,6 +78,7 @@ int main(int argc, char** argv) {
 	source(PATHNAME);
 
 	/************ Génération de l'enveloppe et des motifs liants ************/
+
 	envelope(m) = createShell(substrat(m), alpha);
 	SHL_write(envelope(m));
 	printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
@@ -84,15 +86,16 @@ int main(int argc, char** argv) {
 	generationMoc(m);
 
 	/************** Fermeture de l'environnement R ***************/
-	Rf_endEmbeddedR (0);
-	
-	/********** Assemblage des motifs **********/
-	
-	assemblage(name, m, alpha, tailleMax);
+
+	Rf_endEmbeddedR(0);
 
 	/********** Écriture des résultats dans des fichiers **********/
 
 	output(name, m);
+	
+	/********** Assemblage des motifs **********/
+	
+	assemblage(name, m, alpha, tailleMax);
 	
 	MN_delete(m);
 		
