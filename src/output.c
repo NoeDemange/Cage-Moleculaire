@@ -320,7 +320,7 @@ void output(char* InputFile, Main_t* m) {
   char* dirName = createDir(name);
   //int i;
 
-  printf("taille de %s = %d\n", dirName, (int)strlen(dirName));
+  //printf("taille de %s = %d\n", dirName, (int)strlen(dirName));
 
 
   //copytoDir(InputFile, dirName, name);

@@ -1,6 +1,5 @@
 CFLAGS=-Wall -g
 LDFLAGS=-lR -lm
-MEMFLAGS=-fsanitize=address -static-libasan
 
 INCPATH=-I/usr/share/R/include
 INCDIR=-Iinclude
@@ -28,12 +27,12 @@ dir:
 	mkdir $(OBJDIR)
 	mkdir $(BINDIR)
 
-.PHONY: clean mrproper all mem
+.PHONY: clean mrproper all
 
 clean:
 	rm -rf $(OBJDIR)
 	rm -rf $(BINDIR)
-	ls -s
+	ls
 
 mrproper: clean
 	rm -rf results
