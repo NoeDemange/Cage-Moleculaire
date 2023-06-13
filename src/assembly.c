@@ -468,6 +468,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 
 	for (int i = 2; i < NB_MOTIF; i++)
 	{
+		if(i==3) i++;
 		List_m* lMoc = LSTm_init();
 		List_d* nvDepart = LSTd_init();
 		
