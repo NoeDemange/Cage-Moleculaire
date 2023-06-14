@@ -456,13 +456,17 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 				if(dist(A, B) < DIST_ECART_ENVELOPPE) return;
 			}
 			else {*/
-			if(dist(A, B) < DIST_ECART_CAGE) return;//}
+			if(dist(A, B) < 1/*DIST_ECART_CAGE*/) {
+				return;
+			}//}
 		}
 	}
 	// Vérifier que la position d'ajout est éloigné de 2 du substrat
 	for(int i = 0; i < size(substrat(m)); i++){
 		Point_t A = coords(atom(substrat(m), i));
-			if(dist(A, B) < DIST_ECART_SUBSTRAT) return;
+			if(dist(A, B) < 1/*DIST_ECART_SUBSTRAT*/) {
+				return;
+			}
 	}
 /*************************************************/
 

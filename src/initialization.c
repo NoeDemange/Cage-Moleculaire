@@ -93,8 +93,8 @@ void computeLonePairs(Molecule_t* m) {
 /**
  * Initialise l'ensemble de la molécule.
  *
- * @param 	name	Nom du fichier dans lequel est sauvegardée la molécule.
- * @return  		  Adresse de la Molecule_t.
+ * @param name Nom du fichier dans lequel est sauvegardée la molécule.
+ * @return Adresse de la Molecule_t. 
  */
 Molecule_t* initMolecule(char* name) {
 	Molecule_t* m = readInput_xyz(name);

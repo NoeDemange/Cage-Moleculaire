@@ -4,27 +4,106 @@
 #include "generation.h"
 #include "output.h"
 #include "utile.h"
+#include "main.h"
 #include "assembly.h"
 
 #include <R.h>
 #include <Rinternals.h>
 #include <Rembedded.h>
-
+#include <libgen.h>
 #include <stdlib.h>
 #include <unistd.h>
-// #include <getopt.h>
+#include <getopt.h>
 #include <time.h>
 
-// #define OPTSTR "i:a:s:h"
-// #define USAGE_FMT  "%s [-i inputfile] [-a alpha] [-s sizemax] [-h]"
+int main(int argc, char** argv) {
 
-#define PATHNAME "alphashape.R"
+	time_t start = time(NULL);
 
-// typedef struct {
-//   FILE         *input;
-//   double				alpha;
-// 	int					sizeMax;
-// } options_t;
+	int opt;
+  options_t options = { NULL, DEFLT_ALPHA, DEFLT_SIZEMAX };
+
+  while ((opt = getopt(argc, argv, OPTSTR)) != EOF) {
+    switch(opt) {
+      case 'i':
+				options.input = optarg;
+        break;
+
+			case 'a':
+        options.alpha = atof(optarg);
+        break;
+
+			case 's':
+        options.sizeMax = atoi(optarg);
+        break;
+
+      case 'h':
+      default:
+        usage(argv[0]);
+        break;
+    }
+	}
+
+	if (options.input == NULL) {
+		fprintf(stderr, "Fichier .xyz du substrat manquant.\n");
+		usage(argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	printf("\n####### Informations #######\n");
+	printf("  - Substrat : %s\n  - Alpha : %.1f\n  - Taille maximum d'un chemin (en atomes) : %d\n",
+					 options.input, options.alpha, options.sizeMax);
+
+	Main_t* m = MN_create();
+	substrat(m) = initMolecule(options.input);
+
+	printf("\n####### Initialisation de l'environnement R  #######\n");
+	
+	int r_argc = 2;
+	char *r_argv [] = {"R", "--silent"};
+
+	setenv("R_HOME", "/usr/lib/R", 1);
+	Rf_initEmbeddedR(r_argc, r_argv);
+
+	setWorkingDirectory("src");
+	source(PATHNAME);
+
+	printf("\n####### Début de génération de l'enveloppe avec motifs liants #######\n");
+
+	envelope(m) = createShell(substrat(m), options.alpha);
+	generationMoc(m);
+
+	Rf_endEmbeddedR(0);
+
+	printf("\n####### Ecriture du substrat et de l'enveloppe dans le dossier de résultat #######\n");
+
+	output(options.input, m);
+	
+	printf("\n####### Début de génération des chemins #######\n");
+	assemblage(options.input, m, options.alpha, options.sizeMax);
+	
+	MN_delete(m);
+		
+	time_t end = time(NULL);
+	long seconds = (long) difftime(end, start);
+		
+	int hours = seconds / 3600;
+	seconds -= hours * 3600;
+	int minuts = seconds / 60;
+	seconds -= minuts * 60;
+	printf("\nTemps d'execution : %d heure(s) %d minute(s) %ld seconde(s)\n", hours, minuts, seconds);
+	
+	return EXIT_SUCCESS;
+}
+
+void usage(char *argv0) {
+	if (!argv0) {
+    fprintf(stderr, "Argument manquant pour la fonction 'usage'.\n");
+    exit(EXIT_FAILURE);
+  }
+	fprintf(stderr, USAGE_FMT, basename(argv0), DEFLT_ALPHA, DEFLT_SIZEMAX);
+	exit(EXIT_FAILURE);
+}
 
 void source(const char* name) {
 	SEXP e;
@@ -32,91 +111,24 @@ void source(const char* name) {
 
 	PROTECT(e = lang2(install("source"), mkString(name)));
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
+
 	if (errorOccurred) {
-		printf("Une erreur est survenue lors de l'utilisation de R.\n");
+		fprintf(stderr, "Une erreur est survenue lors de l'utilisation de R.\n");
 		exit(EXIT_FAILURE);
   }
   UNPROTECT(1);
 }
 
-int main(int argc, char** argv) {
-	
-	time_t debut = time(NULL);
-
-	//Vérification qu'une entrée est passée en paramètre
-	if (argc < 4) {
-		printf("Veuillez rentrer le nom du fichier de la molécule et/ou l'alpha et/ou la taille maximale d'un chemin en nombre d'atomes et taille max du chemin\n");
-		exit(1);
-	}
-
-	char* name = argv[1];
-	double alpha = atof(argv[2]);
-	int tailleMax = atoi(argv[3]);
-
-	printf("\n####### Informations #######\n");
-	printf("- Substrat : %s\n- Alpha : %f\n- Taille maximum d'un chemin (en atomes) : %d\n",name,alpha,tailleMax);
-
-	printf("\n####### Début de génération de l'enveloppe avec motifs liants #######\n");
-
-	Main_t* m = MN_create();
-	
-	substrat(m) = initMolecule(name);
-	//MOL_write(substrat(m));
-	
-	/************ Initialisation de l'environnement R ************/
-	
-	int r_argc = 2;
-
-	setenv("R_HOME", "/usr/lib/R", 1);
-
-	char *r_argv [] = {"R", "--silent"};
-	Rf_initEmbeddedR(r_argc, r_argv);
-
+void setWorkingDirectory(char* dir) {
 	SEXP e;
 	int errorOccurred;
-	PROTECT(e = lang2(install("setwd"), mkString("src")));
+
+	PROTECT(e = lang2(install("setwd"), mkString(dir)));
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
+
 	if (errorOccurred) {
-		printf("Une erreur est survenue lors de l'utilisation de R.\n");
+		fprintf(stderr, "Une erreur est survenue lors de l'utilisation de R.\n");
 		exit(EXIT_FAILURE);
   }
   UNPROTECT(1);
-
-	source(PATHNAME);
-
-	/************ Génération de l'enveloppe et des motifs liants ************/
-
-	envelope(m) = createShell(substrat(m), alpha);
-	//SHL_write(envelope(m));
-	//printf("alpha = %0.1f, Nb sommets env = %d\n", alpha, SHL_nbAtom(envelope(m)));
-
-	generationMoc(m);
-
-	/************** Fermeture de l'environnement R ***************/
-
-	Rf_endEmbeddedR(0);
-
-	/********** Écriture du substrat et de l'enveloppe dans des fichiers **********/
-
-	output(name, m);
-	
-	printf("####### Fin de génération de l'enveloppe avec motifs liants #######\n");
-
-	/********** Assemblage des motifs **********/
-	
-	printf("\n####### Début de génération des chemins #######\n");
-	assemblage(name, m, alpha, tailleMax);
-	
-	MN_delete(m);
-		
-	time_t fin = time(NULL);
-	long secondes = (long) difftime(fin, debut);
-		
-	int heure = secondes / 3600;
-	secondes -= heure * 3600;
-	int minute = secondes / 60;
-	secondes -= minute * 60;
-	printf("Temps d'execution : %d heure(s) %d minute(s) %ld seconde(s)\n", heure, minute, secondes);
-	
-	return EXIT_SUCCESS;
 }

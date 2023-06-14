@@ -262,35 +262,32 @@ void generationCycle(Shell_t* s) {
 	List_t* nei;
 	List_t* atomT = LST_create();
 
-	for (i=0; i<size(s); i++) {
-		if (flag(atom(s,i)) != -1)
-			if (cycle(s, i))				
+	for (i = 0; i < size(s); i++) {
+		if (flag(atom(s,i)) != -1) {
+			if (cycle(s, i)) {	
 				LST_addElement(atomT, i);
+			}
+		}
 	}
-
-	for (i=0; i<size(atomT) && elts(atomT,i) != -1; i++) {
-
+	for (i = 0; i < size(atomT) && elts(atomT,i) != -1; i++) {
 		a = atom(s, elts(atomT,i));
 		nei = LST_create();
 
 		//pour tous les voisins de a
-		for (j=0; j<neighborhoodSize(a) && neighbor(a,j) != -1; j++) {
+		for (j = 0; j < neighborhoodSize(a) && neighbor(a,j) != -1; j++) {
 
 			if (!LST_check(atomT, neighbor(a,j)) ||
 			dist(coords(a), coords(atom(s,neighbor(a,j)))) > 1.7) {
-
 				LST_addElement(nei,neighbor(a,j));
-
 			}
 		}
-		
 		//S'il existe au moins deux voisins de a pouvant participés au motif.
 		if (SHL_nbNeighborhood(a) - LST_nbElements(nei) > 1) {
 
 			//Retirer les anciens liens entre l'atome et ses voisins
-			for (j=0; j<size(nei) && elts(nei,j) != -1; j++)
+			for (j = 0; j < size(nei) && elts(nei,j) != -1; j++) {
 				SHL_removeEdge(s, elts(atomT,i), elts(nei,j));
-
+			}
 			flag(a) = 2;
 			if (SHL_nbNeighborhood(a) == 2) {
 				int id = -1;
