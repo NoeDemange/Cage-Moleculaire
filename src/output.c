@@ -337,8 +337,8 @@ void output(char* InputFile, Main_t* m) {
  //for (i=0; i</*mocSize(m)*/1; i++) { // Neutralisé pour avoir une sortie adaptée à une cage finie
   //printf("GDD de %d\n", i);
   //GPH_write(bond(moc(m,i)));
-  //sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
-  //SHL_writeMol2(outputname, moc(m,i));
+  sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, 0);
+  SHL_writeMol2(outputname, moc(m,0));
 //}
 
   //Ecrire les générés
