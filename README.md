@@ -1,11 +1,3 @@
-<style>
-    .david {
-        background-color: #713257;
-        width : 150px;
-    }
-</style>
-
-
 <h1 align="center"> 💻 Guides pour Cage Moléculaire ⚛️</h1>
 <p>
 </p>
@@ -111,7 +103,7 @@ Pour visualiser les résultats vous pouvez utiliser Pymol ou tout autres logicie
             <td>
                 <div>
                     <a href="https://www.david.uvsq.fr">
-                    <img width=150px src="https://www.david.uvsq.fr/wp-content/themes/david/src/img/logo_david_white.svg" alt="Logo Laboratoire david" style="background-color:#713257"</a>
+                    <img width=150px src="https://www.david.uvsq.fr/wp-content/themes/david/src/img/logo_david.svg" alt="Logo Laboratoire david"</a>
                 </div>
             </td>
             <td>
