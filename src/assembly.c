@@ -441,16 +441,12 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 /*************************************************/
 	// Vérifier que la position d'ajout est éloigné de 1.5 de l'enveloppe
 	Point_t B = coords(atom(mocTraite, depart));
-	for(int i = 0; i < size(mocTraite)/*SHL_nbAtom(mocTraite)*/; i++){
-		if(i!=depart && flag(atom(mocTraite, i))!=-1 && flag(atom(mocTraite, i))!=0 ){
-		Point_t A = coords(atom(mocTraite, i));
-			/*if(flag(atom(mocTraite, i))==0){
-				if(dist(A, B) < DIST_ECART_ENVELOPPE) return;
-			}
-			else {*/
+	for(int i = 0; i < size(mocTraite); i++) {
+		if(i!=depart && flag(atom(mocTraite, i))!=-1 && flag(atom(mocTraite, i))!=0 ) {
+			Point_t A = coords(atom(mocTraite, i));
 			if(dist(A, B) < DIST_GAP_CAGE) {
 				return;
-			}//}
+			}
 		}
 	}
 	// Vérifier que la position d'ajout est éloigné de 2 du substrat
