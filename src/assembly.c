@@ -1,13 +1,4 @@
 #include "assembly.h"
-#include "interface.h"
-#include "expansion.h"
-#include "output.h"
-#include <float.h>
-
-#define NB_MOTIF 5
-#define MAX_DIST_ARRIVAL 2
-#define DIST_GAP_CAGE 1.5//1.3
-#define DIST_GAP_SUBSTRATE 2//1.8
 
 /**
  * @brief Vérifie si le point passé en argument est assez éloigné 
@@ -643,25 +634,16 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 		int tailleMocDep = SHL_nbAtom(mocAtt->premier->moc);
 		List_p* sommets = choixSommets(mocAtt->premier->moc);
 		
-		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs
+		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs (cage connexe)
 		{
-			
-			//outputShell(InputFile, mocAtt->premier->moc);
 			outputShell2(InputFile, mocAtt->premier->moc, tailleMocInit); // Ecriture de la sortie
 			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
-			
 		}
 		else // S'il y a au moins 2 groupements de motifs
 		{
 			Shell_t* mocTraite = mocAtt->premier->moc; // Copie le moc a traiter
 			mocAtt->premier->moc = NULL;
 			LSTm_removeFirst(mocAtt);
-			
-			// Quand on ne veut traiter qu'un couple de sommet, permet de changer de sommet à relier
-			/*for (int i = 0; i < 30; i++)
-			{
-				LST2_removeFirst(sommets);
-			}*/
 			
 			while (sommets->premier) // Pour tous les couples de sommets à relier
 			{
@@ -704,7 +686,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 					}
 					
 				}
-				
+
 				SHL_delete(mocTraite2);
 			}
 			SHL_delete(mocTraite);

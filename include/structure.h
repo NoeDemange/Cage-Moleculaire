@@ -4,11 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define REALLOCSIZE 4
-#define HYDRO 1.8
-#define SIMPLE 1.5
-#define MINDIS 0.75
+#include "constante.h"
 
 //retourne l'adresse
 #define atom(o,i) ((o)->atoms+(i)) //adresse de l'atome
