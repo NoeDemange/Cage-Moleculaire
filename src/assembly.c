@@ -5,77 +5,76 @@
 #include <float.h>
 
 #define NB_MOTIF 5
-#define MIN_DIST 2
-#define DIST_ECART_CAGE 1.5
-//#define DIST_ECART_ENVELOPPE 2
-#define DIST_ECART_SUBSTRAT 2
+#define MAX_DIST_ARRIVAL 2
+#define DIST_GAP_CAGE 1.5//1.3
+#define DIST_GAP_SUBSTRATE 2//1.8
 
-void affichage(Shell_t* s) {
-	
-	for (int i = 0; i < SHL_nbAtom(s); i++)
-	{
-		printf("Atome %d : ", i/*+1*/);
-		for (int j = 0; j < neighborhoodSize(atom(s,i)); j++)
-		{
-			printf("%d ",neighbor(atom(s,i),j)/*+1*/);
-		}
-		printf("flag %d\n",flag(atom(s,i)));
-	}
-}
-
-// Vérifie si le point passé en argument est assez éloigné des autres atomes 
-// Retourne 1 s'il n'est pas assez éloigné (<DIST_ECART_CAGE) et 0 sinon
-int encombrement(Shell_t* moc, Molecule_t* sub, Point_t p){
-	for(int i = 0; i < size(moc); i++){
-		if(flag(atom(moc,i))!=0 && flag(atom(moc,i))!=-1){
+/**
+ * @brief Vérifie si le point passé en argument est assez éloigné 
+ * des autres atomes de la cage et de ceux du substrat.
+ * 
+ * @param moc La cage moléculaire en train d'être générée.
+ * @param sub La molécule de substrat.
+ * @param p  Le sommet (atome) à tester.
+ * @return 1 s'il n'est pas assez éloigné, 0 sinon.
+ */
+int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
+	for (int i = 0; i < size(moc); i++) {
+		if (flag(atom(moc,i))!= 0 && flag(atom(moc,i))!= -1) {
 			Point_t A = coords(atom(moc, i));
-			/*if(flag(atom(moc,i))==0){
-				if(dist(A, p) < DIST_ECART_ENVELOPPE)
-					return 1;
-			}
-			else{*/
-			if(dist(A, p) < DIST_ECART_CAGE)
+			
+			if (dist(A, p) < DIST_GAP_CAGE)
 				return 1;
 		}
-		//}
 	}
-	for(int i = 0; i < size(sub); i++){
+	for (int i = 0; i < size(sub); i++) {
 		Point_t A = coords(atom(sub, i));
-		if(dist(A, p) < DIST_ECART_SUBSTRAT) 
+		if (dist(A, p) < DIST_GAP_SUBSTRATE) 
 			return 1;
 	}
-			return 0;
+	return 0;
 }
 
 /**************************************/
 /* Ajout des motifs *******************/
 /**************************************/
 
-// Donne le type de l'atome inseré
-int typeInsert(int numMotif){
-	if (numMotif == 0) // Oxygene
-	{
+/**
+ * @brief Donne le type de l'atome inséré.
+ * 
+ * @param numMotif Le numéro du motif (0, 1, 2) dans la boucle principale.
+ * @return (int) Le numéro correspondant au type du motif.
+ */
+int typeInsert(int numMotif) {
+	if (numMotif == 0) { // Oxygene
 		return 1;
 	}
-	else if (numMotif == 1) // Azote
-	{
+	else if (numMotif == 1) { // Azote
 		return 3;
 	}
-	else //Carbone
-	{
+	else { // Carbone
 		return 4;
 	}
 }
 
-// Ajout du motif 4 (cycle aromatique) perpendiculaire au plan avec son voisin
-void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t posNvDprt, Molecule_t* sub) {
+/**
+ * @brief Ajoute d'un cycle aromatique (motif 4) perpendiculaire au plan 
+ * avec son voisin dans un chemin.
+ * 
+ * @param mocTraite La cage moléculaire en train d'être générée.
+ * @param mocAtt La liste des cages moléculaires en construction à traiter.
+ * @param depart
+ * @param nvDepart 
+ * @param posNvDprt 
+ * @param sub 
+ */
+void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t posNvDprt, Molecule_t* sub) {
 	
 	for (int i = 0; i < neighborhoodSize(atom(mocTraite,depart)); i++) // Pour tous les plans possibles avec les voisins
 	{
 		if (neighbor(atom(mocTraite, depart), i) != -1)
 		{
 			int idSuiv, idCycle;
-			int inASh = 0;
 			Point_t posSuiv;
 			Point_t positionNvDprt = posNvDprt;
 			Shell_t* moc = SHL_copy(mocTraite);
@@ -95,9 +94,10 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			// Positionner les autres atomes du cycle
 			v1 = AX1E2(positionNvDprt, coords(atom(moc, depart)), normal, SIMPLE); // Voisin
 			positionNvDprt = AX2E1(positionNvDprt, coords(atom(moc, depart)), v1, SIMPLE); 
-			if (encombrement(moc, sub, positionNvDprt) == 1) // Si le point n'est pas éloigné de 1.5 des autres atomes
-			{
-				inASh++;
+			if (isHindered(moc, sub, positionNvDprt)) {
+				SHL_delete(moc);
+				return;
+
 			}
 
 			idCycle = SHL_addAtom(moc, positionNvDprt, -1);
@@ -109,9 +109,9 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			{
 				v1 = coords(atom(moc, neighbor(atom(moc, idVoisin), 0)));
 				positionNvDprt = AX1E2(positionNvDprt, v1, normal, SIMPLE);
-				if (encombrement(moc, sub, positionNvDprt) == 1) // Si le point n'est pas éloigné de 1.5 des autres atomes
-				{
-					inASh++;
+				if (isHindered(moc, sub, positionNvDprt)) {
+					SHL_delete(moc);
+					return;
 				}
 				idCycle = SHL_addAtom(moc, positionNvDprt, -1);
 				flag(atom(moc, idCycle)) = 4;
@@ -132,24 +132,16 @@ void ajoutMotif4(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			v1 = coords(atom(moc, neighbor(atom(moc, idSuiv), 0)));
 			Point_t v2 = coords(atom(moc, neighbor(atom(moc, idSuiv), 1)));
 			positionNvDprt = AX2E1(posSuiv, v1, v2, SIMPLE); 
-			if (encombrement(moc, sub, positionNvDprt) == 1) // Si le point n'est pas éloigné de 1.5 des autres atomes
-			{
-				inASh++;
+			if (isHindered(moc, sub, positionNvDprt) == 1) {
+				SHL_delete(moc);
+				return;
 			}
 			int idSuiv2 = SHL_addAtom(moc, positionNvDprt, -1);
 			flag(atom(moc, idSuiv2)) = 4;
 			SHL_addEdge(moc, idSuiv, idSuiv2);
 			
-			if (inASh == 0) // Si tous les atomes du motif sont hors de l'enveloppe
-			{
-				LSTm_addElement(mocAtt, moc);
-				LSTd_addElement(nvDepart, idSuiv2);
-			}
-			else
-			{
-				SHL_delete(moc);
-			}
-			
+			LSTm_addElement(mocAtt, moc);
+			LSTd_addElement(nvDepart, idSuiv2);
 		}
 	}
 }
@@ -178,7 +170,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			//Premier position
 			Point_t positionO = AX1E2(dpt, v1, normal, SIMPLE);
 			
-			if (encombrement(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
+			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id3 = SHL_addAtom(moc, positionO, -1);
 				flag(atom(moc, id3)) = 1;
@@ -194,7 +186,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			//Seconde position
 			positionO = AX2E1(dpt, v1, positionO, SIMPLE);
 			
-			if (encombrement(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
+			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id4 = SHL_addAtom(moc2, positionO, -1);
 				flag(atom(moc2, id4)) = 1;
@@ -242,7 +234,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			//Premier position
 			Point_t positionO = AX1E2(positionNvDprt, dpt, normal, SIMPLE);
 			
-			if (encombrement(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
+			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id3 = SHL_addAtom(moc, positionO, -1);
 				flag(atom(moc, id3)) = 1;
@@ -259,7 +251,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			//Seconde position
 			positionO = AX2E1(positionNvDprt, dpt, positionO, SIMPLE);
 			
-			if (encombrement(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
+			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id4 = SHL_addAtom(moc2, positionO, -1);
 				flag(atom(moc2, id4)) = 1;
@@ -286,7 +278,7 @@ void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 	}
 	else if (numMotif == 4)
 	{
-		ajoutMotif4(mocTraite, mocAtt, depart, nvDepart, positionNvDprt, sub);
+		addAromaticRing(mocTraite, mocAtt, depart, nvDepart, positionNvDprt, sub);
 	}
 	else
 	{
@@ -331,7 +323,7 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 		normal = rotation(normalization(vector(dpt, v1), 1),  30, normal); // Rotation de 30° de la normal
 		positionNvDprt = AX1E3(dpt, v1, normal, SIMPLE);
 		
-		if (encombrement(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
+		if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 		{	
 			LSTs_addElement(positions, positionNvDprt);
 		}
@@ -352,7 +344,7 @@ void projectionN_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 	
 	Point_t positionNvDprt = AX2E2(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
 	
-	if (encombrement(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
+	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
 		ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt, sub); // Ajout a l'enveloppe
 	}
@@ -363,7 +355,7 @@ void projectionC_AX2E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 	
 	Point_t positionNvDprt = AX2E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
 	
-	if (encombrement(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
+	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
 		ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt, sub); // Ajout a l'enveloppe
 	}
@@ -374,14 +366,14 @@ void projectionC_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 	
 	Point_t positionNvDprt = AX2E2(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
 	
-	if (encombrement(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
+	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
 		ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt, sub); // Ajout a l'enveloppe
 	}
 	
 	Point_t positionNvDprt2 = AX3E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), positionNvDprt, SIMPLE);
 	
-	if (encombrement(moc, sub, positionNvDprt2) == 0) // Si le point est éloigné de 1.5 des autres atomes
+	if (isHindered(moc, sub, positionNvDprt2) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
 		ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt2, sub); // Ajout a l'enveloppe
 	}
@@ -392,7 +384,7 @@ void projectionC_AX3E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 	
 	Point_t positionNvDprt = AX3E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), coords(atom(moc, neighbor(atom(moc, depart), 2))), SIMPLE);
 	
-	if (encombrement(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
+	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
 		ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt, sub); // Ajout a l'enveloppe
 	}
@@ -456,7 +448,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 				if(dist(A, B) < DIST_ECART_ENVELOPPE) return;
 			}
 			else {*/
-			if(dist(A, B) < 1/*DIST_ECART_CAGE*/) {
+			if(dist(A, B) < DIST_GAP_CAGE) {
 				return;
 			}//}
 		}
@@ -464,7 +456,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 	// Vérifier que la position d'ajout est éloigné de 2 du substrat
 	for(int i = 0; i < size(substrat(m)); i++){
 		Point_t A = coords(atom(substrat(m), i));
-			if(dist(A, B) < 1/*DIST_ECART_SUBSTRAT*/) {
+			if(dist(A, B) < DIST_GAP_SUBSTRATE) {
 				return;
 			}
 	}
@@ -497,7 +489,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			}
 			
 			if(tailleMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
-				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MIN_DIST /*&& nbMotif4>0*/) // Proche de l'arrivée 
+				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MAX_DIST_ARRIVAL /*&& nbMotif4>0*/) // Proche de l'arrivée 
 				{
 					if(nbMotif4>0){//que s'il y a un cycle dans le chemin
 						SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
