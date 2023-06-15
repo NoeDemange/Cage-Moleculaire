@@ -10,35 +10,18 @@
 //#define DIST_ECART_ENVELOPPE 2
 #define DIST_ECART_SUBSTRAT 2
 
-void affichage(Shell_t* s) {
-	
-	for (int i = 0; i < SHL_nbAtom(s); i++)
-	{
-		printf("Atome %d : ", i/*+1*/);
-		for (int j = 0; j < neighborhoodSize(atom(s,i)); j++)
-		{
-			printf("%d ",neighbor(atom(s,i),j)/*+1*/);
-		}
-		printf("flag %d\n",flag(atom(s,i)));
-	}
-}
-
 // Vérifie si le point passé en argument est assez éloigné des autres atomes 
 // Retourne 1 s'il n'est pas assez éloigné (<DIST_ECART_CAGE) et 0 sinon
 int encombrement(Shell_t* moc, Molecule_t* sub, Point_t p){
+	//Vérification par rapport à la cage
 	for(int i = 0; i < size(moc); i++){
 		if(flag(atom(moc,i))!=0 && flag(atom(moc,i))!=-1){
 			Point_t A = coords(atom(moc, i));
-			/*if(flag(atom(moc,i))==0){
-				if(dist(A, p) < DIST_ECART_ENVELOPPE)
-					return 1;
-			}
-			else{*/
 			if(dist(A, p) < DIST_ECART_CAGE)
 				return 1;
 		}
-		//}
 	}
+	//Vérification par rapport au substrat
 	for(int i = 0; i < size(sub); i++){
 		Point_t A = coords(atom(sub, i));
 		if(dist(A, p) < DIST_ECART_SUBSTRAT) 
@@ -449,22 +432,18 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 /*************************************************/
 	// Vérifier que la position d'ajout est éloigné de 1.5 de l'enveloppe
 	Point_t B = coords(atom(mocTraite, depart));
-	for(int i = 0; i < size(mocTraite)/*SHL_nbAtom(mocTraite)*/; i++){
+	for(int i = 0; i < size(mocTraite); i++){
 		if(i!=depart && flag(atom(mocTraite, i))!=-1 && flag(atom(mocTraite, i))!=0 ){
 		Point_t A = coords(atom(mocTraite, i));
-			/*if(flag(atom(mocTraite, i))==0){
-				if(dist(A, B) < DIST_ECART_ENVELOPPE) return;
-			}
-			else {*/
-			if(dist(A, B) < 1/*DIST_ECART_CAGE*/) {
+			if(dist(A, B) < DIST_ECART_CAGE) {
 				return;
-			}//}
+			}
 		}
 	}
 	// Vérifier que la position d'ajout est éloigné de 2 du substrat
 	for(int i = 0; i < size(substrat(m)); i++){
 		Point_t A = coords(atom(substrat(m), i));
-			if(dist(A, B) < 1/*DIST_ECART_SUBSTRAT*/) {
+			if(dist(A, B) < DIST_ECART_SUBSTRAT) {
 				return;
 			}
 	}
