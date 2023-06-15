@@ -109,9 +109,9 @@ Pour visualiser les résultats vous pouvez utiliser Pymol ou tout autres logicie
     <table align="center">
         <tr>
             <td>
-                <div class = "david">
+                <div>
                     <a href="https://www.david.uvsq.fr">
-                    <img src="https://www.david.uvsq.fr/wp-content/themes/david/src/img/logo_david_white.svg" alt="Logo Laboratoire david"</a>
+                    <img width=150px src="https://www.david.uvsq.fr/wp-content/themes/david/src/img/logo_david_white.svg" alt="Logo Laboratoire david" style="background-color:#713257"</a>
                 </div>
             </td>
             <td>
