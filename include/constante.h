@@ -18,8 +18,8 @@
 #define DIST_ERROR 0.5 //taille de l'erreur acceptable pour la liaison covalente
 #define MINDIS 0.75
 //#define MAX_DIST_ARRIVAL 2 //Distance pour relier notre chemin au sommet d'arrivée
-#define DIST_GAP_CAGE 1.5//1.3  //distance entre 2 atomes de la cage
-#define DIST_GAP_SUBSTRATE 2//1.8 //distance entre 1 atome de la cage et 1 atome du substrat
+#define DIST_GAP_CAGE 1.3//1.5  //distance entre 2 atomes de la cage
+#define DIST_GAP_SUBSTRATE 1.8//2 //distance entre 1 atome de la cage et 1 atome du substrat
 
 
 //Chemin

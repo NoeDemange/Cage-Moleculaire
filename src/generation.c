@@ -106,7 +106,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 		flag(atom(m,indice)) = 1;
 
 	//Rattacher les nouveaux sommets à ceux de la liste l.
-	SHL_linkBorder(m, idv, l);
+	//SHL_linkBorder(m, idv, l);
 
 	LST_delete(l);
 }
@@ -158,7 +158,7 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 		flag(atom(m,indice)) = 1;
 
 	//Rattacher les nouvaux sommets à ceux de la liste l.
-	SHL_linkBorder(m, idc, l);
+	//SHL_linkBorder(m, idc, l);
 	
 	LST_delete(l);
 }
@@ -220,7 +220,7 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	flag(atom(m,indice)) = 1;
 
 	//Rattacher les nouvaux sommets à ceux de la liste l.
-	SHL_linkBorder(m, idc, l);
+	//SHL_linkBorder(m, idc, l);
 	
 	LST_delete(l);
 }
@@ -311,7 +311,7 @@ void generationCycle(Shell_t* s) {
 				SHL_addEdge(s, elts(atomT,i), id);
 			}
 
-			SHL_linkBorder(s, elts(atomT,i), nei);
+			//SHL_linkBorder(s, elts(atomT,i), nei);
 		}
 		LST_delete(nei);
 	}

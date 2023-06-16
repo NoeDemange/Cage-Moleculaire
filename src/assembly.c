@@ -481,10 +481,10 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			if(tailleMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
 				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
-					if(nbMotif4>0){//que s'il y a un cycle dans le chemin
+					//if(nbMotif4>0){//que s'il y a un cycle dans le chemin
 						SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
 						LSTm_addElement(mocAtt, SHL_copy(lMoc->premier->moc));// Ajout dans la liste a traiter
-					}
+					//}
 				}
 				else if (nbMotif3 < 5 && nbMotif4 < 3) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 				{
@@ -504,7 +504,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 /*************************************************/
 
 // Vérifie si le sommet se situe en bordure de motif
-int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
+/*int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
 	
 	int vertexNumberOfNeighbors = LST_nbElements(neighborhood(sommet));
 	for (int i = 0; i < vertexNumberOfNeighbors; i++) // Pour tous les voisins du sommet
@@ -517,7 +517,7 @@ int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
 	}
 	
 	return 0;
-}
+}*/
 
 // Parcours en profondeur en fonction des indices sur les sommets des motifs uniquement
 int parcours(Shell_t* s, List_t* marquer, int indice1, int indice2) {
@@ -579,11 +579,11 @@ List_p* choixSommets(Shell_t* s){
 	
 	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets en bordure
 	{
-		if ( bordureCheck(s, atom(s, i)) )
+		if ( flag(atom(s, i)) == 1 )
 		{
 			for (int j = i+1; j < SHL_nbAtom(s); j++)
 			{
-				if ( bordureCheck(s, atom(s, j)) )
+				if ( flag(atom(s, j)) == 1 )
 				{
 					if (!existeChemin(s, i, j)) // Si i et j sont de groupements différents
 					{
@@ -631,6 +631,13 @@ List_m* initMocAtt(Main_t* m){
 void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
+	for (int j = 0; j < /*SHL_nbAtom*/size(mocAtt->premier->moc); j++)
+	{
+		if (flag(atom(mocAtt->premier->moc,j)) == 0)
+		{
+			SHL_removeAtom(mocAtt->premier->moc, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
+		}
+	}
 	int tailleMocInit = SHL_nbAtom(mocAtt->premier->moc); //permet de récupérer la taille avant l'ajout des chemins, fonctionne car on garde qu'un moc ligne d'avant (à modifier sinon)
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{	
@@ -663,8 +670,8 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 						i--;
 					}
 				}
-#pragma omp parallel for
-				for (int i = 2; i < 4 ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
+//#pragma omp parallel for
+				for (int i = 2; i < 3/*4 avec carbonyle*/ ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
 				{
 					flag(atom(mocTraite2, depart)) = typeInsert(i);
 
