@@ -47,13 +47,18 @@ void SHL_removeNeighbor(AtomShl_t* a, unsigned id) {
 }
 
 void SHL_addAllocAtom(Shell_t* s) {
-	int i;
 
-	s->atoms = realloc(s->atoms,
-		(size(s)+REALLOCSIZE)*sizeof(AtomShl_t));
+	AtomShl_t* tmp = realloc(s->atoms, (size(s) + REALLOCSIZE) * sizeof(AtomShl_t));
+	if (tmp == NULL) {       
+    fprintf(stderr, "Un problème est survenu lors de la réallocation (structureShl.c:53).\n");
+    exit(EXIT_FAILURE);
+	}
+	else {
+    s->atoms = tmp;
+	}
 
-	for (i=0; i<REALLOCSIZE; i++) {
-		SHL_initAtom(atom(s,size(s)+i));
+	for (int i = 0; i < REALLOCSIZE; i++) {
+		SHL_initAtom(atom(s,size(s) + i));
 	}
 
 	size(s) += REALLOCSIZE;
