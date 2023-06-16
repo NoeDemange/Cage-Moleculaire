@@ -1,4 +1,5 @@
 #include "utile.h"
+#include <math.h>
 
 float radianToDegre(float a) {
 	return a * 180 / M_PI;

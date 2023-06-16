@@ -2,7 +2,6 @@
 #define __UTILE_H
 
 #include "structure.h"
-#include <math.h>
 
 float radianToDegre(float);
 float degreToRadian(float);

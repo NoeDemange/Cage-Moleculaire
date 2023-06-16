@@ -1,4 +1,7 @@
 #include "assembly.h"
+#include "utile.h"
+#include "output.h"
+#include "constante.h"
 
 /**
  * @brief Vérifie si le point passé en argument est assez éloigné 
@@ -476,7 +479,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			}
 			
 			if(tailleMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
-				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < MAX_DIST_ARRIVAL /*&& nbMotif4>0*/) // Proche de l'arrivée 
+				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
 					if(nbMotif4>0){//que s'il y a un cycle dans le chemin
 						SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee

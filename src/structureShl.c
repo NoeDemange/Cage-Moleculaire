@@ -325,7 +325,7 @@ Shell_t* SHL_copy(Shell_t* s) {
 
 //Approxiation des distances
 //Création d'un shell de sommets.
-Shell_t* SHL_avoir(Shell_t* s) {
+/*Shell_t* SHL_avoir(Shell_t* s) {
 	int i, j, k, nb;
 	float AB, dis;
 	AtomShl_t* A, *B;
@@ -359,7 +359,7 @@ Shell_t* SHL_avoir(Shell_t* s) {
 	}
 
 	return out;
-}
+}*/
 
 void SHL_testDis(Shell_t* s) {
 
