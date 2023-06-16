@@ -206,15 +206,20 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   //Ecriture des sommets
   ret = fprintf(filestream, "@<TRIPOS>ATOM\n");
   for (i=0, j=1; i<size(s); i++) {
-
     if (flag(atom(s,i)) != -1) {
       indice[i] = j;
       if (flag(atom(s,i)) == 2)
         ret = fprintf(filestream, " %3d S", j);
       else if (flag(atom(s,i)) == 3)
-        ret = fprintf(filestream, " %3d U", j);
+        if(LST_nbElements(neighborhood(atom(s,i)))==1){
+          if(flag(atom(s, neighbor(atom(s,i), 0))) == 3){
+            ret = fprintf(filestream, " %3d H", j);
+          }else {ret = fprintf(filestream, " %3d U", j);}
+        }else ret = fprintf(filestream, " %3d U", j);
       else if (flag(atom(s,i)) == 1)
-        ret = fprintf(filestream, " %3d P", j);
+        if(LST_nbElements(neighborhood(atom(s,i)))>1){
+          ret = fprintf(filestream, " %3d C", j);
+        } else {ret = fprintf(filestream, " %3d P", j);}
       else if (flag(atom(s,i)) == OXYGENE)
         ret = fprintf(filestream, " %3d O", j);
       else if (flag(atom(s,i)) == AZOTE)
@@ -229,9 +234,15 @@ void SHL_writeMol2(char* output, Shell_t* s) {
       if (flag(atom(s,i)) == 2)
         ret = fprintf(filestream, "   S\n");
       else if (flag(atom(s,i)) == 3)
-        ret = fprintf(filestream, "   U\n");
+        if(LST_nbElements(neighborhood(atom(s,i)))==1){
+          if(flag(atom(s, neighbor(atom(s,i), 0))) == 3){
+            ret = fprintf(filestream, "   H\n");
+          }else {ret = fprintf(filestream, "   U\n");}
+        }else ret = fprintf(filestream, "   U\n");
       else if (flag(atom(s,i)) == 1)
-        ret = fprintf(filestream, "   P\n");
+        if(LST_nbElements(neighborhood(atom(s,i)))>1){
+          ret = fprintf(filestream, "   C\n");
+        }else ret = fprintf(filestream, "   P\n");
       else if (flag(atom(s,i)) == OXYGENE)
         ret = fprintf(filestream, "   O\n");
       else if (flag(atom(s,i)) == AZOTE)
@@ -311,7 +322,7 @@ void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
 	Shell_t* s2 = SHL_copy(s);
 	for (int j = 0; j < /*SHL_nbAtom*/size(s2); j++)
 	{
-		if (flag(atom(s2,j)) == 0)
+		if ((flag(atom(s2,j)) == 0) /*|| ((flag(atom(s2,j)) == 1 && LST_nbElements(neighborhood(atom(s2,j)))==1))*/)
 		{
 			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
 		}
