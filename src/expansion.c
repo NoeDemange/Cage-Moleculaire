@@ -218,7 +218,7 @@ void expansion(Molecule_t* m, Shell_t* s) {
  * Appel à R.
  * 
  * @param s				Enveloppe possédant déjà un nuage de points.
- * @param alpha 	Paramètre de la sphère. (2 est souvent une bonne mesure, 3 sinon)
+ * @param alpha 	Paramètre de la sphère. (3 est souvent une bonne mesure, 4 sinon)
  */
 void alphaShape(Shell_t* s, double alpha) {
 	int i;

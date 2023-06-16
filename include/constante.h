@@ -25,5 +25,10 @@
 //Chemin
 #define NB_MOTIF 5 //nombre de motifs pour les chemins
 
+//Flag chemin
+#define CARBONE 6
+#define AZOTE 5
+#define OXYGENE 4
+
 
 #endif

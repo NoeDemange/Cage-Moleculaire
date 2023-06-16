@@ -41,13 +41,13 @@ int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
  */
 int typeInsert(int numMotif) {
 	if (numMotif == 0) { // Oxygene
-		return 1;
+		return OXYGENE;
 	}
 	else if (numMotif == 1) { // Azote
-		return 3;
+		return AZOTE;
 	}
 	else { // Carbone
-		return 4;
+		return CARBONE;
 	}
 }
 
@@ -78,7 +78,7 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 			
 			// Ajouter le premier atome du cycle dont on a déjà la position
 			int id = SHL_addAtom(moc, positionNvDprt, -1);
-			flag(atom(moc, id)) = 4;
+			flag(atom(moc, id)) = CARBONE;
 			SHL_addEdge(moc, depart, id);
 
 			// Cherche la normal pour positionné le cycle
@@ -95,7 +95,7 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 			}
 
 			idCycle = SHL_addAtom(moc, positionNvDprt, -1);
-			flag(atom(moc, idCycle)) = 4;
+			flag(atom(moc, idCycle)) = CARBONE;
 			SHL_addEdge(moc, id, idCycle);
 			
 			int idVoisin = idCycle;
@@ -108,7 +108,7 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 					return;
 				}
 				idCycle = SHL_addAtom(moc, positionNvDprt, -1);
-				flag(atom(moc, idCycle)) = 4;
+				flag(atom(moc, idCycle)) = CARBONE;
 				SHL_addEdge(moc, idVoisin, idCycle);
 				
 				if ( i == 1 ) // Position du prochain depart pour continuer le chemin
@@ -131,7 +131,7 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 				return;
 			}
 			int idSuiv2 = SHL_addAtom(moc, positionNvDprt, -1);
-			flag(atom(moc, idSuiv2)) = 4;
+			flag(atom(moc, idSuiv2)) = CARBONE;
 			SHL_addEdge(moc, idSuiv, idSuiv2);
 			
 			LSTm_addElement(mocAtt, moc);
@@ -167,7 +167,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id3 = SHL_addAtom(moc, positionO, -1);
-				flag(atom(moc, id3)) = 1;
+				flag(atom(moc, id3)) = OXYGENE;
 				SHL_addEdge(moc, depart, id3);
 				
 				LSTm_addElement(mAtt, moc);
@@ -183,7 +183,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id4 = SHL_addAtom(moc2, positionO, -1);
-				flag(atom(moc2, id4)) = 1;
+				flag(atom(moc2, id4)) = OXYGENE;
 				SHL_addEdge(moc2, depart, id4);
 				
 				LSTm_addElement(mAtt, moc2);
@@ -214,11 +214,11 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			
 			// Atome C
 			int id = SHL_addAtom(moc, positionNvDprt, -1);
-			flag(atom(moc, id)) = 4;
+			flag(atom(moc, id)) = CARBONE;
 			SHL_addEdge(moc, depart, id);
 			
 			int id2 = SHL_addAtom(moc2, positionNvDprt, -1);
-			flag(atom(moc2, id2)) = 4;
+			flag(atom(moc2, id2)) = CARBONE;
 			SHL_addEdge(moc2, depart, id2);
 			
 			// Cherche la normal pour positionné le O
@@ -231,7 +231,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id3 = SHL_addAtom(moc, positionO, -1);
-				flag(atom(moc, id3)) = 1;
+				flag(atom(moc, id3)) = OXYGENE;
 				SHL_addEdge(moc, id, id3);
 				
 				LSTm_addElement(mocAtt, moc);
@@ -248,7 +248,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
 				int id4 = SHL_addAtom(moc2, positionO, -1);
-				flag(atom(moc2, id4)) = 1;
+				flag(atom(moc2, id4)) = OXYGENE;
 				SHL_addEdge(moc2, id2, id4);
 				
 				LSTm_addElement(mocAtt, moc2);
@@ -397,16 +397,16 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 		//Diff rotations
 		projectionOCN_AX1E3(moc, mocAtt, depart, arrivee, nvDepart, numMotif, sub);
 	}
-	else if (flag(atom(moc, depart)) == 3 && LST_nbElements(neighborhood(atom(moc, depart))) == 2) // Azote avec 2 voisins
+	else if (flag(atom(moc, depart)) == AZOTE && LST_nbElements(neighborhood(atom(moc, depart))) == 2) // Azote avec 2 voisins
 	{
 		//Projection
 		projectionN_AX2E2(moc, mocAtt, depart, nvDepart, numMotif, sub);
 	}
-	else if (flag(atom(moc, depart)) == 4) // Carbone
+	else if (flag(atom(moc, depart)) == CARBONE) // Carbone
 	{
 		if (LST_nbElements(neighborhood(atom(moc, depart))) == 2) // 2 voisins
 		{
-			if (flag(atom(moc, neighbor(atom(moc, depart), 0))) == 1 || flag(atom(moc, neighbor(atom(moc, depart), 1))) == 1) // Si 1 des 2 voisins est un oxygene
+			if (flag(atom(moc, neighbor(atom(moc, depart), 0))) == OXYGENE || flag(atom(moc, neighbor(atom(moc, depart), 1))) == OXYGENE) // Si 1 des 2 voisins est un oxygene
 			{
 				//Projection
 				projectionC_AX2E1(moc, mocAtt, depart, nvDepart, numMotif, sub);

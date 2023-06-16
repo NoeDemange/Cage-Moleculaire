@@ -231,7 +231,7 @@ void generationHydro(Main_t* m) {
 	AtomShl_t *v;
 	Atom_t *parent;
 
-	for (i=0; i<1; i++) {
+	for (i=0; i<1; i++) { //si toutes les cages possibles fonction graphe de dépendance surement à changer
 		for (j=0; j<size(bond(moc(m,i))); j++) {
 			idv = id(vertex(bond(moc(m,i)),j));
 

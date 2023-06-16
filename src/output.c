@@ -1,4 +1,5 @@
 #include "output.h"
+#include "constante.h"
 
 #include <sys/stat.h>
 #include <string.h>
@@ -211,22 +212,34 @@ void SHL_writeMol2(char* output, Shell_t* s) {
       if (flag(atom(s,i)) == 2)
         ret = fprintf(filestream, " %3d S", j);
       else if (flag(atom(s,i)) == 3)
-        ret = fprintf(filestream, " %3d N", j);
+        ret = fprintf(filestream, " %3d U", j);
       else if (flag(atom(s,i)) == 1)
+        ret = fprintf(filestream, " %3d P", j);
+      else if (flag(atom(s,i)) == OXYGENE)
         ret = fprintf(filestream, " %3d O", j);
-      else 
+      else if (flag(atom(s,i)) == AZOTE)
+        ret = fprintf(filestream, " %3d N", j);
+      else if (flag(atom(s,i)) == CARBONE)
         ret = fprintf(filestream, " %3d C", j);
+      else 
+        ret = fprintf(filestream, " %3d Al", j);
       ret = fprintf(filestream, "   %3.4f", atomX(atom(s,i)));
       ret = fprintf(filestream, "   %3.4f", atomY(atom(s,i)));
       ret = fprintf(filestream, "   %3.4f", atomZ(atom(s,i)));
       if (flag(atom(s,i)) == 2)
         ret = fprintf(filestream, "   S\n");
       else if (flag(atom(s,i)) == 3)
-        ret = fprintf(filestream, "   N\n");
+        ret = fprintf(filestream, "   U\n");
       else if (flag(atom(s,i)) == 1)
+        ret = fprintf(filestream, "   P\n");
+      else if (flag(atom(s,i)) == OXYGENE)
         ret = fprintf(filestream, "   O\n");
-      else
+      else if (flag(atom(s,i)) == AZOTE)
+        ret = fprintf(filestream, "   N\n");
+      else if (flag(atom(s,i)) == CARBONE)
         ret = fprintf(filestream, "   C\n");
+      else 
+        ret = fprintf(filestream, "   Al\n");
       j++;
     }
     else
