@@ -38,7 +38,7 @@ Alpha est utilisé pour la génération d'une enveloppe concave et sizemax corre
 ```sh
 alpha (défaut 3) : -a [double]
 
-sizemax (défaut 13) : -s [entier]
+sizemax (défaut 5) : -s [entier]
 ```
 Pour avoir de l'aide : 
  ```sh

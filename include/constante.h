@@ -5,7 +5,7 @@
 #define OPTSTR "i:a:s:h"
 #define USAGE_FMT  "%s usage : [-i inputfile] [-a alpha (default : %1.f)] [-s sizemax (default : %d)] [-h]\n"
 #define DEFLT_ALPHA 3.
-#define DEFLT_SIZEMAX 13
+#define DEFLT_SIZEMAX 5
 
 #define PATHNAME "alphashape.R"
 

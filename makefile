@@ -18,7 +18,7 @@ OBJ:=$(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: $(EXEC)
 
 demo: all $(BINDIR)/$(TARGET)
-	./$(BINDIR)/$(TARGET) -i ./demos/substrats/ADENOS10.xyz -a 3 -s 13
+	./$(BINDIR)/$(TARGET) -i ./demos/substrats/ADENOS10.xyz
 
 $(BINDIR)/$(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
