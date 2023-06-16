@@ -146,8 +146,15 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 	}
 }
 
-// Ajout seulement du 0 sur un C d'un motif 3
-List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
+/**
+ * @brief Ajoute l'atome d'oxygène d'un groupement carbonyle (:C=0) dans un chemin.
+ * 
+ * @param mocTraite 
+ * @param depart 
+ * @param sub 
+ * @return List_m* 
+ */
+List_m* addCarbonylOxygen(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 	
 	List_m* mAtt = LSTm_init();
 	Point_t dpt = coords(atom(mocTraite, depart));
@@ -163,39 +170,35 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			
 			Point_t v2 = coords(atom(moc, neighbor(atom(moc, voisin1), i)));
 						
-			// Cherche la normal pour positionné le O
+			// Cherche la normal pour positionner l'oxygène
 			Point_t normal = planNormal(dpt, v1, v2);
 			
 			// Atome O
-			//Premier position
+			//Première position
 			Point_t positionO = AX1E2(dpt, v1, normal, SIMPLE);
 			
-			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
-			{
+			if (!isHindered(moc, sub, positionO)) {
 				int id3 = SHL_addAtom(moc, positionO, -1);
 				flag(atom(moc, id3)) = 1;
 				SHL_addEdge(moc, depart, id3);
 				
 				LSTm_addElement(mAtt, moc);
 			}
-			else
-			{
+			else {
 				SHL_delete(moc);
 			}
 						
 			//Seconde position
 			positionO = AX2E1(dpt, v1, positionO, SIMPLE);
 			
-			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
-			{
+			if (!isHindered(moc2, sub, positionO)) {
 				int id4 = SHL_addAtom(moc2, positionO, -1);
 				flag(atom(moc2, id4)) = 1;
 				SHL_addEdge(moc2, depart, id4);
 				
 				LSTm_addElement(mAtt, moc2);
 			}
-			else
-			{
+			else {
 				SHL_delete(moc2);
 			}
 			
@@ -206,7 +209,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 }
 
 // Ajout du motif 3 (C = O) dans le plan avec son voisin
-void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t positionNvDprt, Molecule_t* sub) {
+void addCarbonyl(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepart, Point_t positionNvDprt, Molecule_t* sub) {
 	
 	for (int i = 0; i < neighborhoodSize(atom(mocTraite,depart)); i++) // Pour tous les plans possibles avec les voisins
 	{
@@ -234,8 +237,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			//Premier position
 			Point_t positionO = AX1E2(positionNvDprt, dpt, normal, SIMPLE);
 			
-			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
-			{
+			if (!isHindered(moc, sub, positionO)) {
 				int id3 = SHL_addAtom(moc, positionO, -1);
 				flag(atom(moc, id3)) = 1;
 				SHL_addEdge(moc, id, id3);
@@ -243,16 +245,14 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 				LSTm_addElement(mocAtt, moc);
 				LSTd_addElement(nvDepart, id);
 			}
-			else
-			{
+			else {
 				SHL_delete(moc);
 			}
 			
 			//Seconde position
 			positionO = AX2E1(positionNvDprt, dpt, positionO, SIMPLE);
 			
-			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
-			{
+			if (!isHindered(moc2, sub, positionO)) {
 				int id4 = SHL_addAtom(moc2, positionO, -1);
 				flag(atom(moc2, id4)) = 1;
 				SHL_addEdge(moc2, id2, id4);
@@ -260,8 +260,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 				LSTm_addElement(mocAtt, moc2);
 				LSTd_addElement(nvDepart, id2);
 			}
-			else
-			{
+			else {
 				SHL_delete(moc2);
 			}
 			
@@ -274,7 +273,7 @@ void ajoutProjection(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 	
 	if (numMotif == 3) // C = 0
 	{
-		ajoutMotif3(mocTraite, mocAtt, depart, nvDepart, positionNvDprt, sub);
+		addCarbonyl(mocTraite, mocAtt, depart, nvDepart, positionNvDprt, sub);
 	}
 	else if (numMotif == 4)
 	{
@@ -510,7 +509,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 /*************************************************/
 
 // Vérifie si le sommet se situe en bordure de motif
-int bordureCheck(Shell_t* s, AtomShl_t* sommet) {
+int isOnTheEdge(Shell_t* s, AtomShl_t* sommet) {
 	
 	int vertexNumberOfNeighbors = LST_nbElements(neighborhood(sommet));
 	for (int i = 0; i < vertexNumberOfNeighbors; i++) // Pour tous les voisins du sommet
@@ -585,11 +584,11 @@ List_p* choixSommets(Shell_t* s){
 	
 	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets en bordure
 	{
-		if ( bordureCheck(s, atom(s, i)) )
+		if ( isOnTheEdge(s, atom(s, i)) )
 		{
 			for (int j = i+1; j < SHL_nbAtom(s); j++)
 			{
-				if ( bordureCheck(s, atom(s, j)) )
+				if ( isOnTheEdge(s, atom(s, j)) )
 				{
 					if (!existeChemin(s, i, j)) // Si i et j sont de groupements différents
 					{
@@ -687,7 +686,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 					{
 						if (LST_nbElements(neighborhood(atom(mocTraite2, depart))) == 1) // Motif possible que si le depart n'a qu'un voisin
 						{
-							List_m* mAtt = ajoutOMotif3(mocTraite2, depart,substrat(m)); // Ajout du O du motif 3 ( C = O )
+							List_m* mAtt = addCarbonylOxygen(mocTraite2, depart,substrat(m)); // Ajout du O du motif 3 ( C = O )
 
 							while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 							{
