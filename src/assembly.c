@@ -14,12 +14,12 @@
  */
 int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
 	for (int i = 0; i < size(moc); i++) {
-		if (/*flag(atom(moc,i))!= 0 &&*/ flag(atom(moc,i))!= -1) {
+		//if (/*flag(atom(moc,i))!= 0 &&*/ flag(atom(moc,i))!= -1) {
 			Point_t A = coords(atom(moc, i));
 			
 			if (dist(A, p) < DIST_GAP_CAGE)
 				return 1;
-		}
+		//}
 	}
 	for (int i = 0; i < size(sub); i++) {
 		Point_t A = coords(atom(sub, i));
@@ -436,7 +436,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 	// Vérifier que la position d'ajout est éloigné de 1.5 de l'enveloppe
 	Point_t B = coords(atom(mocTraite, depart));
 	for(int i = 0; i < size(mocTraite); i++) {
-		if(i!=depart && flag(atom(mocTraite, i))!=-1 /*&& flag(atom(mocTraite, i))!=0*/ ) {
+		if(i!=depart /*&& flag(atom(mocTraite, i))!=-1*/ /*&& flag(atom(mocTraite, i))!=0*/ ) {
 			Point_t A = coords(atom(mocTraite, i));
 			if(dist(A, B) < DIST_GAP_CAGE) {
 				return;
@@ -531,7 +531,7 @@ int parcours(Shell_t* s, List_t* marquer, int indice1, int indice2) {
 	}
 	else
 	{
-		for (int i = 0; i < neighborhoodSize(a) && neighbor(a, i) != -1; i++) // Pour tous les voisins de a
+		for (int i = 0; i < neighborhoodSize(a)/* && neighbor(a, i) != -1*/; i++) // Pour tous les voisins de a
 		{
 			//if (flag(atom(s, neighbor(a, i))) != 0) // Si le sommet est dans un motif donc de priorité != 0
 			//{
