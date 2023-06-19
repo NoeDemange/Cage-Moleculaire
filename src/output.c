@@ -183,7 +183,7 @@ void MOL_writeMol2(char* output, Molecule_t* m) {
     printf("L'écriture du fichier %s ne s'est pas bien passé.\n", output);
     exit(2);
   }
-
+  fclose(filestream);
 }
 
 void SHL_writeMol2(char* output, Shell_t* s) {
@@ -313,14 +313,13 @@ void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
   int nbmotif = SHL_nbAtom(s) - tailleMocInit;
   char* dirName = createUnderDir(name, nbmotif);
 	static int i = 0;
-	
 	//Sortie avec enveloppe
 	//sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
 	//SHL_writeMol2(outputname, s);
 	
 	//Sortie sans enveloppe
 	Shell_t* s2 = SHL_copy(s);
-	for (int j = 0; j < /*SHL_nbAtom*/size(s2); j++)
+	for (int j = 0; j < size(s2); j++)
 	{
 		if ((flag(atom(s2,j)) == 0) /*|| ((flag(atom(s2,j)) == 1 && LST_nbElements(neighborhood(atom(s2,j)))==1))*/)
 		{
@@ -334,8 +333,8 @@ void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
 	SHL_delete(s2);
 	free(name);
 	free(dirName);
-	
 	i++;
+  if(i==NB_RESULTAT) exit(EXIT_SUCCESS); // provisoire pour les tests
 }
 
 void output(char* InputFile, Main_t* m) {

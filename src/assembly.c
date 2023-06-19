@@ -577,11 +577,11 @@ List_p* choixSommets(Shell_t* s){
 	
 	List_p* sommets = LST2_init();
 	
-	for (int i = 0; i < SHL_nbAtom(s) - 1; i++) //Pour tous les sommets en bordure
+	for (int i = 0; i < size(s) - 1; i++) //Pour tous les sommets en bordure
 	{
 		if ( flag(atom(s, i)) == 1 )
 		{
-			for (int j = i+1; j < SHL_nbAtom(s); j++)
+			for (int j = i+1; j < size(s); j++)
 			{
 				if ( flag(atom(s, j)) == 1 )
 				{

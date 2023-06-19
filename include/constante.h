@@ -30,5 +30,7 @@
 #define AZOTE 5
 #define OXYGENE 4
 
+#define NB_RESULTAT 10 //nombre de résultats
+
 
 #endif
