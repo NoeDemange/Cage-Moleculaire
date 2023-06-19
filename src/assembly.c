@@ -14,7 +14,7 @@
  */
 int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
 	for (int i = 0; i < size(moc); i++) {
-		if (flag(atom(moc,i))!= 0 && flag(atom(moc,i))!= -1) {
+		if (/*flag(atom(moc,i))!= 0 &&*/ flag(atom(moc,i))!= -1) {
 			Point_t A = coords(atom(moc, i));
 			
 			if (dist(A, p) < DIST_GAP_CAGE)
@@ -436,7 +436,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 	// Vérifier que la position d'ajout est éloigné de 1.5 de l'enveloppe
 	Point_t B = coords(atom(mocTraite, depart));
 	for(int i = 0; i < size(mocTraite); i++) {
-		if(i!=depart && flag(atom(mocTraite, i))!=-1 && flag(atom(mocTraite, i))!=0 ) {
+		if(i!=depart && flag(atom(mocTraite, i))!=-1 /*&& flag(atom(mocTraite, i))!=0*/ ) {
 			Point_t A = coords(atom(mocTraite, i));
 			if(dist(A, B) < DIST_GAP_CAGE) {
 				return;
@@ -533,8 +533,8 @@ int parcours(Shell_t* s, List_t* marquer, int indice1, int indice2) {
 	{
 		for (int i = 0; i < neighborhoodSize(a) && neighbor(a, i) != -1; i++) // Pour tous les voisins de a
 		{
-			if (flag(atom(s, neighbor(a, i))) != 0) // Si le sommet est dans un motif donc de priorité != 0
-			{
+			//if (flag(atom(s, neighbor(a, i))) != 0) // Si le sommet est dans un motif donc de priorité != 0
+			//{
 				if (neighbor(a, i) == indice2) // Si l'identifiant recherché est trouvé
 				{
 					return 1;
@@ -550,7 +550,7 @@ int parcours(Shell_t* s, List_t* marquer, int indice1, int indice2) {
 						}
 					}
 				}
-			}
+			//}
 			
 			
 		}
@@ -631,13 +631,20 @@ List_m* initMocAtt(Main_t* m){
 void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
-	for (int j = 0; j < /*SHL_nbAtom*/size(mocAtt->premier->moc); j++)
+
+	//Retirer les sommets de l'enveloppe et modifier le shell//
+	Shell_t* moc_simplify;
+	for (int j = 0; j < size(mocAtt->premier->moc); j++)
 	{
 		if (flag(atom(mocAtt->premier->moc,j)) == 0)
 		{
 			SHL_removeAtom(mocAtt->premier->moc, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
 		}
 	}
+	moc_simplify = SHL_copyCageAtoms(mocAtt->premier->moc);
+	LSTm_removeFirst(mocAtt);
+	LSTm_addElement(mocAtt, moc_simplify);
+	//***//
 	int tailleMocInit = SHL_nbAtom(mocAtt->premier->moc); //permet de récupérer la taille avant l'ajout des chemins, fonctionne car on garde qu'un moc ligne d'avant (à modifier sinon)
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{	
@@ -662,14 +669,14 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 				int arrivee = sommets->premier->arrivee;
 				LST2_removeFirst(sommets);
 
-				for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
+				/*for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
 				{
 					if (flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))) == 0)
 					{
 						SHL_removeEdge(mocTraite2, depart, neighbor(atom(mocTraite2, depart), i));
 						i--;
 					}
-				}
+				}*/
 //#pragma omp parallel for
 				for (int i = 2; i < 3/*4 avec carbonyle*/ ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
 				{
