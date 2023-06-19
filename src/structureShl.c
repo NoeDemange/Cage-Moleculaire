@@ -405,9 +405,9 @@ void SHL_testDis(Shell_t* s) {
 int i, j;
 	for (i=0; i<size(s); i++) {
 
-		if (flag(atom(s,i)) != -1 && flag(atom(s,i)) != 2)
+		if (flag(atom(s,i)) != -1 && flag(atom(s,i)) != 2 && flag(atom(s,i)) != 0)
 			for (j=i+1; j<size(s); j++) {
-				if (flag(atom(s,j)) != -1 && flag(atom(s,j)) != 2) {
+				if (flag(atom(s,j)) != -1 && flag(atom(s,j)) != 2 && flag(atom(s,j)) != 0) {
 					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS)
 						SHL_mergeAtom2(s, i, j);
 				}

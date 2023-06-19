@@ -173,7 +173,7 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	flag(v) = 3;
 
 	//Insérer tous les voisins de v dans la liste.
-	while (neighbor(v,0) != -1){
+	while (neighbor(v,0) != -1) {
 		LST_addElement(l,neighbor(v,0));
 		SHL_removeEdge(m, idv, neighbor(v,0));
 	}
@@ -231,7 +231,7 @@ void generationHydro(Main_t* m) {
 	AtomShl_t *v;
 	Atom_t *parent;
 
-	for (i=0; i<1; i++) { //si toutes les cages possibles fonction graphe de dépendance surement à changer
+	for (i=0; i<1/*mocSize(m)*/; i++) { //si toutes les cages possibles fonction graphe de dépendance surement à changer
 		for (j=0; j<size(bond(moc(m,i))); j++) {
 			idv = id(vertex(bond(moc(m,i)),j));
 
@@ -258,49 +258,57 @@ void generationHydro(Main_t* m) {
 
 void generationCycle(Shell_t* s) {
 	int i, j;
-	AtomShl_t* a;
-	List_t* nei;
-	List_t* atomT = LST_create();
+	AtomShl_t* atom;
+	List_t* neighborsNotInCycle;
+	List_t* atomsInCycle = LST_create();
 
 	for (i = 0; i < size(s); i++) {
 		if (flag(atom(s,i)) != -1) {
 			if (cycle(s, i)) {	
-				LST_addElement(atomT, i);
+				LST_addElement(atomsInCycle, i);
 			}
 		}
 	}
-	for (i = 0; i < size(atomT) && elts(atomT,i) != -1; i++) {
-		a = atom(s, elts(atomT,i));
-		nei = LST_create();
+	for (i = 0; i < size(atomsInCycle) && elts(atomsInCycle,i) != -1; i++) {
+		atom = atom(s, elts(atomsInCycle,i));
+		neighborsNotInCycle = LST_create();
 
 		//pour tous les voisins de a
-		for (j = 0; j < neighborhoodSize(a) && neighbor(a,j) != -1; j++) {
+		for (j = 0; j < neighborhoodSize(atom) && neighbor(atom,j) != -1; j++) {
 
-			if (!LST_check(atomT, neighbor(a,j)) ||
-			dist(coords(a), coords(atom(s,neighbor(a,j)))) > 1.7) {
-				LST_addElement(nei,neighbor(a,j));
+			if (!LST_check(atomsInCycle, neighbor(atom,j)) ||
+			dist(coords(atom), coords(atom(s,neighbor(atom,j)))) > 1.7) {
+				LST_addElement(neighborsNotInCycle,neighbor(atom,j));
 			}
 		}
 		//S'il existe au moins deux voisins de a pouvant participés au motif.
-		if (SHL_nbNeighborhood(a) - LST_nbElements(nei) > 1) {
+		if (SHL_nbNeighborhood(atom) - LST_nbElements(neighborsNotInCycle) > 1) {
 
 			//Retirer les anciens liens entre l'atome et ses voisins
-			for (j = 0; j < size(nei) && elts(nei,j) != -1; j++) {
-				SHL_removeEdge(s, elts(atomT,i), elts(nei,j));
+			for (j = 0; j < size(neighborsNotInCycle) && elts(neighborsNotInCycle,j) != -1; j++) {
+				SHL_removeEdge(s, elts(atomsInCycle,i), elts(neighborsNotInCycle,j));
 			}
-			flag(a) = 2;
-			if (SHL_nbNeighborhood(a) == 2) {
+			flag(atom) = 2;
+			if (SHL_nbNeighborhood(atom) == 2) {
 				int id = -1;
-				Point_t newCoords = autre(coords(a), coords(atom(s,neighbor(a,0))),
-							coords(atom(s,neighbor(a,1))), 1.4);
+				Point_t newCoords = autre(coords(atom), coords(atom(s,neighbor(atom,0))),
+							coords(atom(s,neighbor(atom,1))), 1.4); //TODO changer à 1.5 (SIMPLE) ?
 				id = SHL_addAtom(s, newCoords, -1);
 
 				for (j=0; j<size(s); j++)
 					if (flag(atom(s,j)) != -1 &&
 					dist(newCoords, coords(atom(s,j))) < 0.7){
-						if (LST_check(nei, j)) LST_removeElement(nei, j);
-						if (cycle(s,j)) LST_addElement(atomT, id);
-						SHL_mergeAtom(s, id, j);
+						if (LST_check(neighborsNotInCycle, j)) {
+							printf("%d nei check\n", j);
+							LST_removeElement(neighborsNotInCycle, j);
+						}
+						if (cycle(s,j)) {
+							printf("%d cycle check\n", j);
+							LST_addElement(atomsInCycle, id);
+						}
+						printf("%d merge in %d\n", j, id);
+						if (flag(atom(s,j)) != 0)
+							SHL_mergeAtom(s, id, j);
 						//S'il le sommet appartenant à la liste de cycle il faut le rajouter dans atomT
 					}
 				if (flag(atom(s,id)) < 2) flag(atom(s,id)) = 1;
@@ -308,14 +316,14 @@ void generationCycle(Shell_t* s) {
 				//si autre sommet trop proche newCoord == coords(sommet)
 
 				//Ajoute les arêtes entre le nouveau sommet et i	
-				SHL_addEdge(s, elts(atomT,i), id);
+				SHL_addEdge(s, elts(atomsInCycle,i), id);
 			}
 
 			//SHL_linkBorder(s, elts(atomT,i), nei);
 		}
-		LST_delete(nei);
+		LST_delete(neighborsNotInCycle);
 	}
-	LST_delete(atomT);
+	LST_delete(atomsInCycle);
 }
 
 void generationMoc(Main_t* m) {
