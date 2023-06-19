@@ -231,7 +231,7 @@ void generationHydro(Main_t* m) {
 	AtomShl_t *v;
 	Atom_t *parent;
 
-	for (i=0; i<1; i++) { //si toutes les cages possibles fonction graphe de dépendance surement à changer
+	for (i=0; i<1/*mocSize(m)*/; i++) { //si toutes les cages possibles fonction graphe de dépendance surement à changer
 		for (j=0; j<size(bond(moc(m,i))); j++) {
 			idv = id(vertex(bond(moc(m,i)),j));
 
@@ -292,7 +292,7 @@ void generationCycle(Shell_t* s) {
 			if (SHL_nbNeighborhood(a) == 2) {
 				int id = -1;
 				Point_t newCoords = autre(coords(a), coords(atom(s,neighbor(a,0))),
-							coords(atom(s,neighbor(a,1))), 1.4);
+							coords(atom(s,neighbor(a,1))), 1.4); //TODO changer à 1.5 (SIMPLE) ?
 				id = SHL_addAtom(s, newCoords, -1);
 
 				for (j=0; j<size(s); j++)
