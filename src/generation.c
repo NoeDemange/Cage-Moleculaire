@@ -299,14 +299,11 @@ void generationCycle(Shell_t* s) {
 					if (flag(atom(s,j)) != -1 &&
 					dist(newCoords, coords(atom(s,j))) < 0.7){
 						if (LST_check(neighborsNotInCycle, j)) {
-							printf("%d nei check\n", j);
 							LST_removeElement(neighborsNotInCycle, j);
 						}
 						if (cycle(s,j)) {
-							printf("%d cycle check\n", j);
 							LST_addElement(atomsInCycle, id);
 						}
-						printf("%d merge in %d\n", j, id);
 						if (flag(atom(s,j)) != 0)
 							SHL_mergeAtom(s, id, j);
 						//S'il le sommet appartenant à la liste de cycle il faut le rajouter dans atomT
