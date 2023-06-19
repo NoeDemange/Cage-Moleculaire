@@ -137,6 +137,15 @@ Point_t rotation(Point_t vec, float alpha, Point_t A) {
 	return rot;
 }
 
+/**
+ * @brief Add the third point to a triangular pattern around a point. 
+ * 
+ * @param A The point at the center of the pattern.
+ * @param B The first point of the triangular pattern.
+ * @param C The second point of the triangular pattern.
+ * @param scal The distance
+ * @return Point_t The third point to add.
+ */
 Point_t autre(Point_t A, Point_t B, Point_t C, float scal) {
 	Point_t normal;
 
