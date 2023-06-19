@@ -252,6 +252,7 @@ void LST_addElement(List_t*, unsigned);
 void LST_removeElement(List_t* , unsigned);
 List_t* LST_create();
 List_t* LST_copy(List_t*);
+List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei);
 List_t* LST_addList(List_t*, List_t*);
 void LST_delete(List_t*);
 
@@ -329,6 +330,7 @@ void SHL_mergeAtom(Shell_t*, unsigned, unsigned);
 void SHL_testDis(Shell_t*);
 Shell_t* SHL_create();
 Shell_t* SHL_copy(Shell_t*);
+Shell_t* SHL_copyCageAtoms(Shell_t* s);
 Shell_t* SHL_avoir(Shell_t*);
 void SHL_delete(Shell_t*);
 void SHL_deleteAtom(AtomShl_t* a);

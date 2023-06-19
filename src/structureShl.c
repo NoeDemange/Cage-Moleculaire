@@ -323,6 +323,45 @@ Shell_t* SHL_copy(Shell_t* s) {
 	return copy;
 }
 
+Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les atomes de flag 0 et -1
+
+	int cpt = 0;
+	int pos = 0;
+	Shell_t* copy = malloc(sizeof(Shell_t));
+
+	size(copy) = SHL_nbAtom(s);
+	copy->atoms = malloc(size(copy)*sizeof(AtomShl_t));
+	copy->cycle = LST_copy(s->cycle);
+	copy->bond = GPH_copy(s->bond);
+
+	int* mod_pos_nei;
+	mod_pos_nei = malloc(size(s)*sizeof(int));
+
+	for (int i=0; i<size(s); i++) {
+		if ((flag(atom(s,i)) == -1)){
+			cpt++;
+		}
+		else{
+			mod_pos_nei[i] = cpt;
+			flag(atom(copy,pos)) = flag(atom(s,i));
+			coords(atom(copy,pos)) = coords(atom(s,i));
+			parentAtom(atom(copy,pos)) = parentAtom(atom(s,i));
+			//neighborhood(atom(copy,pos)) = LST_copy(neighborhood(atom(s,i)));
+			pos++;
+		}
+	}
+
+	pos = 0;
+	for(int i=0; i<size(s); i++) {
+		if ((flag(atom(s,i)) != -1)){
+			neighborhood(atom(copy,pos)) = LST_copyWithShift(neighborhood(atom(s,i)),mod_pos_nei);
+			pos++;
+		}
+	}
+	free(mod_pos_nei);
+	return copy;
+}
+
 //Approxiation des distances
 //Création d'un shell de sommets.
 /*Shell_t* SHL_avoir(Shell_t* s) {

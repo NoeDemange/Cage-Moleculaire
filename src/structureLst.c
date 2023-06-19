@@ -103,6 +103,21 @@ List_t* LST_copy(List_t* l) {
 	return copy;
 }
 
+List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei) { //copie de la liste avec décalage de la numérotation de l'éléments en fonction de la valeur du taleau mod_pos_nei
+
+	int i;
+	List_t* copy = LST_create();
+
+	size(copy) = LST_nbElements(l);
+
+	copy->elts = malloc(size(copy)*sizeof(int));
+
+	for (i=0; i<size(copy); i++)
+		elts(copy,i) = elts(l,i)-mod_pos_nei[elts(l,i)];
+
+	return copy;
+}
+
 List_t* LST_addList(List_t* l1, List_t* l2) {
 
 	int i;
