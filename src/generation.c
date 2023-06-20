@@ -40,7 +40,7 @@ void generationDep(Main_t* m) {
 	//printf("mocSize %d\n", mocSize(m));
 }
 
-void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
+/*void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
 
 	int i, index = idv;
 	float min, distance;
@@ -70,7 +70,8 @@ void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
 		flag(v) = flag(s);
 		SHL_removeVertex(m, idv);
 	}
-}
+
+}*/
 
 /**
  * @brief Insert a hydrogen donor pattern with a triangular geometry.

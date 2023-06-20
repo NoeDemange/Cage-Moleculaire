@@ -19,10 +19,8 @@
 #define MINDIS 0.75 // Minimal distance bewteen two atoms (otherwise they are merged).
 #define DIST_GAP_CAGE 1.34  // Distance between two cage's atoms (defined by trial).
 #define DIST_GAP_SUBSTRATE 1.8 // Distance between an atom of the cage and an atom of the substrate (at least a hydrogen bond size by trial).
-
-
-/*
-	   B
+#define DIST_SIMPLE_PATTERN 1.22 // If we consider a triangle ABC representing 1 carbon for each vertex (carbon pattern) of the path with AB=BC=1.5 and angle ABC = 109°c then 1.22 corresponds to AC/2.
+/*   B
 	 /   \
   A---  C
 */
