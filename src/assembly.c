@@ -666,7 +666,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 			{
 				int depart = sommets->premier->depart;
 				int arrivee = sommets->premier->arrivee;
-				if((dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee))) <= ((DIST_SIMPLE_PATTERN*tailleMax)+SIMPLE+DIST_ERROR))){
+				if((dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee))) <= ((DIST_SIMPLE_PATTERN*tailleMax) + DIST_SIMPLE + DIST_ERROR))){
 					Shell_t* mocTraite2 = SHL_copy(mocTraite); // Crée un nouveau moc dans la liste a traiter
 					//LST2_removeFirst(sommets);
 					/*for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
