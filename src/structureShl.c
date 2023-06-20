@@ -408,8 +408,16 @@ int i, j;
 		if (flag(atom(s,i)) != -1 && flag(atom(s,i)) != 2 && flag(atom(s,i)) != 0)
 			for (j=i+1; j<size(s); j++) {
 				if (flag(atom(s,j)) != -1 && flag(atom(s,j)) != 2 && flag(atom(s,j)) != 0) {
-					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS)
+					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS){
+						if(flag(atom(s,i)) == 1 && flag(atom(s,j)) == 3){
+							SHL_removeAtom(s,i);
+						}
+						else if(flag(atom(s,i)) == 3 && flag(atom(s,j)) == 1){
+							SHL_removeAtom(s,j);
+						}else{
 						SHL_mergeAtom2(s, i, j);
+						}
+					}
 				}
 			}
 	}
