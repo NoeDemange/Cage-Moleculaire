@@ -318,19 +318,19 @@ void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
 	//SHL_writeMol2(outputname, s);
 	
 	//Sortie sans enveloppe
-	Shell_t* s2 = SHL_copy(s);
-	for (int j = 0; j < size(s2); j++)
+	//Shell_t* s2 = SHL_copy(s);
+	/*for (int j = 0; j < size(s2); j++)
 	{
-		if ((flag(atom(s2,j)) == 0) /*|| ((flag(atom(s2,j)) == 1 && LST_nbElements(neighborhood(atom(s2,j)))==1))*/)
+		if ((flag(atom(s2,j)) == 0) || ((flag(atom(s2,j)) == 1 && LST_nbElements(neighborhood(atom(s2,j)))==1)))
 		{
 			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
 		}
-	}
+	}*/
 	
 	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
-	SHL_writeMol2(outputname, s2);
+	SHL_writeMol2(outputname, s);
 	printf("Result : %d\n", i);
-	SHL_delete(s2);
+	//SHL_delete(s2);
 	free(name);
 	free(dirName);
 	i++;
