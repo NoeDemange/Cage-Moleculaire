@@ -383,7 +383,7 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les ato
 			B = atom(s, neighbor(A,j));
 			if (i < neighbor(A,j)) {
 				AB = dist(coords(A), coords(B));
-				nb = roundf(AB/SIMPLE);
+				nb = roundf(AB/DIST_SIMPLE);
 				dis = AB/nb;
 
 				for (k=1; k<nb; k++)

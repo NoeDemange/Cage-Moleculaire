@@ -86,8 +86,8 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 			normal = rotation(normalization(vector(positionNvDprt, dpt), 1),  90, normal); // Perpendiculaire
 			
 			// Positionner les autres atomes du cycle
-			v1 = AX1E2(positionNvDprt, coords(atom(moc, depart)), normal, SIMPLE); // Voisin
-			positionNvDprt = AX2E1(positionNvDprt, coords(atom(moc, depart)), v1, SIMPLE); 
+			v1 = AX1E2(positionNvDprt, coords(atom(moc, depart)), normal, SIMPLE_CYCLE); // Voisin
+			positionNvDprt = AX2E1(positionNvDprt, coords(atom(moc, depart)), v1, SIMPLE_CYCLE); 
 			if (isHindered(moc, sub, positionNvDprt)) {
 				SHL_delete(moc);
 				return;
@@ -102,7 +102,7 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 			for (int i = 0; i < 4; i++) 
 			{
 				v1 = coords(atom(moc, neighbor(atom(moc, idVoisin), 0)));
-				positionNvDprt = AX1E2(positionNvDprt, v1, normal, SIMPLE);
+				positionNvDprt = AX1E2(positionNvDprt, v1, normal, SIMPLE_CYCLE);
 				if (isHindered(moc, sub, positionNvDprt)) {
 					SHL_delete(moc);
 					return;
@@ -125,7 +125,7 @@ void addAromaticRing(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvD
 			// Positionner atome qui suit le cycle
 			v1 = coords(atom(moc, neighbor(atom(moc, idSuiv), 0)));
 			Point_t v2 = coords(atom(moc, neighbor(atom(moc, idSuiv), 1)));
-			positionNvDprt = AX2E1(posSuiv, v1, v2, SIMPLE); 
+			positionNvDprt = AX2E1(posSuiv, v1, v2, DIST_SIMPLE); 
 			if (isHindered(moc, sub, positionNvDprt) == 1) {
 				SHL_delete(moc);
 				return;
@@ -162,7 +162,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			
 			// Atome O
 			//Premier position
-			Point_t positionO = AX1E2(dpt, v1, normal, SIMPLE);
+			Point_t positionO = AX1E2(dpt, v1, normal, DIST_SIMPLE);
 			
 			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
@@ -178,7 +178,7 @@ List_m* ajoutOMotif3(Shell_t* mocTraite, int depart, Molecule_t* sub) {
 			}
 						
 			//Seconde position
-			positionO = AX2E1(dpt, v1, positionO, SIMPLE);
+			positionO = AX2E1(dpt, v1, positionO, DIST_SIMPLE);
 			
 			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
@@ -226,7 +226,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			
 			// Atome O
 			//Premier position
-			Point_t positionO = AX1E2(positionNvDprt, dpt, normal, SIMPLE);
+			Point_t positionO = AX1E2(positionNvDprt, dpt, normal, DIST_SIMPLE);
 			
 			if (isHindered(moc, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
@@ -243,7 +243,7 @@ void ajoutMotif3(Shell_t* mocTraite, List_m* mocAtt, int depart, List_d* nvDepar
 			}
 			
 			//Seconde position
-			positionO = AX2E1(positionNvDprt, dpt, positionO, SIMPLE);
+			positionO = AX2E1(positionNvDprt, dpt, positionO, DIST_SIMPLE);
 			
 			if (isHindered(moc2, sub, positionO) == 0) // Si le point est éloigné de 1.5 des autres atomes
 			{
@@ -309,13 +309,13 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 
 	Point_t normal = planNormal(dpt, v1, x2);
 	
-	Point_t positionNvDprt = AX1E3(dpt, v1, normal, SIMPLE);
+	Point_t positionNvDprt = AX1E3(dpt, v1, normal, DIST_SIMPLE);
 	LSTs_addElement(positions, positionNvDprt);
 	
 	for (int i = 0; i < 11; i++) // Rotation a 360°
 	{
 		normal = rotation(normalization(vector(dpt, v1), 1),  30, normal); // Rotation de 30° de la normal
-		positionNvDprt = AX1E3(dpt, v1, normal, SIMPLE);
+		positionNvDprt = AX1E3(dpt, v1, normal, DIST_SIMPLE);
 		
 		if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 		{	
@@ -336,7 +336,7 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 // Projection pour un azote avec 2 voisins
 void projectionN_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Molecule_t* sub) {
 	
-	Point_t positionNvDprt = AX2E2(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
+	Point_t positionNvDprt = AX2E2(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), DIST_SIMPLE);
 	
 	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
@@ -347,7 +347,7 @@ void projectionN_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 // Projection pour un carbone avec 2 voisins dont un oxygene
 void projectionC_AX2E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Molecule_t* sub) {
 	
-	Point_t positionNvDprt = AX2E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
+	Point_t positionNvDprt = AX2E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), DIST_SIMPLE);
 	
 	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
@@ -358,14 +358,14 @@ void projectionC_AX2E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 // Projection pour un carbone avec 2 voisins
 void projectionC_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif, Molecule_t* sub) {
 	
-	Point_t positionNvDprt = AX2E2(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), SIMPLE);
+	Point_t positionNvDprt = AX2E2(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), DIST_SIMPLE);
 	
 	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
 		ajoutProjection(moc, mocAtt, depart, nvDepart, numMotif, positionNvDprt, sub); // Ajout a l'enveloppe
 	}
 	
-	Point_t positionNvDprt2 = AX3E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), positionNvDprt, SIMPLE);
+	Point_t positionNvDprt2 = AX3E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), positionNvDprt, DIST_SIMPLE);
 	
 	if (isHindered(moc, sub, positionNvDprt2) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
@@ -376,7 +376,7 @@ void projectionC_AX2E2(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepar
 // Projection pour un carbone avec 3 voisins
 void projectionC_AX3E1(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, int numMotif,Molecule_t* sub) {
 	
-	Point_t positionNvDprt = AX3E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), coords(atom(moc, neighbor(atom(moc, depart), 2))), SIMPLE);
+	Point_t positionNvDprt = AX3E1(coords(atom(moc, depart)), coords(atom(moc, neighbor(atom(moc, depart), 0))), coords(atom(moc, neighbor(atom(moc, depart), 1))), coords(atom(moc, neighbor(atom(moc, depart), 2))), DIST_SIMPLE);
 	
 	if (isHindered(moc, sub, positionNvDprt) == 0) // Si le point est éloigné de 1.5 des autres atomes
 	{
@@ -479,7 +479,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			}
 			
 			if(tailleMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
-				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
+				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
 					//if(nbMotif4>0){//que s'il y a un cycle dans le chemin
 						SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee

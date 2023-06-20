@@ -5,12 +5,12 @@
 #include "output.h"
 
 /**
- * Expension de groupement atomique sterique 2.
- * Ajout d'un point dans l'enveloppe.
+ * Expansion of atomic steric grouping 2. 
+ * Add a point in the envelope.
  * 
- * @param m Molécule (entrée).
- * @param s Enveloppe (sortie).
- * @param id Identifiant du sommet traité de la molécule.
+ * @param m Molecule (input).
+ * @param s Envelope (output).
+ * @param id Identifier of the processed atom in the molecule.
  */
 void expansion_AX1E1(Molecule_t* m, Shell_t* s, unsigned id) {
 
@@ -18,7 +18,7 @@ void expansion_AX1E1(Molecule_t* m, Shell_t* s, unsigned id) {
 	Point_t newCoords;
 	Atom_t* a = atom(m,id), *x1 = atom(m,neighbor(a,0));
 
-  newCoords = AX1E1(coords(a), coords(x1), HYDRO);
+  newCoords = AX1E1(coords(a), coords(x1), DIST_HYDRO);
 
   indice = SHL_addAtom(s, newCoords, id);
 
@@ -27,12 +27,12 @@ void expansion_AX1E1(Molecule_t* m, Shell_t* s, unsigned id) {
 }
 
 /**
- * Expension de groupement atomique sterique 3.
- * Ajout de un à quatre points dans l'enveloppe.
+ * @brief Expansion of atomic steric grouping 3. 
+ * Add one to four points in the envelope.
  *
- * @param m Molécule (entrée).
- * @param s Enveloppe (sortie).
- * @param id Identifiant du sommet traité de la molécule.
+ * @param m Molecule (input).
+ * @param s Envelope (output).
+ * @param id Identifier of the processed atom in the molecule.
  */
 void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 
@@ -51,7 +51,7 @@ void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 			x2 = coords(atom(m,neighbor(atom(m,neighbor(atom(m,id),0)),0)));
 
 		normal = planNormal(a, x1, x2);
-		x2 = AX1E2(a, x1, normal, HYDRO);
+		x2 = AX1E2(a, x1, normal, DIST_HYDRO);
 		indice = SHL_addAtom(s, x2, id);
 
 		if (checkVertex(m,id))
@@ -64,7 +64,7 @@ void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 	//Ajout d'un point si le groupement possède moins de trois doublets.
 	//X3 devient soit le point ajouté à l'enveloppe, soit le troisième voisin dans la molécule.
 	if (ligands(atom(m,id)) < 3) {
-		x3 = AX2E1(a, x1, x2, HYDRO);
+		x3 = AX2E1(a, x1, x2, DIST_HYDRO);
 		indice = SHL_addAtom(s, x3, id);
 
 		if (checkVertex(m,id))
@@ -74,7 +74,7 @@ void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 		x3 = coords(atom(m,neighbor(atom(m,id),2)));
 
 	//Ajout des deux extensions perpendiculaires.
-	normal = normalization(planNormal(x1, x2, x3), HYDRO);
+	normal = normalization(planNormal(x1, x2, x3), DIST_HYDRO);
 
 	if (cycle(m,id)) {
 		SHL_addCycle(s, SHL_addAtom(s, addPoint(a, normal), id));
@@ -87,12 +87,12 @@ void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 }
 
 /**
- * Expension de groupement atomique sterique 4.
- * Ajout de zéro à trois points dans l'enveloppe.
+ * @brief Expansion of atomic steric grouping 4. 
+ * Add zero to three points in the envelope.
  *
- * @param m Molécule (entrée).
- * @param s Enveloppe (sortie).
- * @param id Identifiant du sommet traité de la molécule.
+ * @param m Molecule (input).
+ * @param s Envelope (output).
+ * @param id Identifier of the processed atom in the molecule.
  */
 void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 
@@ -114,7 +114,7 @@ void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 		//à voir si on le garde
 		x2 = addPoint(a, planNormal(a, x1, x2));
 		normal = planNormal(a, x1, x2);
-		x2 = AX1E3(a, x1, normal, HYDRO);
+		x2 = AX1E3(a, x1, normal, DIST_HYDRO);
 		indice = SHL_addAtom(s, x2, id);
 
 		if (checkVertex(m,id))
@@ -127,7 +127,7 @@ void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 	//X3 devient soit le point ajouté à l'enveloppe, soit le troisième voisin dans la molécule.
 	if (ligands(atom(m,id)) < 3) {
 
-		x3 = AX2E2(a, x1, x2, HYDRO);
+		x3 = AX2E2(a, x1, x2, DIST_HYDRO);
 		indice = SHL_addAtom(s, x3, id);
 
 		if (checkVertex(m,id))
@@ -138,7 +138,7 @@ void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 
 	if (ligands(atom(m,id)) < 4) {
 
-		indice = SHL_addAtom(s, AX3E1(a, x1, x2, x3, HYDRO), id);
+		indice = SHL_addAtom(s, AX3E1(a, x1, x2, x3, DIST_HYDRO), id);
 
 		if (checkVertex(m,id))
 			SHL_addVertex(s, indice);
@@ -147,12 +147,12 @@ void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 
 /********************* A refaire ************************/
 /**
- * Expension de groupement atomique avec un angle à 180°.
- * Ajout de quatre points dans l'enveloppe.
+ * Expansion of atomic group with an angle of 180°.
+ * Add four points in the envelope.
  * 
- * @param m Molécule (entrée)
- * @param s Enveloppe (sortie)
- * @param id Identifiant du sommet traité de la molécule.
+ * @param m Molecule (input).
+ * @param s Envelope (output).
+ * @param id Identifier of the processed atom in the molecule.
  */
 void expansion_AX2E0(Molecule_t* m, Shell_t* s, unsigned id) {
 	Point_t normal, newCoords;
@@ -162,26 +162,26 @@ void expansion_AX2E0(Molecule_t* m, Shell_t* s, unsigned id) {
 	normal = normalization(vector(coords(a), coords(x1)),1);
 
 	newCoords = normalization(
-		planNormal(coords(a), coords(x1), coords(x2)), HYDRO);
+		planNormal(coords(a), coords(x1), coords(x2)), DIST_HYDRO);
 
 	SHL_addAtom(s, addPoint(coords(a), newCoords), id);
 
 	SHL_addAtom(s, addPoint(coords(a), normalization(
-		rotation(normal, 90, newCoords), HYDRO)), id);
+		rotation(normal, 90, newCoords), DIST_HYDRO)), id);
 
 	SHL_addAtom(s, addPoint(coords(a), normalization(
-		rotation(normal, 180, newCoords), HYDRO)), id);
+		rotation(normal, 180, newCoords), DIST_HYDRO)), id);
 
 	SHL_addAtom(s, addPoint(coords(a), normalization(
-		rotation(normal, -90, newCoords), HYDRO)), id);
+		rotation(normal, -90, newCoords), DIST_HYDRO)), id);
 }
 
 /**
- * Expansion de l'ensemble de la molécule.
- * Ajout de zéro à trois points dans l'enveloppe.
+ * Expansion of the whole molecule.
+ * Add zero to three points in the envelope.
  * 
- * @param m Molécule (entrée) Déjà instanciée.
- * @param s Enveloppe (sortie) créée.
+ * @param m Molecule (input) already instantiated.
+ * @param s Envelope (output) created.
  */
 void expansion(Molecule_t* m, Shell_t* s) {
 	int i, j;
@@ -214,10 +214,10 @@ void expansion(Molecule_t* m, Shell_t* s) {
 }
 
 /**
- * Construction des arêtes de l'enveloppe.
- * Appel à R.
+ * Construction of the edges of the envelope.
+ * Call to R.
  * 
- * @param s				Enveloppe possédant déjà un nuage de points.
+ * @param s				Envelope that already has a cloud of points.
  * @param alpha 	Paramètre de la sphère. (3 est souvent une bonne mesure, 4 sinon)
  */
 void alphaShape(Shell_t* s, double alpha) {
@@ -238,16 +238,15 @@ void alphaShape(Shell_t* s, double alpha) {
 }
 
 /**
- *  Création complète de l'enveloppe à partir de la molécule.
+ *  Creation of the whole envelope from the molecule.
  *
- * @param m Molécule (entrée) Déjà instanciée.
- * @param s Enveloppe (sortie) créée.
+ * @param m Molecule (input) already instantiated.
+ * @param s Envelope (output) created.
  */
 Shell_t* createShell(Molecule_t* m, double alpha) {
 	Shell_t* s = SHL_create();
 	
 	expansion(m, s);
-	
 	//SHL_writeMol2("../results/vec.mol2", s);
 	alphaShape(s, alpha);
 	//printf("Graphe de dépendance de l'enveloppe.\n");

@@ -17,6 +17,8 @@
 #define bond(o)	(o)->bond
 #define elts(l, i) (l)->elts[(i)]
 
+// (in a loop) Browse a list of elements until it finds a -1 element (an unused value).
+// Only used to scroll through list where unused values are at the end. 
 #define forEachElement(l,i) (i) < size((l)) && elts((l),(i)) != -1
 
 #define coords(a) (a)->coords
@@ -26,6 +28,8 @@
 #define neighbor(a,i) (a)->neighborhood->elts[(i)]
 #define neighborhoodSize(a) (a)->neighborhood->size
 
+// (in a loop) Browse a list of neighbors until it finds a -1 element (an unused value).
+// The unused values of neighbors must be at the end. 
 #define forEachNeighbor(a,i) (i) < neighborhoodSize((a)) && neighbor((a),(i)) != -1
 
 ///macro molecule
