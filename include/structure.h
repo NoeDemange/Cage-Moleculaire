@@ -327,7 +327,7 @@ unsigned SHL_addVertex(Shell_t*, unsigned);
 void SHL_removeVertex(Shell_t*, unsigned);
 void SHL_addBond(Shell_t*, unsigned, unsigned);
 void SHL_removeBond(Shell_t*, unsigned, unsigned);
-void SHL_avoir2(Shell_t*, List_t*, List_t*);
+//void SHL_avoir2(Shell_t*, List_t*, List_t*);
 void SHL_linkBorder(Shell_t*, unsigned, List_t*);
 void SHL_addCycle(Shell_t*, unsigned);
 void SHL_mergeAtom(Shell_t*, unsigned, unsigned);
@@ -335,7 +335,7 @@ void SHL_testDis(Shell_t*);
 Shell_t* SHL_create();
 Shell_t* SHL_copy(Shell_t*);
 Shell_t* SHL_copyCageAtoms(Shell_t* s);
-Shell_t* SHL_avoir(Shell_t*);
+//Shell_t* SHL_avoir(Shell_t*);
 void SHL_delete(Shell_t*);
 void SHL_deleteAtom(AtomShl_t* a);
 

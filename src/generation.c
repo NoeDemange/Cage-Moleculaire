@@ -131,6 +131,12 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, (SIMPLE/2)+(MINDIS/2));
 	new_coords = addPoint(coords(v), dir);
+	for (int l = 0; l< size(m); l++){
+		if(flag(atom(m,l)) == 3 && dist(coords(atom(m,l)),new_coords) < MINDIS){
+			flag(v) = 0;
+			return;
+		}
+	}
 	idc = SHL_addAtom(m, new_coords, -1);
 
 	//checkInsertVertex(m, l, idc);
@@ -184,6 +190,12 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, (SIMPLE/2)+(MINDIS/2));
 	x2 = addPoint(coords(v), dir);
+	for (int l = 0; l< size(m); l++){
+		if(flag(atom(m,l)) == 3 && dist(coords(atom(m,l)),x2) < MINDIS){
+			flag(v) = 0;
+			return;
+		}
+	}
 	idc = SHL_addAtom(m, x2, -1);
 
 	//checkInsertVertex(m, l, idc);
@@ -238,15 +250,24 @@ void generationHydro(Main_t* m) {
 			if (idv != -1) {
 				//printf("idv = %d\n", idv);
 				v = atom(moc(m,i), idv);
-				parent = atom(substrat(m), parentAtom(v));
-				if (!strcmp(symbol(parent), "H")) {
-					insertDonor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+				int tooClose = 1;
+				for (int l = 0; l< size(moc(m,i)); l++){
+					if(flag(atom(moc(m,i),l)) == 3 && dist(coords(atom(moc(m,i),l)),coords(v)) < MINDIS){
+						tooClose = 0;
+						break;
+					}
 				}
-				else {
-					if (steric(parent) == 3)
-						insertAcceptor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
-					else
-						insertAcceptor2(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+				if(tooClose){
+					parent = atom(substrat(m), parentAtom(v));
+					if (!strcmp(symbol(parent), "H")) {
+						insertDonor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+					}
+					else {
+						if (steric(parent) == 3)
+							insertAcceptor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+						else
+							insertAcceptor2(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+					}
 				}
 			}
 		}
