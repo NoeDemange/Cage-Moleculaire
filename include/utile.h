@@ -16,7 +16,7 @@ float dist(Point_t, Point_t);
 Point_t normalization(Point_t, float);
 float angle(Point_t, Point_t, Point_t);
 Point_t vector(Point_t, Point_t);
-Point_t autre(Point_t, Point_t, Point_t, float);
+Point_t addThirdPoint(Point_t, Point_t, Point_t, float);
 Point_t planNormal(Point_t, Point_t, Point_t);
 Point_t rotation(Point_t, float, Point_t);
 

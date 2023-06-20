@@ -256,66 +256,73 @@ void generationHydro(Main_t* m) {
 }
 
 
+/**
+ * @brief Add Aromatic ring to the shell.
+ * 
+ * The function find for each atom involved in a cycle
+ * if it can be part of a triangular pattern, then
+ * add the pattern to shell.
+ * 
+ * @param s The shell of the substrat.
+ */
 void generationCycle(Shell_t* s) {
-	int i, j;
 	AtomShl_t* atom;
 	List_t* neighborsNotInCycle;
 	List_t* atomsInCycle = LST_create();
 
-	for (i = 0; i < size(s); i++) {
+	// Find the atoms of the shell involved in a cycle.
+	for (int i = 0; i < size(s); i++) {
 		if (flag(atom(s,i)) != -1) {
 			if (cycle(s, i)) {	
 				LST_addElement(atomsInCycle, i);
 			}
 		}
 	}
-	for (i = 0; i < size(atomsInCycle) && elts(atomsInCycle,i) != -1; i++) {
+
+	for (int i = 0; forEachElement(atomsInCycle, i); i++) {
 		atom = atom(s, elts(atomsInCycle,i));
 		neighborsNotInCycle = LST_create();
 
-		//pour tous les voisins de a
-		for (j = 0; j < neighborhoodSize(atom) && neighbor(atom,j) != -1; j++) {
-
+		// Find the neighbors of the atom not involved in a cycle.
+		for (int j = 0; forEachNeighbor(atom, j); j++) {
 			if (!LST_check(atomsInCycle, neighbor(atom,j)) ||
 			dist(coords(atom), coords(atom(s,neighbor(atom,j)))) > 1.7) {
 				LST_addElement(neighborsNotInCycle,neighbor(atom,j));
 			}
 		}
-		//S'il existe au moins deux voisins de a pouvant participés au motif.
-		if (SHL_nbNeighborhood(atom) - LST_nbElements(neighborsNotInCycle) > 1) {
 
-			//Retirer les anciens liens entre l'atome et ses voisins
-			for (j = 0; j < size(neighborsNotInCycle) && elts(neighborsNotInCycle,j) != -1; j++) {
+		int haveEnoughNeighborsInCycle = (SHL_nbNeighborhood(atom) - LST_nbElements(neighborsNotInCycle) >= 2);
+		if (haveEnoughNeighborsInCycle) {
+			// Remove old link between the atom (i) and the its neighbors (j)
+			for (int j = 0; forEachElement(neighborsNotInCycle, j); j++) {
 				SHL_removeEdge(s, elts(atomsInCycle,i), elts(neighborsNotInCycle,j));
 			}
 			flag(atom) = 2;
 			if (SHL_nbNeighborhood(atom) == 2) {
-				int id = -1;
-				Point_t newCoords = autre(coords(atom), coords(atom(s,neighbor(atom,0))),
-							coords(atom(s,neighbor(atom,1))), 1.4); //TODO changer à 1.5 (SIMPLE) ?
-				id = SHL_addAtom(s, newCoords, -1);
+				int idNewNeigbor = -1;
+				Point_t newNeighborPoint = addThirdPoint(coords(atom), coords(atom(s,neighbor(atom,0))),
+							coords(atom(s,neighbor(atom,1))), 1.4); //TODO? changer à 1.5 (SIMPLE)
+				idNewNeigbor = SHL_addAtom(s, newNeighborPoint, -1);
 
-				for (j=0; j<size(s); j++)
-					if (flag(atom(s,j)) != -1 &&
-					dist(newCoords, coords(atom(s,j))) < 0.7){
+				for (int j = 0; j < size(s); j++) {
+					if (flag(atom(s,j)) != -1 && dist(newNeighborPoint, coords(atom(s,j))) < 0.7) {
 						if (LST_check(neighborsNotInCycle, j)) {
 							LST_removeElement(neighborsNotInCycle, j);
 						}
 						if (cycle(s,j)) {
-							LST_addElement(atomsInCycle, id);
+							//TODO? retirer cette condition
+							LST_addElement(atomsInCycle, idNewNeigbor);
 						}
-						if (flag(atom(s,j)) != 0)
-							SHL_mergeAtom(s, id, j);
-						//S'il le sommet appartenant à la liste de cycle il faut le rajouter dans atomT
+						if (flag(atom(s,j)) != 0) {
+							SHL_mergeAtom(s, idNewNeigbor, j);
+						}
 					}
-				if (flag(atom(s,id)) < 2) flag(atom(s,id)) = 1;
-
-				//si autre sommet trop proche newCoord == coords(sommet)
-
-				//Ajoute les arêtes entre le nouveau sommet et i	
-				SHL_addEdge(s, elts(atomsInCycle,i), id);
+				}
+				if (flag(atom(s,idNewNeigbor)) < 2) {
+					flag(atom(s,idNewNeigbor)) = 1;
+				}
+				SHL_addEdge(s, elts(atomsInCycle, i), idNewNeigbor);
 			}
-
 			//SHL_linkBorder(s, elts(atomT,i), nei);
 		}
 		LST_delete(neighborsNotInCycle);

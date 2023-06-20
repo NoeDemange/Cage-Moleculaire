@@ -17,12 +17,16 @@
 #define bond(o)	(o)->bond
 #define elts(l, i) (l)->elts[(i)]
 
+#define forEachElement(l,i) (i) < size((l)) && elts((l),(i)) != -1
+
 #define coords(a) (a)->coords
 #define atomX(a) (a)->coords.x
 #define atomY(a) (a)->coords.y
 #define atomZ(a) (a)->coords.z
 #define neighbor(a,i) (a)->neighborhood->elts[(i)]
 #define neighborhoodSize(a) (a)->neighborhood->size
+
+#define forEachNeighbor(a,i) (i) < neighborhoodSize((a)) && neighbor((a),(i)) != -1
 
 ///macro molecule
 #define symbol(a) (a)->info.symbol
