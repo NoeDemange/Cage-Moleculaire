@@ -4,23 +4,20 @@
 #include "output.h"
 
 /**
- * Calcule les arêtes de la molécule à partir :
- * - des coordonnées des sommets.
- * - des rayons de covalence des atomes.
+ * Compute the edges of the molecule from the atoms' coordinates and their covalent radius.
  *
- * @param    m     Molécule.
+ * @param m Molecule.
  */
 void computeEdges(Molecule_t* m) {
-  float AB;
+  float distBetweenTwoAtoms;
 
-  //pour chaque couple de sommets
+  // For each pair of atoms.
   for (int i = 0; i < size(m); i++) {
     for (int j = i + 1; j < size(m); j++) {
-      //Calcul de la distance entre les deux points.
-      //*100 pour adapter la métrique à celle du rayon de covalence théorique.
-      AB = dist(coords(atom(m,i)), coords(atom(m,j))) * 100;
+      // mult. by 100 to adapt the metric to the theoretical covalent radius.
+      distBetweenTwoAtoms = dist(coords(atom(m,i)), coords(atom(m,j))) * 100;
 
-      if (AB <= 20 + (radius(atom(m,i)) + radius(atom(m,j)))) {
+      if (distBetweenTwoAtoms <= 20 + (radius(atom(m,i)) + radius(atom(m,j)))) {
         MOL_addEdge(m, i, j);
       }
     }
@@ -28,9 +25,9 @@ void computeEdges(Molecule_t* m) {
 }
 
 /**
- * Compte les arêtes.
+ * Count the edges.
  *
- * @param    m     Molécule.
+ * @param m Molecule.
  */
 void computeLigands(Molecule_t* m) {
 
@@ -42,10 +39,10 @@ void computeLigands(Molecule_t* m) {
 }
 
 /**
- * Calcule l'angle moyen entre les différentes paires de voisins de l'atome.
+ * Compute the mean angle between the different pairs of neighbors of the atom.
  *
- * @param    m     Molécule.
- * @param		id 		Identifiant de l'atome dans la molécule.
+ * @param m Molecule.
+ * @param id Identifier of the atom in the molecule.
  */
 float angleAvg(Molecule_t* m, unsigned id) {
 	float alpha = 0;
@@ -63,9 +60,9 @@ float angleAvg(Molecule_t* m, unsigned id) {
 }
 
 /** 
- * Calcule le nombre de doublets non liants.
+ * Compute the number of lone pairs.
  *
- * @param m Molécule.
+ * @param m Molecule.
  */
 void computeLonePairs(Molecule_t* m) {
 
@@ -78,25 +75,26 @@ void computeLonePairs(Molecule_t* m) {
 		}
 	}
 
-	int neighborStericNumber;
+	int stericNumberOfNeighbor;
 	for (int i = 0; i < size(m); i++) {
-		neighborStericNumber = -1;
+		stericNumberOfNeighbor = -1;
 		for (int j = 0; j < ligands(atom(m,i)); j++) {
-			if (neighborStericNumber != 3) {
-				neighborStericNumber = steric(atom(m,neighbor(atom(m,i),j)));
+			if (stericNumberOfNeighbor != 3) {
+				stericNumberOfNeighbor = steric(atom(m,neighbor(atom(m,i),j)));
 			}
 		}
-		MOL_nbLonePairs(atom(m,i), angleAvg(m,i), neighborStericNumber, cycle(m, i));
+		MOL_nbLonePairs(atom(m,i), angleAvg(m,i), stericNumberOfNeighbor, cycle(m, i));
 	}
 }
 
 /**
- * Initialise l'ensemble de la molécule.
+ * Initialize the whole molecule.
  *
- * @param name Nom du fichier dans lequel est sauvegardée la molécule.
- * @return Adresse de la Molecule_t. 
+ * @param name File name of the molecule.
+ * @return (Molecule_t) adress of the molecule. 
  */
 Molecule_t* initMolecule(char* name) {
+	
 	Molecule_t* m = readInput_xyz(name);
 
 	readCovalence(m);

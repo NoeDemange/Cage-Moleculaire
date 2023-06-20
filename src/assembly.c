@@ -428,7 +428,7 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 
 // Génère le chemin entre 2 groupements de motifs
 // Sans sommets intermediaires
-void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* InputFile, int tailleMax, int tailleMocDep){
+void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* inputFile, int sizeMax, int tailleMocDep){
 
 /*************************************************/
 /* Vérification distance interAtome***********/
@@ -478,7 +478,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 				nbMotif4++;
 			}
 			
-			if(tailleMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
+			if(sizeMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
 				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
 					//if(nbMotif4>0){//que s'il y a un cycle dans le chemin
@@ -488,7 +488,7 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 				}
 				else if (nbMotif3 < 5 && nbMotif4 < 3) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 				{
-					genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, InputFile, tailleMax, tailleMocDep);
+					genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, inputFile, sizeMax, tailleMocDep);
 				}
 			}
 			LSTm_removeFirst(lMoc);
@@ -573,7 +573,7 @@ int existeChemin(Shell_t* s, int indice1, int indice2){
 }
 
 // Génère tous les couples de sommets à relier possible entre des groupements
-List_p* choixSommets(Shell_t* s, int tailleMax){
+List_p* choixSommets(Shell_t* s, int sizeMax){
 	
 	List_p* sommets = LST2_init();
 	
@@ -628,9 +628,11 @@ List_m* initMocAtt(Main_t* m){
 /**************************************/
 
 // Fonction principale
-void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
-
+void generateWholeCages(Main_t* m, Options_t options) {
+	
+	printf("\n####### Start of paths generation #######\n");
 	List_m* mocAtt = initMocAtt(m); // ! Prend le premier moc seulement
+	static int countResults = 0;
 
 	//Retirer les sommets de l'enveloppe et modifier le shell//
 	Shell_t* moc_simplify;
@@ -649,12 +651,17 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{	
 		int tailleMocDep = SHL_nbAtom(mocAtt->premier->moc);
-		List_p* sommets = choixSommets(mocAtt->premier->moc, tailleMax);
+		List_p* sommets = choixSommets(mocAtt->premier->moc, options.sizeMax);
 		
 		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs (cage connexe)
 		{
-			outputShell2(InputFile, mocAtt->premier->moc, tailleMocInit); // Ecriture de la sortie
-			LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
+			if (countResults++ < options.maxResults) {
+				writeShellOutput(options.input, mocAtt->premier->moc, tailleMocInit); // Ecriture de la sortie
+				LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
+			}
+			else {
+				return;
+			}
 		}
 		else // S'il y a au moins 2 groupements de motifs
 		{
@@ -666,7 +673,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 			{
 				int depart = sommets->premier->depart;
 				int arrivee = sommets->premier->arrivee;
-				if((dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee))) <= ((DIST_SIMPLE_PATTERN*tailleMax) + DIST_SIMPLE + DIST_ERROR))){
+				if((dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee))) <= ((DIST_SIMPLE_PATTERN*options.sizeMax) + DIST_SIMPLE + DIST_ERROR))){
 					Shell_t* mocTraite2 = SHL_copy(mocTraite); // Crée un nouveau moc dans la liste a traiter
 					//LST2_removeFirst(sommets);
 					/*for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
@@ -690,7 +697,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 
 								while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 								{
-									genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, tailleMax, tailleMocDep);
+									genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, options.input, options.sizeMax, tailleMocDep);
 									LSTm_removeFirst(mAtt);
 								}
 								LSTm_delete(mAtt);
@@ -698,7 +705,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 						}
 						else
 						{	
-							genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, tailleMax, tailleMocDep);
+							genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, options.input, options.sizeMax, tailleMocDep);
 
 						}
 						

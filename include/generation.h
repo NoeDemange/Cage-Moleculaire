@@ -3,6 +3,6 @@
 
 #include "structure.h"
 
-void generationMoc(Main_t*);
+void generatePathlessCages(Main_t*);
 
 #endif

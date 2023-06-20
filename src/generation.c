@@ -8,7 +8,7 @@
  * 
  * @param m Gathering of the main elements (substrate and envelope).
  */
-void generationDep(Main_t* m) {
+void generateDependancies(Main_t* m) {
 
 	unsigned i, j, copy;
 	Shell_t* mo;
@@ -74,10 +74,10 @@ void generationDep(Main_t* m) {
 }*/
 
 /**
- * @brief Insert a hydrogen donor pattern with a triangular geometry.
+ * @brief Insert a hydrogen acceptor pattern with a triangular geometry.
  * 
  * @param m Envelope with the beginning of the cage.
- * @param idv Index of the hydrogen atom.
+ * @param idv Index of the heteroatom involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
@@ -124,10 +124,10 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 }
 
 /**
- * @brief Insert a hydrogen acceptor pattern with a triangular geometry.  
+ * @brief Insert a hydrogen donor pattern with a triangular geometry.  
  * 
  * @param m Envelope with the beginning of the cage.
- * @param idv Index of the heteroatom.
+ * @param idv Index of the hydrogen involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
@@ -189,12 +189,12 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 }
 
 /**
- * @brief Insert a hydrogen acceptor pattern with a tetrahedral geometry.  
+ * @brief Insert a hydrogen donor pattern with a tetrahedral geometry.  
  * 
  * @param m Envelope with the beginning of the cage.
- * @param idv Index of the heteroatom.
+ * @param idv Index of the hydrogen involved in the H-bond.
  * @param normal Normal vector starting point.
- * @param dir Point in the direction of the normal vector.
+ * @param dir Direction (terminal point) of the normal vector.
  */
 void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
@@ -269,12 +269,12 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
  * 
  * @param m Gathering of the main elements (substrate and envelope).
  */
-void generationHydro(Main_t* m) {
+void generateHydrogenPattern(Main_t* m) {
 
 	AtomShl_t *atomShell;
 	Atom_t *parentAtomSub;
 
-	//TODO choose to keep the loop to make the dependency graph
+	//TODO choose to keep the loop to make the dependencies graph
 	for (int i = 0; i < 1/*mocSize(m)*/; i++) {
 		for (int j = 0; j < size(bond(moc(m, i))); j++) {
 			// Get the atom id from the dependency graph
@@ -290,6 +290,7 @@ void generationHydro(Main_t* m) {
 					}
 				}
 				if(tooClose) {
+					//TODO échanger les noms donor et acceptor entre les fonctions
 					parentAtomSub = atom(substrat(m), parentAtom(atomShell));
 					if (!strcmp(symbol(parentAtomSub), "H")) {
 						insertDonor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
@@ -313,9 +314,8 @@ void generationHydro(Main_t* m) {
 	}
 }
 
-
 /**
- * @brief Add aromatic rings to the shell.
+ * @brief Add aromatic rings to the envelope.
  * 
  * The function find for each atom involved in a cycle
  * if it can be part of a triangular pattern,
@@ -323,7 +323,7 @@ void generationHydro(Main_t* m) {
  * 
  * @param s Envelope of the substrate.
  */
-void generationCycle(Shell_t* s) {
+void generateCycle(Shell_t* s) {
 	AtomShl_t* atom;
 	List_t* neighborsNotInCycle;
 	List_t* atomsInCycle = LST_create();
@@ -388,17 +388,17 @@ void generationCycle(Shell_t* s) {
 	LST_delete(atomsInCycle);
 }
 
-void generationMoc(Main_t* m) {
+void generatePathlessCages(Main_t* m) {
 
 	envarom(m) = SHL_copy(envelope(m));
-	//generationDep(m);
-	printf("### Génération des motifs aromatiques ###\n");
-	generationCycle(envarom(m));
+	//generateDependancies(m);
+	printf("### Aromatic rings generation ###\n");
+	generateCycle(envarom(m));
 	//SHL_write(envarom(m));
 
-	printf("### Génération des motifs hydrogènes ###\n");
+	printf("### Hydrogen patterns generation ###\n");
 	MN_copyMoc(m, envarom(m));
-	generationDep(m);
-	generationHydro(m);
+	generateDependancies(m);
+	generateHydrogenPattern(m);
 
 }

@@ -10,7 +10,7 @@
 
 void SHL_initAtom(AtomShl_t* a) {
 
-	flag(a) = -1;
+	flag(a) = NOT_DEF_F;
 
 	atomX(a) = 0;
 	atomY(a) = 0;
@@ -63,7 +63,7 @@ int SHL_nbAtom(Shell_t* s) {
 	int i, cpt = 0;
 
 	for (i=0; i<size(s); i++)
-		if (flag(atom(s,i)) != -1)
+		if (flag(atom(s,i)) != NOT_DEF_F)
 			cpt++;
 
 	return cpt;
@@ -82,7 +82,7 @@ int SHL_getIndiceFreeAtom(Shell_t* s) {
 	int i;
 
 	for (i=0; i<size(s); i++)
-		if (flag(atom(s,i)) == -1)
+		if (flag(atom(s,i)) == NOT_DEF_F)
 			return i;
 
 	SHL_addAllocAtom(s);
@@ -131,7 +131,7 @@ unsigned SHL_addAtom(Shell_t* s, Point_t coords, unsigned parent) {
 
 	unsigned indice = SHL_getIndiceFreeAtom(s);
 
-	flag(atom(s,indice)) = 0;
+	flag(atom(s,indice)) = SHELL_F;
 	coords(atom(s,indice)) = coords;
 	parentAtom(atom(s,indice)) = parent;
 
@@ -191,7 +191,7 @@ List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 	List_t* out = LST_create();
 	AtomShl_t* a = atom(s, id);
 
-	if (flag(a) == 0 || flag(a) == 1) {
+	if (flag(a) == SHELL_F || flag(a) == LINKABLE_F) {
 		LST_addElement(out, id);
 		return out;
 	}
@@ -338,7 +338,7 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les ato
 	mod_pos_nei = malloc(size(s)*sizeof(int));
 
 	for (int i=0; i<size(s); i++) {
-		if ((flag(atom(s,i)) == -1)){
+		if ((flag(atom(s,i)) == NOT_DEF_F)){
 			cpt++;
 		}
 		else{
@@ -353,7 +353,7 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les ato
 
 	pos = 0;
 	for(int i=0; i<size(s); i++) {
-		if ((flag(atom(s,i)) != -1)){
+		if ((flag(atom(s,i)) != NOT_DEF_F)){
 			neighborhood(atom(copy,pos)) = LST_copyWithShift(neighborhood(atom(s,i)),mod_pos_nei);
 			pos++;
 		}
@@ -403,23 +403,23 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les ato
 void SHL_testDis(Shell_t* s) {
 
 int i, j;
-	for (i=0; i<size(s); i++) {
-
-		if (flag(atom(s,i)) != -1 && flag(atom(s,i)) != 2 && flag(atom(s,i)) != 0)
-			for (j=i+1; j<size(s); j++) {
-				if (flag(atom(s,j)) != -1 && flag(atom(s,j)) != 2 && flag(atom(s,j)) != 0) {
-					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS){
-						if(flag(atom(s,i)) == 1 && flag(atom(s,j)) == 3){
-							SHL_removeAtom(s,i);
+	for (i = 0; i < size(s); i++) {
+		if (flag(atom(s,i)) != NOT_DEF_F && flag(atom(s,i)) != CYCLE_F && flag(atom(s,i)) != SHELL_F) {
+			for (j = i + 1; j < size(s); j++) {
+				if (flag(atom(s,j)) != NOT_DEF_F && flag(atom(s,j)) != CYCLE_F && flag(atom(s,j)) != SHELL_F) {
+					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS) {
+						if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == HYDRO_BOND_F) {
+							SHL_removeAtom(s, i);
 						}
-						else if(flag(atom(s,i)) == 3 && flag(atom(s,j)) == 1){
-							SHL_removeAtom(s,j);
-						}else{
+						else if (flag(atom(s,i)) == HYDRO_BOND_F && flag(atom(s,j)) == LINKABLE_F) {
+							SHL_removeAtom(s, j);
+						}else {
 						SHL_mergeAtom2(s, i, j);
 						}
 					}
 				}
 			}
+		}
 	}
 }
 

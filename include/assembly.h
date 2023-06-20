@@ -2,7 +2,8 @@
 #define __ASSEMBLY_H
 
 #include "structure.h"
+#include "main.h"
 
-void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax);
+void generateWholeCages(Main_t*, Options_t);
 
 #endif

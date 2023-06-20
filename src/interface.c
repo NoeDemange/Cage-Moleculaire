@@ -6,10 +6,10 @@
 #include <Rembedded.h>
 
 /**
- * Appel à R.
+ * Call to R.
  *
- * @param s 		 Enveloppe possédant déjà un nuage de points.
- * @param alpha  Paramètre de l'aphashape.
+ * @param s 		 Envelope that already has a cloud of points.
+ * @param alpha  Aphashape parameter.
  */
 Ashape_t* Cashape3d(Shell_t* s, double alpha) {
 	Ashape_t* as3d = ASP_create();
@@ -17,7 +17,7 @@ Ashape_t* Cashape3d(Shell_t* s, double alpha) {
 	double* data = malloc(size*3*sizeof(double));
 
 	for (i=0, j=0; i<size(s); i++) {
-		if (flag(atom(s,i)) != -1) {
+		if (flag(atom(s,i)) != NOT_DEF_F) {
 			data[j] = atomX(atom(s,i));
 			data[j+size] = atomY(atom(s,i));
 			data[j+2*size] = atomZ(atom(s,i));

@@ -26,7 +26,7 @@ char* createUnderDir(char *input, int nbmotif) {
 
 /**
 */
-char* getBasename (char * in) {
+char* getBasename(char * in) {
   char* r = malloc (256 * sizeof (char) );  
   char *start;
   int i;
@@ -42,10 +42,10 @@ char* getBasename (char * in) {
 
 /**
 */
-void copytoDir(char* InputFile, char* dirName, char* name) {
+void copytoDir(char* inputFile, char* dirName, char* name) {
   char cmd[512];
 
-  sprintf(cmd, "cp %s %s/%s.xyz", InputFile, dirName, name);
+  sprintf(cmd, "cp %s %s/%s.xyz", inputFile, dirName, name);
   if (system(cmd) == -1) {
     printf("%s",cmd);
     exit(0);
@@ -106,7 +106,7 @@ void SHL_write(Shell_t* s) {
 
   printf("Size : %d, SizeMax : %d\n", SHL_nbAtom(s), size(s));
   for (i=0; i<size(s); i++) {
-    //if (flag(atom(s,i)) != -1) {
+    //if (flag(atom(s,i)) != NOT_DEF_F) {
       printf("%d ", i);
       SHL_writeAtom(atom(s,i));
     //}
@@ -180,7 +180,7 @@ void MOL_writeMol2(char* output, Molecule_t* m) {
       }
 
   if (ret<0) {
-    printf("L'écriture du fichier %s ne s'est pas bien passé.\n", output);
+    printf("Writting of file %s did not go well.\n", output);
     exit(2);
   }
   fclose(filestream);
@@ -189,13 +189,13 @@ void MOL_writeMol2(char* output, Molecule_t* m) {
 void SHL_writeMol2(char* output, Shell_t* s) {
   FILE* filestream = NULL;
   int ret, i, j, l;
-  int* indice = malloc(size(s)*sizeof(int));
+  int* index = malloc(size(s)*sizeof(int));
 
   filestream = fopen(output, "w");
   if (filestream == NULL)
   {
-	  printf("Impossible d'ouvrir le fichier %s en écriture\n", output);
-	  if(indice) free(indice);
+	  printf("Th file %s could not be open for writting.\n", output);
+	  if(index) free(index);
 	  return;
   }
   
@@ -206,17 +206,17 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   //Ecriture des sommets
   ret = fprintf(filestream, "@<TRIPOS>ATOM\n");
   for (i=0, j=1; i<size(s); i++) {
-    if (flag(atom(s,i)) != -1) {
-      indice[i] = j;
-      if (flag(atom(s,i)) == 2)
+    if (flag(atom(s,i)) != NOT_DEF_F) {
+      index[i] = j;
+      if (flag(atom(s,i)) == CYCLE_F)
         ret = fprintf(filestream, " %3d S", j);
-      else if (flag(atom(s,i)) == 3)
-        if(LST_nbElements(neighborhood(atom(s,i)))==1){
-          if(flag(atom(s, neighbor(atom(s,i), 0))) == 3){
+      else if (flag(atom(s,i)) == HYDRO_BOND_F)
+        if(LST_nbElements(neighborhood(atom(s,i))) == 1){
+          if(flag(atom(s, neighbor(atom(s,i), 0))) == HYDRO_BOND_F){
             ret = fprintf(filestream, " %3d H", j);
           }else {ret = fprintf(filestream, " %3d U", j);}
         }else ret = fprintf(filestream, " %3d U", j);
-      else if (flag(atom(s,i)) == 1)
+      else if (flag(atom(s,i)) == LINKABLE_F)
         if(LST_nbElements(neighborhood(atom(s,i)))>1){
           ret = fprintf(filestream, " %3d C", j);
         } else {ret = fprintf(filestream, " %3d P", j);}
@@ -231,15 +231,15 @@ void SHL_writeMol2(char* output, Shell_t* s) {
       ret = fprintf(filestream, "   %3.4f", atomX(atom(s,i)));
       ret = fprintf(filestream, "   %3.4f", atomY(atom(s,i)));
       ret = fprintf(filestream, "   %3.4f", atomZ(atom(s,i)));
-      if (flag(atom(s,i)) == 2)
+      if (flag(atom(s,i)) == CYCLE_F)
         ret = fprintf(filestream, "   S\n");
-      else if (flag(atom(s,i)) == 3)
-        if(LST_nbElements(neighborhood(atom(s,i)))==1){
-          if(flag(atom(s, neighbor(atom(s,i), 0))) == 3){
+      else if (flag(atom(s,i)) == HYDRO_BOND_F)
+        if(LST_nbElements(neighborhood(atom(s,i))) == 1){
+          if(flag(atom(s, neighbor(atom(s,i), 0))) == HYDRO_BOND_F){
             ret = fprintf(filestream, "   H\n");
           }else {ret = fprintf(filestream, "   U\n");}
         }else ret = fprintf(filestream, "   U\n");
-      else if (flag(atom(s,i)) == 1)
+      else if (flag(atom(s,i)) == LINKABLE_F)
         if(LST_nbElements(neighborhood(atom(s,i)))>1){
           ret = fprintf(filestream, "   C\n");
         }else ret = fprintf(filestream, "   P\n");
@@ -254,7 +254,7 @@ void SHL_writeMol2(char* output, Shell_t* s) {
       j++;
     }
     else
-      indice[i] = -1;
+      index[i] = -1;
   }
 
   //Ecriture des liens
@@ -263,90 +263,41 @@ void SHL_writeMol2(char* output, Shell_t* s) {
     for (j=0; j<neighborhoodSize(atom(s,i)); j++)
       if (i < neighbor(atom(s,i), j)) {
         ret = fprintf(filestream, " %3d %3d %3d %3d\n",
-          l, indice[i], indice[neighbor(atom(s,i),j)], 1);
+          l, index[i], index[neighbor(atom(s,i),j)], 1);
         l++;
       }
 
   if (ret<0) {
-    printf("L'écriture du fichier %s ne s'est pas bien passé.\n", output);
+    printf("Writting of file %s did not go well.\n", output);
     exit(2);
   }
 
-  free(indice);
+  free(index);
   fclose(filestream);
 }
 
-void outputShell(char* InputFile, Shell_t* s) {
+void writeShellOutput(char* inputFile, Shell_t* s, int tailleMocInit) {
 	char outputname[512];
-	char* name = getBasename (InputFile);
-	char* dirName = createDir(name);
-	static int i = 0;
-	
-	//Sortie avec enveloppe
-	//sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
-	//SHL_writeMol2(outputname, s);
-	
-	//Sortie sans enveloppe
-	Shell_t* s2 = SHL_copy(s);
-	for (int j = 0; j < SHL_nbAtom(s2); j++)
-	{
-		if (flag(atom(s2,j)) == 0)
-		{
-			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
-		}
-	}
-	
-	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
-	SHL_writeMol2(outputname, s2);
-	printf("Result : %d\n", i);
-	SHL_delete(s2);
-	free(name);
-	free(dirName);
-	
-	i++;
-}
-
-void outputShell2(char* InputFile, Shell_t* s, int tailleMocInit) {
-	char outputname[512];
-	char* name = getBasename (InputFile);
-	/*char* dirName =*/ createDir(name);
+	char* name = getBasename (inputFile);
+	createDir(name);
   int nbmotif = SHL_nbAtom(s) - tailleMocInit;
   char* dirName = createUnderDir(name, nbmotif);
 	static int i = 0;
-	//Sortie avec enveloppe
-	//sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
-	//SHL_writeMol2(outputname, s);
-	
-	//Sortie sans enveloppe
-	//Shell_t* s2 = SHL_copy(s);
-	/*for (int j = 0; j < size(s2); j++)
-	{
-		if ((flag(atom(s2,j)) == 0) || ((flag(atom(s2,j)) == 1 && LST_nbElements(neighborhood(atom(s2,j)))==1)))
-		{
-			SHL_removeAtom(s2, j); // Enleve les atomes de l'enveloppe qui ne sont pas des motifs
-		}
-	}*/
 	
 	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
 	SHL_writeMol2(outputname, s);
 	printf("Result : %d\n", i);
-	//SHL_delete(s2);
 	free(name);
 	free(dirName);
 	i++;
-  if(i==NB_RESULTAT) exit(EXIT_SUCCESS); // provisoire pour les tests
 }
 
-void output(char* InputFile, Main_t* m) {
+void writeMainOutput(char* inputFile, Main_t* m) {
   char outputname[512];
-  char* name = getBasename (InputFile);
+  char* name = getBasename (inputFile);
   char* dirName = createDir(name);
-  //int i;
 
-  //printf("taille de %s = %d\n", dirName, (int)strlen(dirName));
-
-
-  //copytoDir(InputFile, dirName, name);
+  printf("\n####### Writing the substrate and the envelope in the result files #######\n");
 
   sprintf(outputname, "%s/%s.mol2", dirName, name);
   MOL_writeMol2(outputname, substrat(m));
@@ -357,20 +308,8 @@ void output(char* InputFile, Main_t* m) {
   sprintf(outputname, "%s/%s_aro.mol2", dirName, name);
   SHL_writeMol2(outputname, envarom(m));
 
- //for (i=0; i</*mocSize(m)*/1; i++) { // Neutralisé pour avoir une sortie adaptée à une cage finie
-  //printf("GDD de %d\n", i);
-  //GPH_write(bond(moc(m,i)));
   sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, 0);
   SHL_writeMol2(outputname, moc(m,0));
-//}
-
-  //Ecrire les générés
-  /*Shell_t* out = SHL_avoir(moc);
-  sprintf(outputname, "%s/%s_moc2.mol2", dirName, name);
-  SHL_writeMol2(outputname, out);
-
-
-  SHL_delete(out);*/
 
   free(name);
   free(dirName);

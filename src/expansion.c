@@ -200,7 +200,7 @@ void expansion(Molecule_t* m, Shell_t* s) {
 			expansion_AX2E0(m, s, i);
 	}
 
-	//Construction d'arêtes du graphe.
+	//Graph edges construction.
 	for (i = 0; i < size(bond(s)) && id(vertex(bond(s),i)) != -1; i++)
 		for (j = i + 1; j < size(bond(s)) && id(vertex(bond(s),j)) != -1; j++) {
 			if (parentAtom(atom(s,id(vertex(bond(s),i)))) == parentAtom(atom(s,id(vertex(bond(s),j))))
@@ -244,8 +244,9 @@ void alphaShape(Shell_t* s, double alpha) {
  * @param s Envelope (output) created.
  */
 Shell_t* createShell(Molecule_t* m, double alpha) {
+
+	printf("\n####### Start of the envelope and binding patterns generation #######\n");
 	Shell_t* s = SHL_create();
-	
 	expansion(m, s);
 	//SHL_writeMol2("../results/vec.mol2", s);
 	alphaShape(s, alpha);

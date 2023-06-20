@@ -6,11 +6,11 @@
 /**************************************/
 
 /**
-* Récupère le fichier contenant les données de la molécule.
-* Doit avoir une extention .xyz.
+* Retrieves the file containing the molecule data.
+* Must have an .xyz extension.
 *
-* @param 		inputname		Nom du fichier contenant les données de la molécule.
-* @param 		m 					Adresse de stockage de la molécule.
+* @param inputname Name of the file containing the molecule data.
+* @param m Address of the molecule.
 */
 Molecule_t* readInput_xyz(char* inputname) {
 	FILE* filestream = NULL;
@@ -20,7 +20,7 @@ Molecule_t* readInput_xyz(char* inputname) {
 	filestream = fopen(inputname, "r");
 
   if(!filestream) {
-    printf("Erreur lors de l'ouverture du fichier %s en lecture.\n", inputname);
+    fprintf(stderr, "The file %s could not be open for reading.\n", inputname);
     exit(EXIT_FAILURE);
   }
 	
@@ -35,7 +35,7 @@ Molecule_t* readInput_xyz(char* inputname) {
 	fclose(filestream);
 	
 	if (ret < 0) {
-		printf("La lecture du fichier %s ne s'est pas bien passée.\n", inputname);
+		fprintf(stderr, "An error occured while reading %s.\n", inputname);
 		exit(EXIT_FAILURE);
 	}
 
@@ -43,10 +43,10 @@ Molecule_t* readInput_xyz(char* inputname) {
 }
 
 /**
-* Récupère les rayons de covalence des atomes.
-* Ils sont contenus dans le fichier rdc.dat.
+* Retrieves the covalent radius of atoms.
+* They are stored in the rdc.dat file.
 *
-* @param		m 					Adresse de la molécule.
+* @param m Address of the molecule.
 */
 void readCovalence(Molecule_t* m) {
   FILE* filestream = NULL;
@@ -56,25 +56,24 @@ void readCovalence(Molecule_t* m) {
   filestream = fopen("resources/rdc.dat", "r");
 
   if(!filestream) {
-    printf("Erreur lors de l'ouverture du fichier des rayons de covalence.\n");
+    fprintf(stderr, "The file resources/rdc.dat could not be open for reading.\n");
     exit(EXIT_FAILURE);
   }
   
   ret = fscanf(filestream, "%d", &number);
   atoms = malloc(number*sizeof(Atom_t));
 
-  //Récupére les rayons de covalence des atomes inscrits dans le fichier.
+  // Retrieves the covalent radius.
   for (i = 0; i < number; i++) {
     ret = fscanf(filestream, "%s %u", symbol(atoms+i), &radius(atoms+i));
   }
   
   for (i = 0; i < size(m); i++) {
-    //Trouve le symbole qui lui correspond dans les covalence
+    // Find the corresponding symbol for each atom.
     for (j = 0; strcmp(symbol(atom(m,i)), symbol(atoms + j)) && j < number; j++);
 
-    //Vérifie si son symbole est référencé dans les covalence du fichier
     if (number <= j) {
-      printf("%s n'est pas référencé.\n", symbol(atom(m,i)));
+      fprintf(stderr, "The %s atom is not referenced.\n", symbol(atom(m,i)));
       exit(EXIT_FAILURE);
     }
     else {
@@ -87,7 +86,7 @@ void readCovalence(Molecule_t* m) {
   free(atoms);
 
   if (ret < 0) {
-    printf("La lecture du fichier resources/rdc.dat ne s'est pas bien passée.\n");
+    fprintf(stderr, "An error occured while reading resources/rdc.dat.\n");
     exit(EXIT_FAILURE);
   }
 }
