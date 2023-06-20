@@ -20,6 +20,7 @@
 //#define MAX_DIST_ARRIVAL 2 //Distance pour relier notre chemin au sommet d'arrivée
 #define DIST_GAP_CAGE 1.34//1.5  //distance entre 2 atomes de la cage
 #define DIST_GAP_SUBSTRATE 1.8//2 //distance entre 1 atome de la cage et 1 atome du substrat
+#define DIST_SIMPLE_PATTERN 1.22 //Si on considére un triangle ABC représentant 1 carbone pour chaque sommet (motif carbone) du chemin avec AB=BC=1.5 et l'angle ABC = 109°c alors 1.22 correspond à AC/2
 
 
 //Chemin

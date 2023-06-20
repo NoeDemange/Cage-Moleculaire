@@ -573,7 +573,7 @@ int existeChemin(Shell_t* s, int indice1, int indice2){
 }
 
 // Génère tous les couples de sommets à relier possible entre des groupements
-List_p* choixSommets(Shell_t* s){
+List_p* choixSommets(Shell_t* s, int tailleMax){
 	
 	List_p* sommets = LST2_init();
 	
@@ -649,7 +649,7 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 	while (mocAtt->premier) // Tant qu'il existe un moc a traiter
 	{	
 		int tailleMocDep = SHL_nbAtom(mocAtt->premier->moc);
-		List_p* sommets = choixSommets(mocAtt->premier->moc);
+		List_p* sommets = choixSommets(mocAtt->premier->moc, tailleMax);
 		
 		if (!sommets->premier) // S'il n'y a plus qu'un groupement de motifs (cage connexe)
 		{
@@ -664,47 +664,48 @@ void assemblage(char* InputFile, Main_t* m, double alpha, int tailleMax){
 			
 			while (sommets->premier) // Pour tous les couples de sommets à relier
 			{
-				Shell_t* mocTraite2 = SHL_copy(mocTraite); // Crée un nouveau moc dans la liste a traiter
 				int depart = sommets->premier->depart;
 				int arrivee = sommets->premier->arrivee;
-				LST2_removeFirst(sommets);
-
-				/*for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
-				{
-					if (flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))) == 0)
+				if((dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee))) <= ((DIST_SIMPLE_PATTERN*tailleMax)+SIMPLE+DIST_ERROR))){
+					Shell_t* mocTraite2 = SHL_copy(mocTraite); // Crée un nouveau moc dans la liste a traiter
+					//LST2_removeFirst(sommets);
+					/*for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
 					{
-						SHL_removeEdge(mocTraite2, depart, neighbor(atom(mocTraite2, depart), i));
-						i--;
-					}
-				}*/
-//#pragma omp parallel for
-				for (int i = 2; i < 3/*4 avec carbonyle*/ ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
-				{
-					flag(atom(mocTraite2, depart)) = typeInsert(i);
-
-					if (i == 3) 
-					{
-						if (LST_nbElements(neighborhood(atom(mocTraite2, depart))) == 1) // Motif possible que si le depart n'a qu'un voisin
+						if (flag(atom(mocTraite2, neighbor(atom(mocTraite2, depart), i))) == 0)
 						{
-							List_m* mAtt = ajoutOMotif3(mocTraite2, depart,substrat(m)); // Ajout du O du motif 3 ( C = O )
-
-							while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
-							{
-								genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, tailleMax, tailleMocDep);
-								LSTm_removeFirst(mAtt);
-							}
-							LSTm_delete(mAtt);
+							SHL_removeEdge(mocTraite2, depart, neighbor(atom(mocTraite2, depart), i));
+							i--;
 						}
-					}
-					else
-					{	
-						genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, tailleMax, tailleMocDep);
+					}*/
+		//#pragma omp parallel for
+					for (int i = 2; i < 3/*4 avec carbonyle*/ ; i++) // Attribution de tous les types a l'atome de départ (sommet en bordure)
+					{
+						flag(atom(mocTraite2, depart)) = typeInsert(i);
 
+						if (i == 3) 
+						{
+							if (LST_nbElements(neighborhood(atom(mocTraite2, depart))) == 1) // Motif possible que si le depart n'a qu'un voisin
+							{
+								List_m* mAtt = ajoutOMotif3(mocTraite2, depart,substrat(m)); // Ajout du O du motif 3 ( C = O )
+
+								while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
+								{
+									genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, InputFile, tailleMax, tailleMocDep);
+									LSTm_removeFirst(mAtt);
+								}
+								LSTm_delete(mAtt);
+							}
+						}
+						else
+						{	
+							genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, InputFile, tailleMax, tailleMocDep);
+
+						}
+						
 					}
-					
+					SHL_delete(mocTraite2);
 				}
-
-				SHL_delete(mocTraite2);
+				LST2_removeFirst(sommets);
 			}
 			SHL_delete(mocTraite);
 		}

@@ -206,7 +206,7 @@ List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 }
 
 //remplacement de avoir2
-void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
+/*void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
 
 	int i, j, indiceMin;
 	float distMin, dis;
@@ -232,7 +232,7 @@ void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
 	}
 
 	LST_delete(border);
-}
+}*/
 
 
 void SHL_addCycle(Shell_t* s, unsigned id) {

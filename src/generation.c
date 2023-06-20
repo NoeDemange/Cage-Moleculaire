@@ -36,7 +36,7 @@ void generationDep(Main_t* m) {
 	//Création des différents moc en fonction des types de D/A.
 }
 
-void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
+/*void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
 
 	int i, indice = idv;
 	float min, distance;
@@ -67,7 +67,7 @@ void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
 		SHL_removeVertex(m, idv);
 	}
 
-}
+}*/
 
 void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
@@ -263,10 +263,12 @@ void generationHydro(Main_t* m) {
 						insertDonor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
 					}
 					else {
-						if (steric(parent) == 3)
+						if (steric(parent) == 3){
 							insertAcceptor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
-						else
+						}
+						else{
 							insertAcceptor2(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+						}
 					}
 				}
 			}
