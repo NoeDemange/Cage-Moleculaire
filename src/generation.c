@@ -133,7 +133,6 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	new_coords = addPoint(coords(v), dir);
 	for (int l = 0; l< size(m); l++){
 		if(flag(atom(m,l)) == 3 && dist(coords(atom(m,l)),new_coords) < MINDIS){
-			printf("passe\n");
 			flag(v) = 0;
 			return;
 		}
@@ -193,7 +192,6 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	x2 = addPoint(coords(v), dir);
 	for (int l = 0; l< size(m); l++){
 		if(flag(atom(m,l)) == 3 && dist(coords(atom(m,l)),x2) < MINDIS){
-			printf("passe\n");
 			flag(v) = 0;
 			return;
 		}
@@ -255,7 +253,6 @@ void generationHydro(Main_t* m) {
 				int tooClose = 1;
 				for (int l = 0; l< size(moc(m,i)); l++){
 					if(flag(atom(moc(m,i),l)) == 3 && dist(coords(atom(moc(m,i),l)),coords(v)) < MINDIS){
-						printf("passe\n");
 						tooClose = 0;
 						break;
 					}
