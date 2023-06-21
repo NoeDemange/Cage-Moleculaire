@@ -324,7 +324,7 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 		}
 	}
 	
-	for (int i = 0; i < 1 && positions->premier; i++) // 1 positions les mieux placés (distance min avec arrivée)
+	for (int i = 0; i < 2 && positions->premier; i++) // 1 positions les mieux placés (distance min avec arrivée)
 	{
 		positionNvDprt = distMin(positions, arv); 
 		LSTs_removeElement(positions, positionNvDprt);
@@ -481,15 +481,18 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			}
 			
 			if(sizeMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
-				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
+				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(lMoc->premier->moc, arrivee)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
 					float trA = dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, nvDepart->premier->sommet),0))));
-					float trB = dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)));
-					float trC = dist(coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, nvDepart->premier->sommet),0))), coords(atom(mocTraite, arrivee)));
-					float angle = radianToDegre(acosf(((trC*trC)-(trA*trA)-(trB*trB))/(-2*trA*trB)));
-					if((angle>=(END_ANGLE-ANGLE_ERROR)) && (angle<=(END_ANGLE+ANGLE_ERROR))){
-						printf("%lf\n",angle);
+					float trB = dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(lMoc->premier->moc, arrivee)));
+					float trC = dist(coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, nvDepart->premier->sommet),0))), coords(atom(lMoc->premier->moc, arrivee)));
+					float trD = dist( coords(atom(lMoc->premier->moc, arrivee)), coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, arrivee),0))));
+					float trE = dist(coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, arrivee),0))), coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)));
+					float angleAvantDernier = radianToDegre(acosf(((trC*trC)-(trA*trA)-(trB*trB))/(-2*trA*trB)));
+					float angleDernier = radianToDegre(acosf(((trE*trE)-(trD*trD)-(trB*trB))/(-2*trD*trB)));
+					if((angleAvantDernier>=(END_ANGLE-ANGLE_ERROR)) && (angleAvantDernier<=(END_ANGLE+ANGLE_ERROR)) && (angleDernier<=(END_ANGLE+ANGLE_ERROR)) && (angleDernier>=(END_ANGLE-ANGLE_ERROR))){
 						if((!forceCycle) || (forceCycle && nbMotif4>0)){//que s'il y a un cycle dans le chemin et qu'on oblige la présence d'un cycle
+							flag(atom(lMoc->premier->moc, arrivee)) = CARBONE; // changer le flag du sommet d'arriver
 							SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
 							LSTm_addElement(mocAtt, SHL_copy(lMoc->premier->moc));// Ajout dans la liste a traiter
 						}
