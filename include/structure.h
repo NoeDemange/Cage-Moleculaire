@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "constante.h"
+#include "constant.h"
 
 //retourne l'adresse
 #define atom(o,i) ((o)->atoms+(i)) //adresse de l'atome

@@ -1,7 +1,7 @@
 #include "assembly.h"
-#include "utile.h"
+#include "util.h"
 #include "output.h"
-#include "constante.h"
+#include "constant.h"
 
 /**
  * @brief Vérifie si le point passé en argument est assez éloigné 
@@ -660,6 +660,8 @@ void generateWholeCages(Main_t* m, Options_t options) {
 				LSTm_removeFirst(mocAtt); // Suppression dans la liste a traiter
 			}
 			else {
+				LST2_delete(sommets);
+				free(mocAtt);
 				return;
 			}
 		}

@@ -1,5 +1,5 @@
 #include "output.h"
-#include "constante.h"
+#include "constant.h"
 
 #include <sys/stat.h>
 #include <string.h>
