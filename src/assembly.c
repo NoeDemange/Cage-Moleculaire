@@ -2,6 +2,7 @@
 #include "util.h"
 #include "output.h"
 #include "constant.h"
+#include <math.h>
 
 /**
  * @brief Vérifie si le point passé en argument est assez éloigné 
@@ -476,15 +477,22 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			// Compte le nombre de motif 4 (Cycle) 
 			if (i == 4) 
 			{
-				nbMotif4++;
+				nbMotif4++; 
 			}
 			
 			if(sizeMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
 				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
-					if((!forceCycle) || (forceCycle && nbMotif4>0)){//que s'il y a un cycle dans le chemin et qu'on oblige la présence d'un cycle
-						SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
-						LSTm_addElement(mocAtt, SHL_copy(lMoc->premier->moc));// Ajout dans la liste a traiter
+					float trA = dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, nvDepart->premier->sommet),0))));
+					float trB = dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)));
+					float trC = dist(coords(atom(lMoc->premier->moc,neighbor(atom(lMoc->premier->moc, nvDepart->premier->sommet),0))), coords(atom(mocTraite, arrivee)));
+					float angle = radianToDegre(acosf(((trC*trC)-(trA*trA)-(trB*trB))/(-2*trA*trB)));
+					if((angle>=(END_ANGLE-ANGLE_ERROR)) && (angle<=(END_ANGLE+ANGLE_ERROR))){
+						printf("%lf\n",angle);
+						if((!forceCycle) || (forceCycle && nbMotif4>0)){//que s'il y a un cycle dans le chemin et qu'on oblige la présence d'un cycle
+							SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
+							LSTm_addElement(mocAtt, SHL_copy(lMoc->premier->moc));// Ajout dans la liste a traiter
+						}
 					}
 				}
 				else if (nbMotif3 < 5 && nbMotif4 < 3) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout

@@ -36,6 +36,10 @@
 #define MINDIS_CYCLE 0.7 // Minimal distance bewteen two atoms when one of them belong to a cycle (otherwise they are merged).
 #define MAXDIS_CYCLE 1.7 // Maximal distance between two atoms of a cycle (otherwise they can't be both in the same cycle).
 
+// Angle
+#define END_ANGLE 109
+#define ANGLE_ERROR 10
+
 /********* not to be modified (the incremental order must be preserved) */
 // Flags atoms in the shell
 #define NOT_DEF_F -1 // Atom not used
