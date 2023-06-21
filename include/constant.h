@@ -29,6 +29,7 @@
     A     C
 */
 #define DIST_CYCLE_PATTERN 5.8 //1.5+0.7+1.4+0.7+1.5
+#define NUMBER_ATOM_CYCLE_PATTERN 7 //number of atom in a cycle pattern
 
 // Distance in generateCycle (TODO document why these values were chosen)
 #define SIMPLE_CYCLE 1.4 // Simple covalent bond size between an atom involved in a cycle and a neighboring atom outside of the cycle.

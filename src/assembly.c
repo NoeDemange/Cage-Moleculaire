@@ -428,7 +428,8 @@ void insererMotif(Shell_t* moc, List_m* mocAtt, int depart, List_d* nvDepart, in
 
 // Génère le chemin entre 2 groupements de motifs
 // Sans sommets intermediaires
-void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee, int nbMotif3, int nbMotif4, char* inputFile, int sizeMax, int tailleMocDep){
+void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, int arrivee,
+ int nbMotif3, int nbMotif4, char* inputFile, int sizeMax, int tailleMocDep, int forceCycle){
 
 /*************************************************/
 /* Vérification distance interAtome***********/
@@ -481,14 +482,14 @@ void genererChemin(Main_t* m, List_m* mocAtt, Shell_t* mocTraite, int depart, in
 			if(sizeMax>=(SHL_nbAtom(lMoc->premier->moc)-tailleMocDep)){
 				if (dist( coords(atom(lMoc->premier->moc, nvDepart->premier->sommet)), coords(atom(mocTraite, arrivee)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
 				{
-					//if(nbMotif4>0){//que s'il y a un cycle dans le chemin
+					if((!forceCycle) || (forceCycle && nbMotif4>0)){//que s'il y a un cycle dans le chemin et qu'on oblige la présence d'un cycle
 						SHL_addEdge(lMoc->premier->moc, nvDepart->premier->sommet, arrivee); // Ajout lien entre dernier sommet du chemin et arrivee
 						LSTm_addElement(mocAtt, SHL_copy(lMoc->premier->moc));// Ajout dans la liste a traiter
-					//}
+					}
 				}
 				else if (nbMotif3 < 5 && nbMotif4 < 3) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
 				{
-					genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, inputFile, sizeMax, tailleMocDep);
+					genererChemin(m, mocAtt, lMoc->premier->moc, nvDepart->premier->sommet, arrivee, nbMotif3, nbMotif4, inputFile, sizeMax, tailleMocDep, forceCycle);
 				}
 			}
 			LSTm_removeFirst(lMoc);
@@ -675,7 +676,13 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			{
 				int depart = sommets->premier->depart;
 				int arrivee = sommets->premier->arrivee;
-				if((dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee))) <= ((DIST_SIMPLE_PATTERN*options.sizeMax) + DIST_SIMPLE + DIST_ERROR))){
+				int forceCycle = 0;
+				float distDepArr = dist(coords(atom(mocTraite,depart)),coords(atom(mocTraite,arrivee)));
+				if(( distDepArr <= ((DIST_SIMPLE_PATTERN*options.sizeMax) + DIST_SIMPLE + DIST_ERROR))){
+					if((distDepArr <= ((DIST_SIMPLE_PATTERN*(options.sizeMax-NUMBER_ATOM_CYCLE_PATTERN))+ DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR)) 
+					&& (distDepArr > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR)){
+						forceCycle = 1;
+					}
 					Shell_t* mocTraite2 = SHL_copy(mocTraite); // Crée un nouveau moc dans la liste a traiter
 					//LST2_removeFirst(sommets);
 					/*for (int i = 0; i < LST_nbElements(neighborhood(atom(mocTraite2, depart))); i++) // Retire les voisins enveloppe de l'atome de départ (bordure)
@@ -699,7 +706,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 
 								while (mAtt->premier) // Traiter tous les mocs générés par cet ajout
 								{
-									genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, options.input, options.sizeMax, tailleMocDep);
+									genererChemin(m, mocAtt, mAtt->premier->moc, depart, arrivee, 0, 0, options.input, options.sizeMax, tailleMocDep, forceCycle);
 									LSTm_removeFirst(mAtt);
 								}
 								LSTm_delete(mAtt);
@@ -707,7 +714,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 						}
 						else
 						{	
-							genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, options.input, options.sizeMax, tailleMocDep);
+							genererChemin(m, mocAtt, mocTraite2, depart, arrivee, 0, 0, options.input, options.sizeMax, tailleMocDep, forceCycle);
 
 						}
 						
