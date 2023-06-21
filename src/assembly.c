@@ -2,6 +2,7 @@
 #include "util.h"
 #include "output.h"
 #include "constant.h"
+#include <math.h>
 
 /**
  * @brief Checks if a point is far enough away from the other atoms 
@@ -28,7 +29,7 @@ int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
 }
 
 /**************************************/
-/* Ajout des motifs *******************/
+/********* Patterns addition **********/
 /**************************************/
 
 /**
@@ -69,7 +70,7 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		Point_t copyNewStartPos = newStartPos;
 		Shell_t* moc = SHL_copy(processedMoc);
 			
-		Point_t startNeighborPos = coords(atom(moc, neighbor(atom(moc, idStart), i)));
+		Point_t neighborStartPos = coords(atom(moc, neighbor(atom(moc, idStart), i)));
 		Point_t startPos = coords(atom(moc, idStart));
 			
 		// Add the first ring atom of already known position.
@@ -78,14 +79,14 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		SHL_addEdge(moc, idStart, idnewStart);
 
 		// Look for the normal to position the ring.
-		Point_t normal = planNormal(copyNewStartPos, startPos, startNeighborPos);
+		Point_t normal = planNormal(copyNewStartPos, startPos, neighborStartPos);
 		normal = rotation(normalization(vector(copyNewStartPos, startPos), 1),  90, normal); // Perpendicular
 			
 		// Position the other atoms of the cycle.
 		//writeShellOutput("demos/substrates/ADENOS10.xyz",processedMoc,0);
-		startNeighborPos = AX1E2(copyNewStartPos, coords(atom(moc, idStart)), normal, SIMPLE_CYCLE); // Neighbor
+		neighborStartPos = AX1E2(copyNewStartPos, coords(atom(moc, idStart)), normal, SIMPLE_CYCLE); // Neighbor
 		//writeShellOutput("demos/substrates/ADENOS10.xyz",processedMoc,0);
-		copyNewStartPos = AX2E1(copyNewStartPos, coords(atom(moc, idStart)), startNeighborPos, SIMPLE_CYCLE); 
+		copyNewStartPos = AX2E1(copyNewStartPos, coords(atom(moc, idStart)), neighborStartPos, SIMPLE_CYCLE); 
 		//writeShellOutput("demos/substrates/ADENOS10.xyz",processedMoc,0);
 		if (isHindered(moc, sub, copyNewStartPos)) {
 			SHL_delete(moc);
@@ -98,8 +99,8 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 			
 		int idNeighbor = idAtomCycle;
 		for (int i = 0; i < 4; i++) {
-			startNeighborPos = coords(atom(moc, neighbor(atom(moc, idNeighbor), 0)));
-			copyNewStartPos = AX1E2(copyNewStartPos, startNeighborPos, normal, SIMPLE_CYCLE);
+			neighborStartPos = coords(atom(moc, neighbor(atom(moc, idNeighbor), 0)));
+			copyNewStartPos = AX1E2(copyNewStartPos, neighborStartPos, normal, SIMPLE_CYCLE);
 			if (isHindered(moc, sub, copyNewStartPos)) {
 				SHL_delete(moc);
 				return;
@@ -118,9 +119,9 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		SHL_addEdge(moc, idnewStart, idAtomCycle);
 			
 		// Position atom after the cycle.
-		startNeighborPos = coords(atom(moc, neighbor(atom(moc, idNext), 0)));
+		neighborStartPos = coords(atom(moc, neighbor(atom(moc, idNext), 0)));
 		Point_t v2 = coords(atom(moc, neighbor(atom(moc, idNext), 1)));
-		copyNewStartPos = AX2E1(nextPos, startNeighborPos, v2, DIST_SIMPLE); 
+		copyNewStartPos = AX2E1(nextPos, neighborStartPos, v2, DIST_SIMPLE); 
 		if (isHindered(moc, sub, copyNewStartPos) == 1) {
 			SHL_delete(moc);
 			return;
@@ -324,7 +325,7 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 		}
 	}
 	
-	for (int i = 0; i < 1 && positions->first; i++) { // Best placed position (min distance to the end)
+	for (int i = 0; i < 2 && positions->first; i++) { // Best placed position (min distance to the end)
 		newStartPos = minDist(positions, endPos); 
 		LSTs_removeElement(positions, newStartPos);
 		addProjection(processedMoc, mocsInsProgress, idStart, newStarts, numPattern, newStartPos, sub);
@@ -449,7 +450,7 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
  * @param sizeMax Maximale size (in atoms) of a path.
  * @param startingMocSize Size (in atoms) of the cage before adding the path.
  */
-void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbCarbonyls, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize) {
+void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbCarbonyls, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize, int forceCycle) {
 	/*************** Check distances bewteen atoms *****/
 	Point_t B = coords(atom(processedMoc, idStart));
 	for (int i = 0; i < size(processedMoc); i++) {
@@ -469,13 +470,12 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 	/***************************************************/
 	for (int i = 2; i < NB_PATTERNS; i++) {
 		if(i == 3) i++; // TEMP exclude carbonyl pattern
-		List_m* lMoc = LSTm_init();
+		List_m* tempMocsInProg = LSTm_init();
 		List_d* newStarts = LSTd_init();
 		
-		insertPattern(processedMoc, lMoc, idStart, newStarts, i, idEnd, substrat(m));
+		insertPattern(processedMoc, tempMocsInProg, idStart, newStarts, i, idEnd, substrat(m));
 		
-		while (lMoc->first) // Pour toutes les solutions générées en générant le chemin / Diff rotations
-		{
+		while (tempMocsInProg->first) {
 			// Count the number of consecutive carbonyls.
 			if (i == 3) {
 				nbCarbonyls++;
@@ -489,23 +489,32 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 				nbAroRings++;
 			}
 			
-			if(sizeMax>=(SHL_nbAtom(lMoc->first->moc)-startingMocSize)){
-				if (dist( coords(atom(lMoc->first->moc, newStarts->first->idAtom)), coords(atom(processedMoc, idEnd)) ) < (DIST_SIMPLE+DIST_ERROR)/*MAX_DIST_ARRIVAL*/ ) // Proche de l'arrivée 
-				{
-					//if(nbMotif4>0){//que s'il y a un cycle dans le chemin
-						SHL_addEdge(lMoc->first->moc, newStarts->first->idAtom, idEnd); // Ajout lien entre dernier sommet du chemin et arrivee
-						LSTm_addElement(mocsInProgress, SHL_copy(lMoc->first->moc));// Ajout dans la liste a traiter
-					//}
+			if(sizeMax >= SHL_nbAtom(tempMocsInProg->first->moc) - startingMocSize) {
+				if (dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(processedMoc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
+					float trA = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))));
+					float trB = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc, idEnd)));
+					float trC = dist(coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(tempMocsInProg->first->moc, idEnd)));
+					float trD = dist( coords(atom(tempMocsInProg->first->moc, idEnd)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))));
+					float trE = dist(coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))), coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)));
+					float beforeLastAngle = radianToDegre(acosf(((trC * trC) - (trA * trA) - (trB * trB)) / (-2 * trA * trB)));
+					float lastAngle = radianToDegre(acosf(((trE * trE) - (trD * trD) - (trB * trB)) / (-2 * trD * trB)));
+
+					if(beforeLastAngle >= (END_ANGLE - ANGLE_ERROR) && beforeLastAngle <= (END_ANGLE + ANGLE_ERROR) && lastAngle <= (END_ANGLE + ANGLE_ERROR) && lastAngle >= (END_ANGLE - ANGLE_ERROR)) {
+						if(!forceCycle || (forceCycle && nbAroRings > 0)) { // Only if there is a cycle in the path and we force the presence of a cycle.
+							flag(atom(tempMocsInProg->first->moc, idEnd)) = CARBON; // Change end atom (arrival) flag.
+							SHL_addEdge(tempMocsInProg->first->moc, newStarts->first->idAtom, idEnd); //Add a link between last atom of the path and arrival.
+							LSTm_addElement(mocsInProgress, SHL_copy(tempMocsInProg->first->moc));// Add to the list to be processed.
+						}
+					}
 				}
-				else if (nbCarbonyls < 5 && nbAroRings < 3) // Maximum 4 motifs 3 d'affilée et 2 motifs 4 en tout
-				{
-					generatePaths(m, mocsInProgress, lMoc->first->moc, newStarts->first->idAtom, idEnd, nbCarbonyls, nbAroRings, inputFile, sizeMax, startingMocSize);
+				else if (nbCarbonyls < 5 && nbAroRings < 3) {
+					generatePaths(m, mocsInProgress, tempMocsInProg->first->moc, newStarts->first->idAtom, idEnd, nbCarbonyls, nbAroRings, inputFile, sizeMax, startingMocSize, forceCycle);
 				}
 			}
-			LSTm_removeFirst(lMoc);
+			LSTm_removeFirst(tempMocsInProg);
 			LSTd_removeFirst(newStarts);
 		}
-		LSTm_delete(lMoc);
+		LSTm_delete(tempMocsInProg);
 		LSTd_delete(newStarts);
 	}
 }
@@ -534,7 +543,7 @@ int search(Shell_t* s, List_t* markedAtoms, int index1, int index2) {
 	else {
 		for (int i = 0; i < neighborhoodSize(a); i++) {
 
-			if (neighbor(a, i) == index2) { // searched index found
+			if (neighbor(a, i) == index2) {
 				return 1;
 			}
 			else {
@@ -550,7 +559,7 @@ int search(Shell_t* s, List_t* markedAtoms, int index1, int index2) {
 }
 
 /**
- * @brief Check if two atoms are connected on the cage.
+ * @brief Check if two atoms in the cage are connected.
  * Use a Depth-first search.
  * 
  * @param s Cage without any added paths.
@@ -675,8 +684,15 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			
 				int idStart = startEndAtoms->first->start;
 				int idEnd = startEndAtoms->first->end;
-				if((dist(coords(atom(processedMoc,idStart)),coords(atom(processedMoc,idEnd))) <= ((DIST_SIMPLE_PATTERN*options.sizeMax) + DIST_SIMPLE + DIST_ERROR))){
-					Shell_t* appendedMoc = SHL_copy(processedMoc); // Crée un nouveau moc dans la liste a traiter
+				int forceCycle = 0;
+				float startEndDist = dist(coords(atom(processedMoc,idStart)),coords(atom(processedMoc,idEnd)));
+				
+				if (startEndDist <= DIST_SIMPLE_PATTERN * options.sizeMax + DIST_SIMPLE + DIST_ERROR) {
+					if (startEndDist <= DIST_SIMPLE_PATTERN * (options.sizeMax - NUMBER_ATOM_CYCLE_PATTERN) + DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR
+					&& startEndDist > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR) {
+						forceCycle = 1;
+					}
+					Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 					
 		//#pragma omp parallel for
 					for (int i = 2; i < 3/*4 with carbonyl*/; i++) { // Assignment of all types to the starting atom (atom on the edges).
@@ -688,14 +704,14 @@ void generateWholeCages(Main_t* m, Options_t options) {
 								List_m* mocsWithCarbonyl = addOxygenOfCarbonyl(appendedMoc, idStart,substrat(m));
 
 								while (mocsWithCarbonyl->first) { // Process all mocs generated by this addition.
-									generatePaths(m, mocsInProgress, mocsWithCarbonyl->first->moc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize);
+									generatePaths(m, mocsInProgress, mocsWithCarbonyl->first->moc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
 									LSTm_removeFirst(mocsWithCarbonyl);
 								}
 								LSTm_delete(mocsWithCarbonyl);
 							}
 						}
 						else {	
-							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize);
+							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
 						}
 					}
 					SHL_delete(appendedMoc);

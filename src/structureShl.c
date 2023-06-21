@@ -414,7 +414,9 @@ int i, j;
 						else if (flag(atom(s,i)) == HYDRO_BOND_F && flag(atom(s,j)) == LINKABLE_F) {
 							SHL_removeAtom(s, j);
 						}else {
-						SHL_mergeAtom2(s, i, j);
+							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) 
+								flag(atom(s,i)) = CARBON; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
+							SHL_mergeAtom2(s, i, j);
 						}
 					}
 				}

@@ -28,11 +28,17 @@
 	\ /   \ /
     A     C
 */
+#define DIST_CYCLE_PATTERN 5.8 //1.5+0.7+1.4+0.7+1.5
+#define NUMBER_ATOM_CYCLE_PATTERN 7 //number of atom in a cycle pattern
 
 // Distance in generateCycle (TODO document why these values were chosen)
 #define SIMPLE_CYCLE 1.4 // Simple covalent bond size between an atom involved in a cycle and a neighboring atom outside of the cycle.
 #define MINDIS_CYCLE 0.7 // Minimal distance bewteen two atoms when one of them belong to a cycle (otherwise they are merged).
 #define MAXDIS_CYCLE 1.7 // Maximal distance between two atoms of a cycle (otherwise they can't be both in the same cycle).
+
+// Angle
+#define END_ANGLE 109
+#define ANGLE_ERROR 10
 
 /********* not to be modified (the incremental order must be preserved) */
 // Flags atoms in the shell
