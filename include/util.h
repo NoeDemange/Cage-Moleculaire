@@ -1,5 +1,5 @@
-#ifndef __UTILE_H
-#define __UTILE_H
+#ifndef __UTIL_H
+#define __UTIL_H
 
 #include "structure.h"
 

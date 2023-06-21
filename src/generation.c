@@ -1,12 +1,12 @@
 #include "generation.h"
-#include "utile.h"
+#include "util.h"
 #include "output.h"
 
 
 /**
  * @brief Creation of the beginning of cages according to the dependencies.
  * 
- * @param m Gathering of the main elements (substrate and envelope).
+ * @param m Grouping of the main structures (substrate and envelope).
  */
 void generateDependancies(Main_t* m) {
 
@@ -74,14 +74,14 @@ void generateDependancies(Main_t* m) {
 }*/
 
 /**
- * @brief Insert a hydrogen acceptor pattern with a triangular geometry.
+ * @brief Insert an acceptor hydrogen pattern with a triangular geometry.
  * 
  * @param m Envelope with the beginning of the cage.
  * @param idv Index of the heteroatom involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
-void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
 	int index;
 	Point_t new_coords;
@@ -124,14 +124,14 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 }
 
 /**
- * @brief Insert a hydrogen donor pattern with a triangular geometry.  
+ * @brief Insert a donor hydrogen pattern with a triangular geometry.  
  * 
  * @param m Envelope with the beginning of the cage.
  * @param idv Index of the hydrogen involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
-void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
 	int index, idc;
 	Point_t new_coords;
@@ -189,14 +189,14 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 }
 
 /**
- * @brief Insert a hydrogen donor pattern with a tetrahedral geometry.  
+ * @brief Insert a donor hydrogen pattern with a tetrahedral geometry.  
  * 
  * @param m Envelope with the beginning of the cage.
  * @param idv Index of the hydrogen involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
-void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
 	int index, idc;
 	Point_t x1, x2, x3, x4;
@@ -265,9 +265,9 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 }
 
 /**
- * @brief Add hydrogen patterns (donor or acceptor) to the beginning of the cage.
+ * @brief Add donor or acceptor hydrogen patterns to the beginning of the cage.
  * 
- * @param m Gathering of the main elements (substrate and envelope).
+ * @param m Grouping of the main structures (substrate and envelope).
  */
 void generateHydrogenPattern(Main_t* m) {
 
@@ -290,20 +290,19 @@ void generateHydrogenPattern(Main_t* m) {
 					}
 				}
 				if(tooClose) {
-					//TODO échanger les noms donor et acceptor entre les fonctions
 					parentAtomSub = atom(substrat(m), parentAtom(atomShell));
 					if (!strcmp(symbol(parentAtomSub), "H")) {
-						insertDonor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
+						insertAcceptor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
 							vector(coords(parentAtomSub), coords(atomShell)));
 					}
 					else {
 						int haveTriangularGeometry = (steric(parentAtomSub) == 3);
 						if (haveTriangularGeometry) {
-							insertAcceptor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
+							insertDonor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
 								vector(coords(parentAtomSub), coords(atomShell)));
 						}
 						else {
-							insertAcceptor2(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
+							insertDonor2(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
 								vector(coords(parentAtomSub), coords(atomShell)));
 						}
 					}

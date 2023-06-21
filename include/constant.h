@@ -1,5 +1,5 @@
-#ifndef __CONSTANTE_H
-#define __CONSTANTE_H
+#ifndef __CONSTANT_H
+#define __CONSTANT_H
 
 // Main
 #define OPTSTR "i:a:s:r:h"
@@ -24,9 +24,9 @@
 #define DIST_GAP_CAGE 1.34  // Distance between two cage's atoms (defined by trial).
 #define DIST_GAP_SUBSTRATE 1.8 // Distance between an atom of the cage and an atom of the substrate (at least a hydrogen bond size by trial).
 #define DIST_SIMPLE_PATTERN 1.22 // AC/2, with ABC a triangle where each of its vertex is an atom of the path involved in a simple pattern, AB = BC = 1.5 and angle ABC = 109°C.
-/*    B
+/*     B
 	\ /   \ /
-   A     C
+    A     C
 */
 
 // Distance in generateCycle (TODO document why these values were chosen)
@@ -44,11 +44,11 @@
 /***********************************************************************/
 
 // Path (in the cage)
-#define NB_MOTIF 5 // Number of patterns available to make a path
+#define NB_PATTERNS 5 // Number of patterns available to make a path
 
 // Flags atoms in paths
-#define CARBONE 6
-#define AZOTE 5
-#define OXYGENE 4
+#define CARBON 6
+#define NITROGEN 5
+#define OXYGEN 4
 
 #endif

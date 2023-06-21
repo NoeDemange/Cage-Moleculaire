@@ -3,7 +3,7 @@
 #include "expansion.h"
 #include "generation.h"
 #include "output.h"
-#include "utile.h"
+#include "util.h"
 #include "main.h"
 #include "assembly.h"
 

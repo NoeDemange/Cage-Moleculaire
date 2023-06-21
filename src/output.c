@@ -1,5 +1,5 @@
 #include "output.h"
-#include "constante.h"
+#include "constant.h"
 
 #include <sys/stat.h>
 #include <string.h>
@@ -220,11 +220,11 @@ void SHL_writeMol2(char* output, Shell_t* s) {
         if(LST_nbElements(neighborhood(atom(s,i)))>1){
           ret = fprintf(filestream, " %3d C", j);
         } else {ret = fprintf(filestream, " %3d P", j);}
-      else if (flag(atom(s,i)) == OXYGENE)
+      else if (flag(atom(s,i)) == OXYGEN)
         ret = fprintf(filestream, " %3d O", j);
-      else if (flag(atom(s,i)) == AZOTE)
+      else if (flag(atom(s,i)) == NITROGEN)
         ret = fprintf(filestream, " %3d N", j);
-      else if (flag(atom(s,i)) == CARBONE)
+      else if (flag(atom(s,i)) == CARBON)
         ret = fprintf(filestream, " %3d C", j);
       else 
         ret = fprintf(filestream, " %3d Al", j);
@@ -243,11 +243,11 @@ void SHL_writeMol2(char* output, Shell_t* s) {
         if(LST_nbElements(neighborhood(atom(s,i)))>1){
           ret = fprintf(filestream, "   C\n");
         }else ret = fprintf(filestream, "   P\n");
-      else if (flag(atom(s,i)) == OXYGENE)
+      else if (flag(atom(s,i)) == OXYGEN)
         ret = fprintf(filestream, "   O\n");
-      else if (flag(atom(s,i)) == AZOTE)
+      else if (flag(atom(s,i)) == NITROGEN)
         ret = fprintf(filestream, "   N\n");
-      else if (flag(atom(s,i)) == CARBONE)
+      else if (flag(atom(s,i)) == CARBON)
         ret = fprintf(filestream, "   C\n");
       else 
         ret = fprintf(filestream, "   Al\n");

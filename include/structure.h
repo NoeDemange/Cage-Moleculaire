@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "constante.h"
+#include "constant.h"
 
 //retourne l'adresse
 #define atom(o,i) ((o)->atoms+(i)) //adresse de l'atome
@@ -77,15 +77,14 @@ typedef struct {
 typedef struct Element Element;
 struct Element {
 	
-	int depart;
-	int arrivee;
-	Element *suivant;	
-
+	int start;
+	int end;
+	Element *next;
 };
 
 typedef struct {
 	
-	Element *premier;	
+	Element *first;	
 
 } List_p;
 
@@ -93,29 +92,27 @@ typedef struct {
 typedef struct Elem_s Elem_s;
 struct Elem_s {
 	
-	Point_t sommet;
-	Elem_s *suivant;	
-
+	Point_t position;
+	Elem_s *next;
 };
 
 typedef struct {
 	
-	Elem_s *premier;	
-
+	Elem_s *first;
 } List_s;
 
 // Liste d'entiers
 typedef struct Elem_d Elem_d;
 struct Elem_d {
 	
-	int sommet;
-	Elem_d *suivant;	
+	int idAtom;
+	Elem_d *next;	
 
 };
 
 typedef struct {
 	
-	Elem_d *premier;	
+	Elem_d *first;	
 
 } List_d;
 
@@ -229,14 +226,12 @@ typedef struct Elem Elem;
 struct Elem {
 	
 	Shell_t* moc;
-	Elem *suivant;	
-
+	Elem *next;	
 };
 
 typedef struct {
 	
-	Elem *premier;	
-
+	Elem *first;	
 } List_m;
 
 
@@ -279,7 +274,7 @@ void LSTs_addElement(List_s* list, Point_t sommet);
 void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
 void LSTs_removeElement(List_s* list, Point_t p);
-Point_t distMin(List_s* list, Point_t p) ;
+Point_t minDist(List_s* list, Point_t p) ;
 
 List_d* LSTd_init();
 void LSTd_addElement(List_d* list, int sommet);
