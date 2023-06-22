@@ -324,7 +324,7 @@ void projectionOCN_AX1E3(Shell_t* moc, List_m* mocAtt, int depart, int arrivee, 
 		}
 	}
 	
-	for (int i = 0; i < 2 && positions->premier; i++) // 1 positions les mieux placés (distance min avec arrivée)
+	for (int i = 0; i < NUMBER_POSITION_AX1E3 && positions->premier; i++) // 1 positions les mieux placés (distance min avec arrivée)
 	{
 		positionNvDprt = distMin(positions, arv); 
 		LSTs_removeElement(positions, positionNvDprt);
