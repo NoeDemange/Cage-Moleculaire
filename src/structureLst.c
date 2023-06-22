@@ -143,7 +143,7 @@ void LST_delete(List_t* l) {
 List_p* LST2_init() {
 	
 	List_p* list = malloc(sizeof(List_p));
-	list->premier = NULL;
+	list->first = NULL;
 	
 	return list;
 }
@@ -153,23 +153,23 @@ void LST2_addElement(List_p* list, int depart, int arrivee) {
 	
 	Element* elem = malloc(sizeof(Element));
 	
-	elem->depart = depart;
-	elem->arrivee = arrivee;
-	elem->suivant = list->premier;
+	elem->start = depart;
+	elem->end = arrivee;
+	elem->next = list->first;
 	
-	list->premier = elem;
+	list->first = elem;
 }
 
 void LST2_removeFirst(List_p* list) {
 	
-	Element* suppr = list->premier;
-	list->premier = list->premier->suivant;
+	Element* suppr = list->first;
+	list->first = list->first->next;
 	free(suppr);
 }
 
 void LST2_delete(List_p* list) {
 
-	while (list->premier)
+	while (list->first)
 	{
 		LST2_removeFirst(list);
 	}
@@ -181,7 +181,7 @@ void LST2_delete(List_p* list) {
 List_m* LSTm_init() {
 	
 	List_m* list = malloc(sizeof(List_m));
-	list->premier = NULL;
+	list->first = NULL;
 	
 	return list;
 }
@@ -192,22 +192,22 @@ void LSTm_addElement(List_m* list, Shell_t* moc) {
 	Elem* elem = malloc(sizeof(Elem));
 	
 	elem->moc = moc;
-	elem->suivant = list->premier;
+	elem->next = list->first;
 	
-	list->premier = elem;
+	list->first = elem;
 }
 
 void LSTm_removeFirst(List_m* list) {
 	
-	Elem* suppr = list->premier;
-	list->premier = list->premier->suivant;
+	Elem* suppr = list->first;
+	list->first = list->first->next;
 	if(suppr->moc) SHL_delete(suppr->moc);
 	free(suppr);
 }
 
 void LSTm_delete(List_m* list) {
 
-	while (list->premier)
+	while (list->first)
 	{
 		LSTm_removeFirst(list);
 	}
@@ -219,7 +219,7 @@ void LSTm_delete(List_m* list) {
 List_s* LSTs_init() {
 	
 	List_s* list = malloc(sizeof(List_s));
-	list->premier = NULL;
+	list->first = NULL;
 	
 	return list;
 }
@@ -229,24 +229,24 @@ void LSTs_addElement(List_s* list, Point_t sommet) {
 	
 	Elem_s* elem = malloc(sizeof(Elem_s));
 	
-	elem->sommet.x = sommet.x;
-	elem->sommet.y = sommet.y;
-	elem->sommet.z = sommet.z;
-	elem->suivant = list->premier;
+	elem->position.x = sommet.x;
+	elem->position.y = sommet.y;
+	elem->position.z = sommet.z;
+	elem->next = list->first;
 	
-	list->premier = elem;
+	list->first = elem;
 }
 
 void LSTs_removeFirst(List_s* list) {
 	
-	Elem_s* suppr = list->premier;
-	list->premier = list->premier->suivant;
+	Elem_s* suppr = list->first;
+	list->first = list->first->next;
 	free(suppr);
 }
 
 void LSTs_delete(List_s* list) {
 
-	while (list->premier)
+	while (list->first)
 	{
 		LSTs_removeFirst(list);
 	}
@@ -255,24 +255,24 @@ void LSTs_delete(List_s* list) {
 
 void LSTs_removeElement(List_s* list, Point_t p) {
 	
-	Elem_s* cursor = list->premier;
+	Elem_s* cursor = list->first;
 	Elem_s* suppr = NULL;
 	if (cursor)
 	{
-		if (cursor->sommet.x == p.x && cursor->sommet.y == p.y && cursor->sommet.z == p.z)
+		if (cursor->position.x == p.x && cursor->position.y == p.y && cursor->position.z == p.z)
 		{
 			LSTs_removeFirst(list);
 		}
 		else
 		{
-			while (cursor->suivant && !suppr)
+			while (cursor->next && !suppr)
 			{
-				if (cursor->suivant->sommet.x == p.x && cursor->suivant->sommet.y == p.y && cursor->suivant->sommet.z == p.z)
+				if (cursor->next->position.x == p.x && cursor->next->position.y == p.y && cursor->next->position.z == p.z)
 				{
-					suppr = cursor->suivant;
-					cursor->suivant = cursor->suivant->suivant;
+					suppr = cursor->next;
+					cursor->next = cursor->next->next;
 				}
-				else cursor = cursor->suivant;
+				else cursor = cursor->next;
 			}
 		}
 		
@@ -284,19 +284,19 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 }
 
 // Retourne le point de la liste le plus proche du point en argument
-Point_t distMin(List_s* list, Point_t p) {
+Point_t minDist(List_s* list, Point_t p) {
 	Point_t min = PT_init();
 	int distanceMin = INT_MAX;
-	Elem_s* l = list->premier;
+	Elem_s* l = list->first;
 	
 	while (l)
 	{
-		if (dist(l->sommet, p) < distanceMin)
+		if (dist(l->position, p) < distanceMin)
 		{
-			min = l->sommet;
-			distanceMin = dist(l->sommet, p);
+			min = l->position;
+			distanceMin = dist(l->position, p);
 		}
-		l = l->suivant;
+		l = l->next;
 	}
 	return min;
 }
@@ -306,7 +306,7 @@ Point_t distMin(List_s* list, Point_t p) {
 List_d* LSTd_init() {
 	
 	List_d* list = malloc(sizeof(List_d));
-	list->premier = NULL;
+	list->first = NULL;
 	
 	return list;
 }
@@ -316,38 +316,38 @@ void LSTd_addElement(List_d* list, int sommet) {
 	
 	Elem_d* elem = malloc(sizeof(Elem_d));
 	
-	elem->sommet = sommet;
-	elem->suivant = list->premier;
+	elem->idAtom = sommet;
+	elem->next = list->first;
 	
-	list->premier = elem;
+	list->first = elem;
 }
 
 void LSTd_removeFirst(List_d* list) {
 	
-	Elem_d* suppr = list->premier;
-	list->premier = list->premier->suivant;
+	Elem_d* suppr = list->first;
+	list->first = list->first->next;
 	free(suppr);
 }
 
 void LSTd_removeSommet(List_d* list, int sommet) {
-	Elem_d* cursor = list->premier;
+	Elem_d* cursor = list->first;
 	Elem_d* suppr = NULL;
 	if (cursor)
 	{
-		if (cursor->sommet == sommet)
+		if (cursor->idAtom == sommet)
 		{
 			LSTd_removeFirst(list);
 		}
 		else
 		{
-			while (cursor->suivant && !suppr)
+			while (cursor->next && !suppr)
 			{
-				if (cursor->suivant->sommet == sommet)
+				if (cursor->next->idAtom == sommet)
 				{
-					suppr = cursor->suivant;
-					cursor->suivant = cursor->suivant->suivant;
+					suppr = cursor->next;
+					cursor->next = cursor->next->next;
 				}
-				else cursor = cursor->suivant;
+				else cursor = cursor->next;
 			}
 		}
 		
@@ -361,7 +361,7 @@ void LSTd_removeSommet(List_d* list, int sommet) {
 
 void LSTd_delete(List_d* list) {
 
-	while (list->premier)
+	while (list->first)
 	{
 		LSTd_removeFirst(list);
 	}

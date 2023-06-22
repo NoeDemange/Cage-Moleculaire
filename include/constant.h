@@ -53,11 +53,11 @@
 /***********************************************************************/
 
 // Path (in the cage)
-#define NB_MOTIF 5 // Number of patterns available to make a path
+#define NB_PATTERNS 5 // Number of patterns available to make a path
 
 // Flags atoms in paths
-#define CARBONE 6
-#define AZOTE 5
-#define OXYGENE 4
+#define CARBON 6
+#define NITROGEN 5
+#define OXYGEN 4
 
 #endif
