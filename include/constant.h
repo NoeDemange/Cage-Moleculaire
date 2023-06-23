@@ -44,6 +44,9 @@ A___/   \___B
 #define END_ANGLE 109
 #define ANGLE_ERROR 10
 
+// Path choice
+#define NUMBER_POSITION_AX1E3 2
+
 /********* not to be modified (the incremental order must be preserved) */
 // Flags atoms in the envelope and cage
 #define NOT_DEF_F -1 // Atom not used

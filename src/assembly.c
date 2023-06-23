@@ -325,7 +325,7 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 		}
 	}
 	
-	for (int i = 0; i < 2 && positions->first; i++) { // Best placed position (min distance to the end)
+	for (int i = 0; i < NUMBER_POSITION_AX1E3 && positions->first; i++) { // Best placed position (min distance to the end)
 		newStartPos = minDist(positions, endPos); 
 		LSTs_removeElement(positions, newStartPos);
 		addProjection(processedMoc, mocsInsProgress, idStart, newStarts, numPattern, newStartPos, sub);
