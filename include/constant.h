@@ -17,19 +17,23 @@
 #define EDGE_ERROR 20 // Acceptable error for the computation of the edges between atoms
 
 // Distance
-#define DIST_HYDRO 1.8 //  Hydrogen bond size.
+#define DIST_HYDRO 1.8 // Hydrogen bond size.
 #define DIST_SIMPLE 1.5 // Simple covalent bond size.
 #define DIST_ERROR 0.5 // Acceptable error for the covalent bond size. 
 #define MINDIS 0.75 // Minimal distance bewteen two atoms (otherwise they are merged).
-#define DIST_GAP_CAGE 1.34  // Distance between two cage's atoms (defined by trial).
+#define DIST_GAP_CAGE 1.34 // Distance between two cage's atoms (defined by trial).
 #define DIST_GAP_SUBSTRATE 1.8 // Distance between an atom of the cage and an atom of the substrate (at least a hydrogen bond size by trial).
 #define DIST_SIMPLE_PATTERN 1.22 // AC/2, with ABC a triangle where each of its vertex is an atom of the path involved in a simple pattern, AB = BC = 1.5 and angle ABC = 109°C.
-/*     B
-	\ /   \ /
-    A     C
+/*  B
+ \ / \ /
+  A   C
 */
-#define DIST_CYCLE_PATTERN 5.8 //1.5+0.7+1.4+0.7+1.5
-#define NUMBER_ATOM_CYCLE_PATTERN 7 //number of atom in a cycle pattern
+#define DIST_CYCLE_PATTERN 5.8 // Distance bewteen two neighbors of a cycle ([AB] = 1.5 + 0.7 + 1.4 + 0.7 + 1.5).
+/*   ___
+A___/   \___B
+    \___/
+*/
+#define NB_ATOMS_IN_CYCLE 7 // Number of atoms in an aromatic ring pattern.
 
 // Distance in generateCycle (TODO document why these values were chosen)
 #define SIMPLE_CYCLE 1.4 // Simple covalent bond size between an atom involved in a cycle and a neighboring atom outside of the cycle.
@@ -41,7 +45,7 @@
 #define ANGLE_ERROR 10
 
 /********* not to be modified (the incremental order must be preserved) */
-// Flags atoms in the shell
+// Flags atoms in the envelope and cage
 #define NOT_DEF_F -1 // Atom not used
 #define SHELL_F 0 // Atom of the shell
 #define LINKABLE_F 1 // Atom at the edge of a pattern that can still make another bond (unless it's a hydrogen).
@@ -52,9 +56,9 @@
 // Path (in the cage)
 #define NB_PATTERNS 5 // Number of patterns available to make a path
 
-// Flags atoms in paths
-#define CARBON 6
-#define NITROGEN 5
-#define OXYGEN 4
+// Flags atoms in paths, ! must be different of flags in the envelope
+#define CARBON_F 6
+#define NITROGEN_F 5
+#define OXYGEN_F 4
 
 #endif
