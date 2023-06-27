@@ -33,25 +33,6 @@ int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
 /**************************************/
 
 /**
- * @brief Returns the type of the inserted atom.
- * 
- * @param numPattern Pattern number (0, 1, 2) in the main loop.
- * @return (int) Number corresponding to the pattern type.
- */
-int insertType(int numPattern) {
-
-	if (numPattern == 0) {
-		return OXYGEN_F;
-	}
-	else if (numPattern == 1) {
-		return NITROGEN_F;
-	}
-	else {
-		return CARBON_F;
-	}
-}
-
-/**
  * @brief Adds an aromatic ring (pattern 4) perpendicular to the plane 
  * with its neighbor.
  * 
@@ -83,11 +64,8 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		normal = rotation(normalization(vector(copyNewStartPos, startPos), 1),  90, normal); // Perpendicular
 			
 		// Position the other atoms of the cycle.
-		//writeShellOutput("demos/substrates/ADENOS10.xyz",processedMoc,0);
 		neighborStartPos = AX1E2(copyNewStartPos, coords(atom(moc, idStart)), normal, SIMPLE_CYCLE); // Neighbor
-		//writeShellOutput("demos/substrates/ADENOS10.xyz",processedMoc,0);
 		copyNewStartPos = AX2E1(copyNewStartPos, coords(atom(moc, idStart)), neighborStartPos, SIMPLE_CYCLE); 
-		//writeShellOutput("demos/substrates/ADENOS10.xyz",processedMoc,0);
 		if (isHindered(moc, sub, copyNewStartPos)) {
 			SHL_delete(moc);
 			return;
@@ -136,150 +114,26 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 }
 
 /**
- * @brief Adds the oxygen atom of a carbonyl pattern (pattern 3).
- * 
- * @param processedMoc Molecular cage being generated.
- * @param idStart Index of the first linkable atom in the path in construction.
- * @param sub Substrate molecule.
- * @return (List_m*) List of cages in construction with the added oxygen.
- */
-List_m* addOxygenOfCarbonyl(Shell_t* processedMoc, int idStart, Molecule_t* sub) {
-	List_m* mocsInProgress = LSTm_init();
-	Point_t startPos = coords(atom(processedMoc, idStart));
-	int idNeighbor1 = neighbor(atom(processedMoc, idStart), 0); // Neighbor
-	Point_t neighbor1Pos = coords(atom(processedMoc, idNeighbor1));
-	
-	for (int i = 0; forEachNeighbor(atom(processedMoc,idNeighbor1), i); i++) { // For every possible plans with starting atom's neighbors.
-		if (neighbor(atom(processedMoc, idNeighbor1), i) != idStart) {
-			Shell_t* firstMoc = SHL_copy(processedMoc);
-			Shell_t* secondMoc = SHL_copy(processedMoc);
-			
-			Point_t neighbor2Pos = coords(atom(firstMoc, neighbor(atom(firstMoc, idNeighbor1), i)));
-						
-			// Look for the normal to position the oxygen.
-			Point_t normal = planNormal(startPos, neighbor1Pos, neighbor2Pos);
-			
-			// Oxygen
-			// First position.
-			Point_t oxygenPos = AX1E2(startPos, neighbor1Pos, normal, DIST_SIMPLE);
-			int idOxygen;
-			
-			if (!isHindered(firstMoc, sub, oxygenPos)) {
-				idOxygen = SHL_addAtom(firstMoc, oxygenPos, -1);
-				flag(atom(firstMoc, idOxygen)) = OXYGEN_F;
-				SHL_addEdge(firstMoc, idStart, idOxygen);
-				
-				LSTm_addElement(mocsInProgress, firstMoc);
-			}
-			else {
-				SHL_delete(firstMoc);
-			}
-						
-			// Second position
-			oxygenPos = AX2E1(startPos, neighbor1Pos, oxygenPos, DIST_SIMPLE);
-			
-			if (!isHindered(secondMoc, sub, oxygenPos)) {
-				int idOxygen = SHL_addAtom(secondMoc, oxygenPos, -1);
-				flag(atom(secondMoc, idOxygen)) = OXYGEN_F;
-				SHL_addEdge(secondMoc, idStart, idOxygen);	
-				LSTm_addElement(mocsInProgress, secondMoc);
-			}
-			else {
-				SHL_delete(secondMoc);
-			}
-		}
-	}
-	return mocsInProgress;
-}
-
-/**
- * @brief Adds a carbonyl pattern (c=0) and a neighboring atom.
- * 
- * @param processedMoc Molecular cage being generated.
- * @param mocsInProgress List of cages in construction to be processed.
- * @param idStart Index of the first linkable atom in the path in construction.
- * @param newStarts Stack of atoms starting a path in construction.
- * @param newStartPos Position (point) of the next atom added in the path.
- * @param sub Substrate molecule.
- */
-void addCarbonyl(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, Point_t newStartPos, Molecule_t* sub) {
-	for (int i = 0; forEachNeighbor(atom(processedMoc,idStart), i); i++) { // For every possible plans with starting atom's neighbors.
-		Shell_t* firstMoc = SHL_copy(processedMoc);
-		Shell_t* secondMoc = SHL_copy(processedMoc);
-			
-		Point_t neighbor1Pos = coords(atom(firstMoc, neighbor(atom(firstMoc, idStart), i)));
-		Point_t startPos = coords(atom(firstMoc, idStart));
-			
-		// Carbon
-		int idNewStartMoc1 = SHL_addAtom(firstMoc, newStartPos, -1);
-		flag(atom(firstMoc, idNewStartMoc1)) = CARBON_F;
-		SHL_addEdge(firstMoc, idStart, idNewStartMoc1);
-		
-		int idNewStartMoc2 = SHL_addAtom(secondMoc, newStartPos, -1);
-		flag(atom(secondMoc, idNewStartMoc2)) = CARBON_F;
-		SHL_addEdge(secondMoc, idStart, idNewStartMoc2);
-			
-		// Look for the normal to position the oxygen.
-		Point_t normal = planNormal(newStartPos, startPos, neighbor1Pos);
-		
-		// Oxygen
-		// First position.
-		Point_t oxygenPos = AX1E2(newStartPos, startPos, normal, DIST_SIMPLE);
-		int idOxygen;
-			
-		if (!isHindered(firstMoc, sub, oxygenPos)) {
-			int idOxygen = SHL_addAtom(firstMoc, oxygenPos, -1);
-			flag(atom(firstMoc, idOxygen)) = OXYGEN_F;
-			SHL_addEdge(firstMoc, idNewStartMoc1, idOxygen);
-				
-			LSTm_addElement(mocsInProgress, firstMoc);
-			LSTd_addElement(newStarts, idNewStartMoc1);
-		}
-		else {
-			SHL_delete(firstMoc);
-		}
-			
-		// Second position.
-		oxygenPos = AX2E1(newStartPos, startPos, oxygenPos, DIST_SIMPLE);
-			
-		if (!isHindered(secondMoc, sub, oxygenPos)) {
-			idOxygen = SHL_addAtom(secondMoc, oxygenPos, -1);
-			flag(atom(secondMoc, idOxygen)) = OXYGEN_F;
-			SHL_addEdge(secondMoc, idNewStartMoc2, idOxygen);
-				
-			LSTm_addElement(mocsInProgress, secondMoc);
-			LSTd_addElement(newStarts, idNewStartMoc2);
-		}
-		else {
-			SHL_delete(secondMoc);
-		}		
-	}
-}
-
-/**
  * @brief Adds the projected atom(s) to the cage being generated.
  * 
  * @param processedMoc Molecular cage being generated.
  * @param mocsInProgress List of cages in construction to be processed.
  * @param idStart Index of the first linkable atom in the path in construction.
  * @param newStarts Stack of atoms starting a path in construction.
- * @param numPattern Pattern number (0, 1, 2) in the main loop. 
+ * @param numPattern Pattern number (0, 1) in the main loop. 
  * @param newStartPos Position (point) of the next atom added in the path.
  * @param sub Substrate molecule.
  */
 void addProjection(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern, Point_t newStartPos, Molecule_t* sub) {
 	
-	if (numPattern == 3) {
-		addCarbonyl(processedMoc, mocsInProgress, idStart, newStarts, newStartPos, sub);
-	}
-	else if (numPattern == 4) {
+	if (numPattern == CYCLE_PATTERN) {
 		addAromaticRing(processedMoc, mocsInProgress, idStart, newStarts, newStartPos, sub);
 	}
 	else {
 		Shell_t* moc = SHL_copy(processedMoc);
 	
 		int idnewStart = SHL_addAtom(moc, newStartPos, -1);
-		flag(atom(moc, idnewStart)) = insertType(numPattern);
+		flag(atom(moc, idnewStart)) = CARBON_F;
 		SHL_addEdge(moc, idStart, idnewStart);
 		
 		LSTm_addElement(mocsInProgress, moc);
@@ -330,7 +184,7 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 	LSTs_delete(positions);
 }
 
-// Projection for a nitrogen with two neighbors.
+/*// Projection for a nitrogen with two neighbors.
 void projectionN_AX2E2(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern, Molecule_t* sub) {
 	
 	int idFirstNeighbor = neighbor(atom(processedMoc, idStart), 0);
@@ -340,9 +194,9 @@ void projectionN_AX2E2(Shell_t* processedMoc, List_m* mocsInProgress, int idStar
 	if (!isHindered(processedMoc, sub, newStartPos)) {
 		addProjection(processedMoc, mocsInProgress, idStart, newStarts, numPattern, newStartPos, sub);
 	}
-}
+}*/
 
-// Projection for a carbon with two neighbors and one is an oxygen.
+/*// Projection for a carbon with two neighbors and one is an oxygen.
 void projectionC_AX2E1(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern, Molecule_t* sub) {
 	
 	int idFirstNeighbor = neighbor(atom(processedMoc, idStart), 0);
@@ -352,7 +206,7 @@ void projectionC_AX2E1(Shell_t* processedMoc, List_m* mocsInProgress, int idStar
 	if (!isHindered(processedMoc, sub, newStartPos)) {
 		addProjection(processedMoc, mocsInProgress, idStart, newStarts, numPattern, newStartPos, sub);
 	}
-}
+}*/
 
 // Projection for a carbon with two neighbors.
 void projectionC_AX2E2(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern, Molecule_t* sub) {
@@ -408,22 +262,11 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
 		//Diff rotations
 		projectionOCN_AX1E3(processedMoc, mocsInProgress, idStart, idEnd, newStarts, numPattern, sub);
 	}
-	else if (flag(atom(processedMoc, idStart)) == NITROGEN_F && numberOfNeighborsStart == 2) {
-		//Projection
-		projectionN_AX2E2(processedMoc, mocsInProgress, idStart, newStarts, numPattern, sub);
-	}
 	else if (flag(atom(processedMoc, idStart)) == CARBON_F) {
 		if (numberOfNeighborsStart == 2) {
-			int idFirstNeighborStart = neighbor(atom(processedMoc, idStart), 0);
-			int idSecondNeighborStart = neighbor(atom(processedMoc, idStart), 1);
-			if (flag(atom(processedMoc, idFirstNeighborStart)) == OXYGEN_F || flag(atom(processedMoc, idSecondNeighborStart)) == OXYGEN_F) {
-				// Projection
-				projectionC_AX2E1(processedMoc, mocsInProgress, idStart, newStarts, numPattern, sub);
-			}
-			else {
-				// 2 Projections
-				projectionC_AX2E2(processedMoc, mocsInProgress, idStart, newStarts, numPattern, sub);
-			}
+			// 2 neighbors
+			// 2 Projections
+			projectionC_AX2E2(processedMoc, mocsInProgress, idStart, newStarts, numPattern, sub);
 		}
 		else { 
 			// 3 neighbors
@@ -448,6 +291,7 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
  * @param startingMocSize Size (in atoms) of the cage before adding the path.
  */
 void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbCarbonyls, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize, int forceCycle) {
+	
 	/*************** Check distances bewteen atoms *****/
 	Point_t B = coords(atom(processedMoc, idStart));
 	for (int i = 0; i < size(processedMoc); i++) {
@@ -465,24 +309,15 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 		}
 	}
 	/***************************************************/
-	for (int i = 2; i < NB_PATTERNS; i++) {
-		if(i == 3) i++; // TEMP exclude carbonyl pattern
+	for (int i = 0; i < NB_PATTERNS; i++) {
 		List_m* tempMocsInProg = LSTm_init();
 		List_d* newStarts = LSTd_init();
 		
 		insertPattern(processedMoc, tempMocsInProg, idStart, newStarts, i, idEnd, substrat(m));
 		
 		while (tempMocsInProg->first) {
-			// Count the number of consecutive carbonyls.
-			if (i == 3) {
-				nbCarbonyls++;
-			}
-			else {
-				nbCarbonyls = 0;
-			}
-			
 			// Count the number of aromatic rings.
-			if (i == 4) {
+			if (i == CYCLE_PATTERN) {
 				nbAroRings++;
 			}
 			
@@ -504,7 +339,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 						}
 					}
 				}
-				else if (nbCarbonyls < 5 && nbAroRings < 3) {
+				else if (nbAroRings < 3) {
 					generatePaths(m, mocsInProgress, tempMocsInProg->first->moc, newStarts->first->idAtom, idEnd, nbCarbonyls, nbAroRings, inputFile, sizeMax, startingMocSize, forceCycle);
 				}
 			}
@@ -530,6 +365,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
  * @return (int) 1 if the searched atom is found, 0 otherwise. 
  */
 int search(Shell_t* s, List_t* markedAtoms, int index1, int index2) {
+	
 	AtomShl_t* a = atom(s, index1);
 	LST_addElement(markedAtoms, index1);
 	
@@ -608,6 +444,7 @@ List_p* chooseStartAndEndPairs(Shell_t* s) {
  * @return (List_m*) Initialized list of mocs. 
  */
 List_m* initMocsInProgress(Main_t* m){
+	
 	List_m* mocsInProgress = LSTm_init();
 	
 	for (int i = 0; i < mocSize(m); i++) {
@@ -689,27 +526,8 @@ void generateWholeCages(Main_t* m, Options_t options) {
 						forceCycle = 1;
 					}
 					Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
-					
-		//#pragma omp parallel for
-					for (int i = 2; i < 3/*4 with carbonyl*/; i++) { // Assignment of all types to the starting atom (atom on the edges).
-
-						flag(atom(appendedMoc, idStart)) = insertType(i);
-						if (i == 3) {
-							if (LST_nbElements(neighborhood(atom(appendedMoc, idStart))) == 1) // Carbonyl possible only if the starting atom has only one neighbor.
-							{
-								List_m* mocsWithCarbonyl = addOxygenOfCarbonyl(appendedMoc, idStart,substrat(m));
-
-								while (mocsWithCarbonyl->first) { // Process all mocs generated by this addition.
-									generatePaths(m, mocsInProgress, mocsWithCarbonyl->first->moc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
-									LSTm_removeFirst(mocsWithCarbonyl);
-								}
-								LSTm_delete(mocsWithCarbonyl);
-							}
-						}
-						else {	
-							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
-						}
-					}
+					flag(atom(appendedMoc, idStart)) = CARBON_F;
+					generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
 					SHL_delete(appendedMoc);
 				}
 				LST2_removeFirst(startEndAtoms);

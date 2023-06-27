@@ -57,7 +57,8 @@ A___/   \___B
 /***********************************************************************/
 
 // Path (in the cage)
-#define NB_PATTERNS 5 // Number of patterns available to make a path
+#define NB_PATTERNS 2 // Number of patterns available to make a path
+#define CYCLE_PATTERN 1 // Number for cycle pattern
 
 // Flags atoms in paths, ! must be different of flags in the envelope
 #define CARBON_F 6
