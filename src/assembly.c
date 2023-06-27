@@ -144,7 +144,6 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
  * @return (List_m*) List of cages in construction with the added oxygen.
  */
 List_m* addOxygenOfCarbonyl(Shell_t* processedMoc, int idStart, Molecule_t* sub) {
-	
 	List_m* mocsInProgress = LSTm_init();
 	Point_t startPos = coords(atom(processedMoc, idStart));
 	int idNeighbor1 = neighbor(atom(processedMoc, idStart), 0); // Neighbor
@@ -182,8 +181,7 @@ List_m* addOxygenOfCarbonyl(Shell_t* processedMoc, int idStart, Molecule_t* sub)
 			if (!isHindered(secondMoc, sub, oxygenPos)) {
 				int idOxygen = SHL_addAtom(secondMoc, oxygenPos, -1);
 				flag(atom(secondMoc, idOxygen)) = OXYGEN_F;
-				SHL_addEdge(secondMoc, idStart, idOxygen);
-				
+				SHL_addEdge(secondMoc, idStart, idOxygen);	
 				LSTm_addElement(mocsInProgress, secondMoc);
 			}
 			else {
@@ -205,7 +203,6 @@ List_m* addOxygenOfCarbonyl(Shell_t* processedMoc, int idStart, Molecule_t* sub)
  * @param sub Substrate molecule.
  */
 void addCarbonyl(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, Point_t newStartPos, Molecule_t* sub) {
-	
 	for (int i = 0; forEachNeighbor(atom(processedMoc,idStart), i); i++) { // For every possible plans with starting atom's neighbors.
 		Shell_t* firstMoc = SHL_copy(processedMoc);
 		Shell_t* secondMoc = SHL_copy(processedMoc);
@@ -533,7 +530,6 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
  * @return (int) 1 if the searched atom is found, 0 otherwise. 
  */
 int search(Shell_t* s, List_t* markedAtoms, int index1, int index2) {
-	
 	AtomShl_t* a = atom(s, index1);
 	LST_addElement(markedAtoms, index1);
 	
