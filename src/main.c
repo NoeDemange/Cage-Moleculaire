@@ -3,7 +3,7 @@
 #include "expansion.h"
 #include "generation.h"
 #include "output.h"
-#include "utile.h"
+#include "util.h"
 #include "main.h"
 #include "assembly.h"
 
@@ -20,8 +20,9 @@ int main(int argc, char** argv) {
 
 	time_t start = time(NULL);
 
+	/********************************* Options *****/
 	int opt;
-  options_t options = { NULL, DEFLT_ALPHA, DEFLT_SIZEMAX };
+  Options_t options = { NULL, DEFLT_ALPHA, DEFLT_SIZEMAX, DEFLT_MAX_RESULTS };
 
   while ((opt = getopt(argc, argv, OPTSTR)) != EOF) {
     switch(opt) {
@@ -37,27 +38,35 @@ int main(int argc, char** argv) {
         options.sizeMax = atoi(optarg);
         break;
 
+			case 'r':
+        options.maxResults = atoi(optarg);
+        break;
+
       case 'h':
       default:
-        usage(argv[0]);
+        usage();
         break;
     }
 	}
 
 	if (options.input == NULL) {
-		fprintf(stderr, "Fichier .xyz du substrat manquant.\n");
-		usage(argv[0]);
+		fprintf(stderr, "Input filename .xyz of the substrate is missing.\n");
+		usage();
 		exit(EXIT_FAILURE);
 	}
 
+	/*********************************** Infos *****/
+
 	printf("\n####### Informations #######\n");
-	printf("  - Substrat : %s\n  - Alpha : %.1f\n  - Taille maximum d'un chemin (en atomes) : %d\n",
-					 options.input, options.alpha, options.sizeMax);
+	printf("  - Substrate : %s\n  - Alpha : %.1f\n  - Maximum size of a path (in atoms) : %d\n  - Maximum number of results : %d\n",
+					 options.input, options.alpha, options.sizeMax, options.maxResults);
 
 	Main_t* m = MN_create();
 	substrat(m) = initMolecule(options.input);
 
-	printf("\n####### Initialisation de l'environnement R  #######\n");
+	/*************************************** R *****/
+
+	printf("\n####### R environment initialization #######\n");
 	
 	int r_argc = 2;
 	char *r_argv [] = {"R", "--silent"};
@@ -68,40 +77,37 @@ int main(int argc, char** argv) {
 	setWorkingDirectory("src");
 	source(PATHNAME);
 
-	printf("\n####### Début de génération de l'enveloppe avec motifs liants #######\n");
+	/*********** Envelope and binding patterns *****/
 
 	envelope(m) = createShell(substrat(m), options.alpha);
-	generationMoc(m);
+	generatePathlessCages(m);
 
 	Rf_endEmbeddedR(0);
 
-	printf("\n####### Ecriture du substrat et de l'enveloppe dans le dossier de résultat #######\n");
+	/***************************** Whole cages *****/
 
-	output(options.input, m);
+	writeMainOutput(options.input, m);
 	
-	printf("\n####### Début de génération des chemins #######\n");
-	assemblage(options.input, m, options.alpha, options.sizeMax);
+	generateWholeCages(m, options);
 	
 	MN_delete(m);
+
+	/************************************ Time *****/
 		
 	time_t end = time(NULL);
 	long seconds = (long) difftime(end, start);
 		
 	int hours = seconds / 3600;
 	seconds -= hours * 3600;
-	int minuts = seconds / 60;
-	seconds -= minuts * 60;
-	printf("\nTemps d'execution : %d heure(s) %d minute(s) %ld seconde(s)\n", hours, minuts, seconds);
+	int minutes = seconds / 60;
+	seconds -= minutes * 60;
+	printf("\nExecution time : %d hour(s) %d minute(s) %ld second(s)\n", hours, minutes, seconds);
 	
 	return EXIT_SUCCESS;
 }
 
-void usage(char *argv0) {
-	if (!argv0) {
-    fprintf(stderr, "Argument manquant pour la fonction 'usage'.\n");
-    exit(EXIT_FAILURE);
-  }
-	fprintf(stderr, USAGE_FMT, basename(argv0), DEFLT_ALPHA, DEFLT_SIZEMAX);
+void usage() {
+	fprintf(stderr, USAGE_FMT, DEFLT_ALPHA, DEFLT_SIZEMAX, DEFLT_MAX_RESULTS);
 	exit(EXIT_FAILURE);
 }
 
@@ -113,7 +119,7 @@ void source(const char* name) {
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
 
 	if (errorOccurred) {
-		fprintf(stderr, "Une erreur est survenue lors de l'utilisation de R.\n");
+		fprintf(stderr, "An error occurred while using R.\n");
 		exit(EXIT_FAILURE);
   }
   UNPROTECT(1);
@@ -127,7 +133,7 @@ void setWorkingDirectory(char* dir) {
   R_tryEval(e, R_GlobalEnv, &errorOccurred);
 
 	if (errorOccurred) {
-		fprintf(stderr, "Une erreur est survenue lors de l'utilisation de R.\n");
+		fprintf(stderr, "An error occurred while using R.\n");
 		exit(EXIT_FAILURE);
   }
   UNPROTECT(1);

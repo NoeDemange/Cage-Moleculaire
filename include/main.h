@@ -5,9 +5,10 @@ typedef struct {
   char*         input;
   double				alpha;
 	int					sizeMax;
-} options_t;
+  int      maxResults;
+} Options_t;
 
-void usage(char *);
+void usage();
 void source(const char*);
 void setWorkingDirectory(char*);
 

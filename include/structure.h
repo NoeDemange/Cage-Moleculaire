@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "constante.h"
+#include "constant.h"
 
 //retourne l'adresse
 #define atom(o,i) ((o)->atoms+(i)) //adresse de l'atome
@@ -17,12 +17,20 @@
 #define bond(o)	(o)->bond
 #define elts(l, i) (l)->elts[(i)]
 
+// (in a loop) Browse a list of elements until it finds a -1 element (an unused value).
+// Only used to scroll through list where unused values are at the end. 
+#define forEachElement(l,i) (i) < size((l)) && elts((l),(i)) != -1
+
 #define coords(a) (a)->coords
 #define atomX(a) (a)->coords.x
 #define atomY(a) (a)->coords.y
 #define atomZ(a) (a)->coords.z
 #define neighbor(a,i) (a)->neighborhood->elts[(i)]
 #define neighborhoodSize(a) (a)->neighborhood->size
+
+// (in a loop) Browse a list of neighbors until it finds a -1 element (an unused value).
+// The unused values of neighbors must be at the end. 
+#define forEachNeighbor(a,i) (i) < neighborhoodSize((a)) && neighbor((a),(i)) != -1
 
 ///macro molecule
 #define symbol(a) (a)->info.symbol
@@ -69,15 +77,14 @@ typedef struct {
 typedef struct Element Element;
 struct Element {
 	
-	int depart;
-	int arrivee;
-	Element *suivant;	
-
+	int start;
+	int end;
+	Element *next;
 };
 
 typedef struct {
 	
-	Element *premier;	
+	Element *first;	
 
 } List_p;
 
@@ -85,29 +92,27 @@ typedef struct {
 typedef struct Elem_s Elem_s;
 struct Elem_s {
 	
-	Point_t sommet;
-	Elem_s *suivant;	
-
+	Point_t position;
+	Elem_s *next;
 };
 
 typedef struct {
 	
-	Elem_s *premier;	
-
+	Elem_s *first;
 } List_s;
 
 // Liste d'entiers
 typedef struct Elem_d Elem_d;
 struct Elem_d {
 	
-	int sommet;
-	Elem_d *suivant;	
+	int idAtom;
+	Elem_d *next;	
 
 };
 
 typedef struct {
 	
-	Elem_d *premier;	
+	Elem_d *first;	
 
 } List_d;
 
@@ -221,14 +226,12 @@ typedef struct Elem Elem;
 struct Elem {
 	
 	Shell_t* moc;
-	Elem *suivant;	
-
+	Elem *next;	
 };
 
 typedef struct {
 	
-	Elem *premier;	
-
+	Elem *first;	
 } List_m;
 
 
@@ -252,6 +255,7 @@ void LST_addElement(List_t*, unsigned);
 void LST_removeElement(List_t* , unsigned);
 List_t* LST_create();
 List_t* LST_copy(List_t*);
+List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei);
 List_t* LST_addList(List_t*, List_t*);
 void LST_delete(List_t*);
 
@@ -270,7 +274,7 @@ void LSTs_addElement(List_s* list, Point_t sommet);
 void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
 void LSTs_removeElement(List_s* list, Point_t p);
-Point_t distMin(List_s* list, Point_t p) ;
+Point_t minDist(List_s* list, Point_t p) ;
 
 List_d* LSTd_init();
 void LSTd_addElement(List_d* list, int sommet);
@@ -322,14 +326,15 @@ unsigned SHL_addVertex(Shell_t*, unsigned);
 void SHL_removeVertex(Shell_t*, unsigned);
 void SHL_addBond(Shell_t*, unsigned, unsigned);
 void SHL_removeBond(Shell_t*, unsigned, unsigned);
-void SHL_avoir2(Shell_t*, List_t*, List_t*);
+//void SHL_avoir2(Shell_t*, List_t*, List_t*);
 void SHL_linkBorder(Shell_t*, unsigned, List_t*);
 void SHL_addCycle(Shell_t*, unsigned);
 void SHL_mergeAtom(Shell_t*, unsigned, unsigned);
 void SHL_testDis(Shell_t*);
 Shell_t* SHL_create();
 Shell_t* SHL_copy(Shell_t*);
-Shell_t* SHL_avoir(Shell_t*);
+Shell_t* SHL_copyCageAtoms(Shell_t* s);
+//Shell_t* SHL_avoir(Shell_t*);
 void SHL_delete(Shell_t*);
 void SHL_deleteAtom(AtomShl_t* a);
 

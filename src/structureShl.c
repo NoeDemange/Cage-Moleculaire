@@ -1,5 +1,5 @@
 #include "structure.h"
-#include "utile.h"
+#include "util.h"
 #include "output.h"
 
 /**************************************/
@@ -10,7 +10,7 @@
 
 void SHL_initAtom(AtomShl_t* a) {
 
-	flag(a) = -1;
+	flag(a) = NOT_DEF_F;
 
 	atomX(a) = 0;
 	atomY(a) = 0;
@@ -68,7 +68,7 @@ int SHL_nbAtom(Shell_t* s) {
 	int i, cpt = 0;
 
 	for (i=0; i<size(s); i++)
-		if (flag(atom(s,i)) != -1)
+		if (flag(atom(s,i)) != NOT_DEF_F)
 			cpt++;
 
 	return cpt;
@@ -87,7 +87,7 @@ int SHL_getIndiceFreeAtom(Shell_t* s) {
 	int i;
 
 	for (i=0; i<size(s); i++)
-		if (flag(atom(s,i)) == -1)
+		if (flag(atom(s,i)) == NOT_DEF_F)
 			return i;
 
 	SHL_addAllocAtom(s);
@@ -136,7 +136,7 @@ unsigned SHL_addAtom(Shell_t* s, Point_t coords, unsigned parent) {
 
 	unsigned indice = SHL_getIndiceFreeAtom(s);
 
-	flag(atom(s,indice)) = 0;
+	flag(atom(s,indice)) = SHELL_F;
 	coords(atom(s,indice)) = coords;
 	parentAtom(atom(s,indice)) = parent;
 
@@ -166,7 +166,7 @@ void SHL_removeAtom(Shell_t* s, unsigned id) {
 }
 
 //Relie les éléments de la liste l2 au plus proche de la liste l1
-void SHL_avoir2(Shell_t* s, List_t* l1, List_t* l2) {
+/*void SHL_avoir2(Shell_t* s, List_t* l1, List_t* l2) {
 
 	int i, j, indiceMin;
 	float distMin, dis;
@@ -188,7 +188,7 @@ void SHL_avoir2(Shell_t* s, List_t* l1, List_t* l2) {
 		if (flag(atom(s, indiceMin)) != 1)
 			SHL_addEdge(s, elts(l2,i), indiceMin);
 	}
-}
+}*/
 
 List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 
@@ -196,7 +196,7 @@ List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 	List_t* out = LST_create();
 	AtomShl_t* a = atom(s, id);
 
-	if (flag(a) == 0 || flag(a) == 1) {
+	if (flag(a) == SHELL_F || flag(a) == LINKABLE_F) {
 		LST_addElement(out, id);
 		return out;
 	}
@@ -211,7 +211,7 @@ List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 }
 
 //remplacement de avoir2
-void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
+/*void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
 
 	int i, j, indiceMin;
 	float distMin, dis;
@@ -237,7 +237,7 @@ void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
 	}
 
 	LST_delete(border);
-}
+}*/
 
 
 void SHL_addCycle(Shell_t* s, unsigned id) {
@@ -328,6 +328,45 @@ Shell_t* SHL_copy(Shell_t* s) {
 	return copy;
 }
 
+Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les atomes de flag 0 et -1
+
+	int cpt = 0;
+	int pos = 0;
+	Shell_t* copy = malloc(sizeof(Shell_t));
+
+	size(copy) = SHL_nbAtom(s);
+	copy->atoms = malloc(size(copy)*sizeof(AtomShl_t));
+	copy->cycle = LST_copy(s->cycle);
+	copy->bond = GPH_copy(s->bond);
+
+	int* mod_pos_nei;
+	mod_pos_nei = malloc(size(s)*sizeof(int));
+
+	for (int i=0; i<size(s); i++) {
+		if ((flag(atom(s,i)) == NOT_DEF_F)){
+			cpt++;
+		}
+		else{
+			mod_pos_nei[i] = cpt;
+			flag(atom(copy,pos)) = flag(atom(s,i));
+			coords(atom(copy,pos)) = coords(atom(s,i));
+			parentAtom(atom(copy,pos)) = parentAtom(atom(s,i));
+			//neighborhood(atom(copy,pos)) = LST_copy(neighborhood(atom(s,i)));
+			pos++;
+		}
+	}
+
+	pos = 0;
+	for(int i=0; i<size(s); i++) {
+		if ((flag(atom(s,i)) != NOT_DEF_F)){
+			neighborhood(atom(copy,pos)) = LST_copyWithShift(neighborhood(atom(s,i)),mod_pos_nei);
+			pos++;
+		}
+	}
+	free(mod_pos_nei);
+	return copy;
+}
+
 //Approxiation des distances
 //Création d'un shell de sommets.
 /*Shell_t* SHL_avoir(Shell_t* s) {
@@ -349,7 +388,7 @@ Shell_t* SHL_copy(Shell_t* s) {
 			B = atom(s, neighbor(A,j));
 			if (i < neighbor(A,j)) {
 				AB = dist(coords(A), coords(B));
-				nb = roundf(AB/SIMPLE);
+				nb = roundf(AB/DIST_SIMPLE);
 				dis = AB/nb;
 
 				for (k=1; k<nb; k++)
@@ -369,15 +408,25 @@ Shell_t* SHL_copy(Shell_t* s) {
 void SHL_testDis(Shell_t* s) {
 
 int i, j;
-	for (i=0; i<size(s); i++) {
-
-		if (flag(atom(s,i)) != -1 && flag(atom(s,i)) != 2)
-			for (j=i+1; j<size(s); j++) {
-				if (flag(atom(s,j)) != -1 && flag(atom(s,j)) != 2) {
-					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS)
-						SHL_mergeAtom2(s, i, j);
+	for (i = 0; i < size(s); i++) {
+		if (flag(atom(s,i)) != NOT_DEF_F && flag(atom(s,i)) != CYCLE_F && flag(atom(s,i)) != SHELL_F) {
+			for (j = i + 1; j < size(s); j++) {
+				if (flag(atom(s,j)) != NOT_DEF_F && flag(atom(s,j)) != CYCLE_F && flag(atom(s,j)) != SHELL_F) {
+					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS) {
+						if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == HYDRO_BOND_F) {
+							SHL_removeAtom(s, i);
+						}
+						else if (flag(atom(s,i)) == HYDRO_BOND_F && flag(atom(s,j)) == LINKABLE_F) {
+							SHL_removeAtom(s, j);
+						}else {
+							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) 
+								flag(atom(s,i)) = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
+							SHL_mergeAtom2(s, i, j);
+						}
+					}
 				}
 			}
+		}
 	}
 }
 

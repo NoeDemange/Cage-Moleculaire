@@ -1,8 +1,14 @@
 #include "generation.h"
-#include "utile.h"
+#include "util.h"
 #include "output.h"
 
-void generationDep(Main_t* m) {
+
+/**
+ * @brief Creation of the beginning of cages according to the dependencies.
+ * 
+ * @param m Grouping of the main structures (substrate and envelope).
+ */
+void generateDependancies(Main_t* m) {
 
 	unsigned i, j, copy;
 	Shell_t* mo;
@@ -32,31 +38,29 @@ void generationDep(Main_t* m) {
 		
 	}
 	//printf("mocSize %d\n", mocSize(m));
-
-	//Création des différents moc en fonction des types de D/A.
 }
 
-void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
+/*void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
 
-	int i, indice = idv;
+	int i, index = idv;
 	float min, distance;
 	AtomShl_t *v = atom(m,idv), *s;
 
 	if (size(l) > 0 && elts(l,0) != -1) {
 		min = dist(coords(v), coords(atom(m, elts(l,0))));
-		indice = 0;
+		index = 0;
 	}
 
-	for (i=1; i<size(l) && elts(l,i) != -1; i++) {
+	for (i = 1; forEachElement(l, i); i++) {
 		distance = dist(coords(v), coords(atom(m, elts(l,i))));
 		if (min > distance) {
 			min = distance;
-			indice = i;
+			index = i;
 		}
 	}
 
-	if (indice != idv && min < MINDIS) {
-		s = atom(m, indice);
+	if (index != idv && min < MINDIS) {
+		s = atom(m, index);
 
 		while (neighbor(s,0) != -1){
 			LST_addElement(l,neighbor(s,0));
@@ -67,113 +71,142 @@ void checkInsertVertex(Shell_t* m, List_t* l, unsigned idv) {
 		SHL_removeVertex(m, idv);
 	}
 
-}
+}*/
 
-void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+/**
+ * @brief Insert an acceptor hydrogen pattern with a triangular geometry.
+ * 
+ * @param m Envelope with the beginning of the cage.
+ * @param idv Index of the heteroatom involved in the H-bond.
+ * @param normal Normal vector starting point.
+ * @param dir Direction (terminal point) of the normal vector.
+ */
+void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
-	int indice;
+	int index;
 	Point_t new_coords;
 	AtomShl_t* v = atom(m,idv);
 	List_t* l = LST_create();
 
-	flag(v) = 3;
-	dir = subPoint(initPoint(0), normalization(dir, SIMPLE));
+	flag(v) = HYDRO_BOND_F;
+	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
 
-	//Insérer tous les voisins de v dans la liste.
-	while (neighbor(v,0) != -1){
+	// Remove the edges between v and its neighbors and add them to the list.
+	while (neighbor(v,0) != -1) {
 		LST_addElement(l,neighbor(v,0));
 		SHL_removeEdge(m, idv, neighbor(v,0));
 	}
 
 	//Position du deuxième : (rotation de normal, 120, -dir) + coords(v)
 	new_coords = addPoint(coords(v), rotation(normal, 120, dir));
-	indice = SHL_addAtom(m, new_coords, -1);
+	index = SHL_addAtom(m, new_coords, -1);
 
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idv, indice);
-	if (flag(atom(m,indice)) < 2)
-		flag(atom(m,indice)) = 1;
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idv, index);
+	if (flag(atom(m,index)) < LINKABLE_F)
+		flag(atom(m,index)) = LINKABLE_F;
 	
 	v = atom(m,idv);
 	
 	//Position du troisième : (rotation de normal, -120, -dir) + coords(v)
 	new_coords = addPoint(coords(v), rotation(normal, -120, dir));
-	indice = SHL_addAtom(m, new_coords, -1);
+	index = SHL_addAtom(m, new_coords, -1);
 
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idv, indice);
-	if (flag(atom(m,indice)) < 2)
-		flag(atom(m,indice)) = 1;
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idv, index);
+	if (flag(atom(m,index)) < LINKABLE_F)
+		flag(atom(m,index)) = LINKABLE_F;
 
 	//Rattacher les nouveaux sommets à ceux de la liste l.
-	SHL_linkBorder(m, idv, l);
+	//SHL_linkBorder(m, idv, l);
 
 	LST_delete(l);
 }
 
-void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+/**
+ * @brief Insert a donor hydrogen pattern with a triangular geometry.  
+ * 
+ * @param m Envelope with the beginning of the cage.
+ * @param idv Index of the hydrogen involved in the H-bond.
+ * @param normal Normal vector starting point.
+ * @param dir Direction (terminal point) of the normal vector.
+ */
+void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
-	int indice, idc;
+	int index, idc;
 	Point_t new_coords;
 	AtomShl_t* v = atom(m, idv), *c;
-	List_t* l = LST_create();
+	List_t* neighborsFirstAtom = LST_create();
 
-	flag(v) = 3;
+	flag(v) = HYDRO_BOND_F;
 
-	//Insérer tous les voisins de v dans la liste.
-	while (neighbor(v,0) != -1){
-		LST_addElement(l,neighbor(v,0));
+	// Remove the edges between v and its neighbors and add them to the list.
+	while (neighbor(v,0) != -1) {
+		LST_addElement(neighborsFirstAtom, neighbor(v,0));
 		SHL_removeEdge(m, idv, neighbor(v,0));
 	}
 
-
 	//Position du deuxième sommet : centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
-	dir = normalization(dir, (SIMPLE/2)+(MINDIS/2));
+	dir = normalization(dir, (DIST_SIMPLE / 2) + (MINDIS / 2));
 	new_coords = addPoint(coords(v), dir);
+	for (int i = 0; i < size(m); i++) {
+		if (flag(atom(m, i)) == HYDRO_BOND_F && dist(coords(atom(m, i)),new_coords) < MINDIS) {
+			flag(v) = SHELL_F;
+			return;
+		}
+	}
 	idc = SHL_addAtom(m, new_coords, -1);
 
 	//checkInsertVertex(m, l, idc);
 	SHL_addEdge(m, idv, idc);
 	c = atom(m,idc);
-	flag(c) = 3;
+	flag(c) = HYDRO_BOND_F;
 
 	//Position du deuxième : (rotation de normal, 120, -dir) + coords(v)
-	dir = subPoint(initPoint(0), normalization(dir, SIMPLE));
+	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
 	new_coords = addPoint(coords(c), rotation(normal, 120, dir));
-	indice = SHL_addAtom(m, new_coords, -1);
+	index = SHL_addAtom(m, new_coords, -1);
 
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idc, indice);
-	if (flag(atom(m,indice)) < 2)
-		flag(atom(m,indice)) = 1;
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idc, index);
+	if (flag(atom(m,index)) < LINKABLE_F)
+		flag(atom(m,index)) = LINKABLE_F;
 
 	//Position du troisième : (rotation de normal, 120, -dir) + coords(v)
 	new_coords = addPoint(coords(c), rotation(normal, -120, dir));
-	indice = SHL_addAtom(m, new_coords, -1);
+	index = SHL_addAtom(m, new_coords, -1);
 
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idc, indice);
-	if (flag(atom(m,indice)) < 2)
-		flag(atom(m,indice)) = 1;
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idc, index);
+	if (flag(atom(m,index)) < LINKABLE_F)
+		flag(atom(m,index)) = LINKABLE_F;
 
 	//Rattacher les nouvaux sommets à ceux de la liste l.
-	SHL_linkBorder(m, idc, l);
+	//SHL_linkBorder(m, idc, l);
 	
-	LST_delete(l);
+	LST_delete(neighborsFirstAtom);
 }
 
-void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+/**
+ * @brief Insert a donor hydrogen pattern with a tetrahedral geometry.  
+ * 
+ * @param m Envelope with the beginning of the cage.
+ * @param idv Index of the hydrogen involved in the H-bond.
+ * @param normal Normal vector starting point.
+ * @param dir Direction (terminal point) of the normal vector.
+ */
+void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
-	int indice, idc;
+	int index, idc;
 	Point_t x1, x2, x3, x4;
 	AtomShl_t* v = atom(m, idv), *c;
 	List_t* l = LST_create();
 
-	flag(v) = 3;
+	flag(v) = HYDRO_BOND_F;
 
 	//Insérer tous les voisins de v dans la liste.
-	while (neighbor(v,0) != -1){
+	while (neighbor(v,0) != -1) {
 		LST_addElement(l,neighbor(v,0));
 		SHL_removeEdge(m, idv, neighbor(v,0));
 	}
@@ -182,157 +215,189 @@ void insertAcceptor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 
 	//Position du deuxième sommet : centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
-	dir = normalization(dir, (SIMPLE/2)+(MINDIS/2));
+	dir = normalization(dir, (DIST_SIMPLE/2)+(MINDIS/2));
 	x2 = addPoint(coords(v), dir);
+	for (int l = 0; l< size(m); l++){
+		if(flag(atom(m,l)) == HYDRO_BOND_F && dist(coords(atom(m,l)),x2) < MINDIS){
+			flag(v) = SHELL_F;
+			return;
+		}
+	}
 	idc = SHL_addAtom(m, x2, -1);
 
 	//checkInsertVertex(m, l, idc);
 	SHL_addEdge(m, idv, idc);
 	c = atom(m,idc);
-	flag(c) = 3;
+	flag(c) = HYDRO_BOND_F;
 
 	//Deuxième sommet du tétraèdre
-	//x2 = AX1E3(coords(c), x1, normal, SIMPLE);
+	//x2 = AX1E3(coords(c), x1, normal, DIST_SIMPLE);
 	x2 = normalization(vector(x1, coords(c)), 1);
 	x2 = rotation(normal, 109.47, x2);
-	x2 = normalization(x2, SIMPLE);
+	x2 = normalization(x2, DIST_SIMPLE);
 	x2 = addPoint(coords(c), x2);
-	indice = SHL_addAtom(m, x2, -1);
+	index = SHL_addAtom(m, x2, -1);
 
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idc, indice);
-	flag(atom(m,indice)) = 1;
-
-	//Troisième sommet du tétraèdre
-	x3 = AX2E2(coords(c), x1, x2, SIMPLE);
-	indice = SHL_addAtom(m, x3, -1);
-
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idc, indice);
-	flag(atom(m,indice)) = 1;
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idc, index);
+	flag(atom(m,index)) = LINKABLE_F;
 
 	//Troisième sommet du tétraèdre
-	x4 = AX3E1(coords(c), x1, x2, x3, SIMPLE);
-	indice = SHL_addAtom(m, x4, -1);
+	x3 = AX2E2(coords(c), x1, x2, DIST_SIMPLE);
+	index = SHL_addAtom(m, x3, -1);
 
-	//checkInsertVertex(m, l, indice);
-	SHL_addEdge(m, idc, indice);
-	flag(atom(m,indice)) = 1;
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idc, index);
+	flag(atom(m,index)) = LINKABLE_F;
+
+	//Troisième sommet du tétraèdre
+	x4 = AX3E1(coords(c), x1, x2, x3, DIST_SIMPLE);
+	index = SHL_addAtom(m, x4, -1);
+
+	//checkInsertVertex(m, l, index);
+	SHL_addEdge(m, idc, index);
+	flag(atom(m,index)) = LINKABLE_F;
 
 	//Rattacher les nouvaux sommets à ceux de la liste l.
-	SHL_linkBorder(m, idc, l);
+	//SHL_linkBorder(m, idc, l);
 	
 	LST_delete(l);
 }
 
-void generationHydro(Main_t* m) {
+/**
+ * @brief Add donor or acceptor hydrogen patterns to the beginning of the cage.
+ * 
+ * @param m Grouping of the main structures (substrate and envelope).
+ */
+void generateHydrogenPattern(Main_t* m) {
 
-	int i, j, idv;
-	AtomShl_t *v;
-	Atom_t *parent;
+	AtomShl_t *atomShell;
+	Atom_t *parentAtomSub;
 
-	for (i=0; i<1/*mocSize(m)*/; i++) {
-		for (j=0; j<size(bond(moc(m,i))); j++) {
-			idv = id(vertex(bond(moc(m,i)),j));
+	//TODO choose to keep the loop to make the dependencies graph
+	for (int i = 0; i < 1/*mocSize(m)*/; i++) {
+		for (int j = 0; j < size(bond(moc(m, i))); j++) {
+			// Get the atom id from the dependency graph
+			int idAtomShell = id(vertex(bond(moc(m, i)), j));
 
-			if (idv != -1) {
-				//printf("idv = %d\n", idv);
-				v = atom(moc(m,i), idv);
-				parent = atom(substrat(m), parentAtom(v));
-				if (!strcmp(symbol(parent), "H")) {
-					insertDonor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+			if (idAtomShell != -1) {
+				atomShell = atom(moc(m,i), idAtomShell);
+				int tooClose = 1;
+				for (int l = 0; l< size(moc(m,i)); l++) {
+					if(flag(atom(moc(m, i), l)) == HYDRO_BOND_F && dist(coords(atom(moc(m, i), l)), coords(atomShell)) < MINDIS) {
+						tooClose = 0;
+						break;
+					}
 				}
-				else {
-					if (steric(parent) == 3)
-						insertAcceptor1(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
-					else
-						insertAcceptor2(moc(m,i), idv, MOL_seekNormal(substrat(m), parentAtom(v), -1), vector(coords(parent), coords(v)));
+				if(tooClose) {
+					parentAtomSub = atom(substrat(m), parentAtom(atomShell));
+					if (!strcmp(symbol(parentAtomSub), "H")) {
+						insertAcceptor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
+							vector(coords(parentAtomSub), coords(atomShell)));
+					}
+					else {
+						int haveTriangularGeometry = (steric(parentAtomSub) == 3);
+						if (haveTriangularGeometry) {
+							insertDonor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
+								vector(coords(parentAtomSub), coords(atomShell)));
+						}
+						else {
+							insertDonor2(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
+								vector(coords(parentAtomSub), coords(atomShell)));
+						}
+					}
 				}
 			}
 		}
-
 		SHL_testDis(moc(m,i));
 	}
 }
 
+/**
+ * @brief Add aromatic rings to the envelope.
+ * 
+ * The function find for each atom involved in a cycle
+ * if it can be part of a triangular pattern,
+ * then add the pattern to the envelpe.
+ * 
+ * @param s Envelope of the substrate.
+ */
+void generateCycle(Shell_t* s) {
+	AtomShl_t* atom;
+	List_t* neighborsNotInCycle;
+	List_t* atomsInCycle = LST_create();
 
-void generationCycle(Shell_t* s) {
-	int i, j;
-	AtomShl_t* a;
-	List_t* nei;
-	List_t* atomT = LST_create();
-
-	for (i = 0; i < size(s); i++) {
-		if (flag(atom(s,i)) != -1) {
+	// Find the atoms of the shell involved in a cycle.
+	for (int i = 0; i < size(s); i++) {
+		if (flag(atom(s, i)) != NOT_DEF_F) {
 			if (cycle(s, i)) {	
-				LST_addElement(atomT, i);
+				LST_addElement(atomsInCycle, i);
 			}
 		}
 	}
-	for (i = 0; i < size(atomT) && elts(atomT,i) != -1; i++) {
-		a = atom(s, elts(atomT,i));
-		nei = LST_create();
 
-		//pour tous les voisins de a
-		for (j = 0; j < neighborhoodSize(a) && neighbor(a,j) != -1; j++) {
+	for (int i = 0; forEachElement(atomsInCycle, i); i++) {
+		atom = atom(s, elts(atomsInCycle,i));
+		neighborsNotInCycle = LST_create();
 
-			if (!LST_check(atomT, neighbor(a,j)) ||
-			dist(coords(a), coords(atom(s,neighbor(a,j)))) > 1.7) {
-				LST_addElement(nei,neighbor(a,j));
+		// Find the neighbors of the atom not involved in a cycle.
+		for (int j = 0; forEachNeighbor(atom, j); j++) {
+			if (!LST_check(atomsInCycle, neighbor(atom, j)) ||
+			dist(coords(atom), coords(atom(s, neighbor(atom, j)))) > MAXDIS_CYCLE) {
+				LST_addElement(neighborsNotInCycle,neighbor(atom, j));
 			}
 		}
-		//S'il existe au moins deux voisins de a pouvant participés au motif.
-		if (SHL_nbNeighborhood(a) - LST_nbElements(nei) > 1) {
 
-			//Retirer les anciens liens entre l'atome et ses voisins
-			for (j = 0; j < size(nei) && elts(nei,j) != -1; j++) {
-				SHL_removeEdge(s, elts(atomT,i), elts(nei,j));
+		int haveEnoughNeighborsInCycle = (SHL_nbNeighborhood(atom) - LST_nbElements(neighborsNotInCycle) >= 2);
+		if (haveEnoughNeighborsInCycle) {
+			// Remove old link between the atom (i) and its neighbors (j).
+			for (int j = 0; forEachElement(neighborsNotInCycle, j); j++) {
+				SHL_removeEdge(s, elts(atomsInCycle,i), elts(neighborsNotInCycle,j));
 			}
-			flag(a) = 2;
-			if (SHL_nbNeighborhood(a) == 2) {
-				int id = -1;
-				Point_t newCoords = autre(coords(a), coords(atom(s,neighbor(a,0))),
-							coords(atom(s,neighbor(a,1))), 1.4);
-				id = SHL_addAtom(s, newCoords, -1);
+			flag(atom) = CYCLE_F;
+			if (SHL_nbNeighborhood(atom) == 2) {
+				int idNewNeigbor = -1;
+				Point_t newNeighborPoint = addThirdPoint(coords(atom), coords(atom(s, neighbor(atom, 0))),
+							coords(atom(s, neighbor(atom, 1))), SIMPLE_CYCLE);
+				idNewNeigbor = SHL_addAtom(s, newNeighborPoint, -1);
 
-				for (j=0; j<size(s); j++)
-					if (flag(atom(s,j)) != -1 &&
-					dist(newCoords, coords(atom(s,j))) < 0.7){
-						if (LST_check(nei, j)) LST_removeElement(nei, j);
-						if (cycle(s,j)) LST_addElement(atomT, id);
-						SHL_mergeAtom(s, id, j);
-						//S'il le sommet appartenant à la liste de cycle il faut le rajouter dans atomT
+				for (int j = 0; j < size(s); j++) {
+					if (flag(atom(s, j)) != NOT_DEF_F && dist(newNeighborPoint, coords(atom(s, j))) < MINDIS_CYCLE) {
+						if (LST_check(neighborsNotInCycle, j)) {
+							LST_removeElement(neighborsNotInCycle, j);
+						}
+						if (cycle(s, j)) {
+							//TODO remove this condition unless needed
+							LST_addElement(atomsInCycle, idNewNeigbor);
+						}
+						if (flag(atom(s, j)) != SHELL_F) {
+							SHL_mergeAtom(s, idNewNeigbor, j);
+						}
 					}
-				if (flag(atom(s,id)) < 2) flag(atom(s,id)) = 1;
-
-				//si autre sommet trop proche newCoord == coords(sommet)
-
-				//Ajoute les arêtes entre le nouveau sommet et i	
-				SHL_addEdge(s, elts(atomT,i), id);
+				}
+				if (flag(atom(s, idNewNeigbor)) <= LINKABLE_F) {
+					flag(atom(s, idNewNeigbor)) = LINKABLE_F;
+				}
+				SHL_addEdge(s, elts(atomsInCycle, i), idNewNeigbor);
 			}
-
-			SHL_linkBorder(s, elts(atomT,i), nei);
+			//SHL_linkBorder(s, elts(atomT,i), nei);
 		}
-		LST_delete(nei);
+		LST_delete(neighborsNotInCycle);
 	}
-	LST_delete(atomT);
+	LST_delete(atomsInCycle);
 }
 
-void generationMoc(Main_t* m) {
+void generatePathlessCages(Main_t* m) {
 
-	//unsigned idMoc = MN_copyMoc(m, envelope(m));
-	//printf("idMoc %d\n", idMoc);
-
-	//SHL_write(moc(m, idMoc));
 	envarom(m) = SHL_copy(envelope(m));
-	//generationDep(m);
-	printf("### Génération des motifs aromatiques ###\n");
-	generationCycle(envarom(m));
+	//generateDependancies(m);
+	printf("### Aromatic rings generation ###\n");
+	generateCycle(envarom(m));
 	//SHL_write(envarom(m));
 
-	printf("### Génération des motifs hydrogènes ###\n");
+	printf("### Hydrogen patterns generation ###\n");
 	MN_copyMoc(m, envarom(m));
-	generationDep(m);
-	generationHydro(m);
+	generateDependancies(m);
+	generateHydrogenPattern(m);
 
 }

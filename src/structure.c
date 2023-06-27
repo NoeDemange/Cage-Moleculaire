@@ -25,7 +25,7 @@ Graph_t* ShlToGph(Shell_t* s) {
 
 	for (i=0; i<size(s); i++) {
 
-		if (flag(atom(s,i)) != -1) {
+		if (flag(atom(s,i)) != NOT_DEF_F) {
 
 			GPH_addVertex(g, i);
 			for (j=0; j<neighborhoodSize(atom(s,i)); j++) {

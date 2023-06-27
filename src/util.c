@@ -1,4 +1,4 @@
-#include "utile.h"
+#include "util.h"
 #include <math.h>
 
 float radianToDegre(float a) {
@@ -137,7 +137,16 @@ Point_t rotation(Point_t vec, float alpha, Point_t A) {
 	return rot;
 }
 
-Point_t autre(Point_t A, Point_t B, Point_t C, float scal) {
+/**
+ * @brief Add the third point to a triangular pattern around a point. 
+ * 
+ * @param A The point at the center of the pattern.
+ * @param B The first point at the edge of the triangular pattern.
+ * @param C The second point at the edge of the triangular pattern.
+ * @param scal The distance between A and the new third point.
+ * @return Point_t The third point at the edge to add.
+ */
+Point_t addThirdPoint(Point_t A, Point_t B, Point_t C, float scal) {
 	Point_t normal;
 
 	normal.x = 2 * A.x - B.x - C.x;
