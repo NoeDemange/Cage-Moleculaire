@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 	/*********************************** Infos *****/
 
 	printf("\n####### Informations #######\n");
-	printf("  - Substrate : %s\n  - Alpha : %.1f\n  - Maximum size of a path (in atoms) : %d\n  - Maximum number of results : %d\n",
+	printf("  - Substrate : %s\n  - Alpha : %.1f\n  - Maximum size of a path (in patterns) : %d\n  - Maximum number of results : %d\n",
 					 options.input, options.alpha, options.sizeMax, options.maxResults);
 
 	Main_t* m = MN_create();
