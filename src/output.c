@@ -229,6 +229,8 @@ void SHL_writeMol2(char* output, Shell_t* s) {
         ret = fprintf(filestream, " %3d N", j);
       else if (flag(atom(s,i)) == CARBON_F)
         ret = fprintf(filestream, " %3d C", j);
+      else if (flag(atom(s,i)) == HYDROGEN_F)
+        ret = fprintf(filestream, " %3d H", j);
       else 
         ret = fprintf(filestream, " %3d Al", j);
       ret = fprintf(filestream, "   %3.4f", atomX(atom(s,i)));
@@ -252,6 +254,8 @@ void SHL_writeMol2(char* output, Shell_t* s) {
         ret = fprintf(filestream, "   N\n");
       else if (flag(atom(s,i)) == CARBON_F)
         ret = fprintf(filestream, "   C\n");
+      else if (flag(atom(s,i)) == HYDROGEN_F)
+        ret = fprintf(filestream, "   H\n");
       else 
         ret = fprintf(filestream, "   Al\n");
       j++;

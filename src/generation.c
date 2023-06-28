@@ -148,7 +148,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 
 	//Position du deuxième sommet : centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
-	dir = normalization(dir, (DIST_SIMPLE / 2) + (MINDIS / 2));
+	dir = normalization(dir, DIST_ATOM_H);
 	new_coords = addPoint(coords(v), dir);
 	for (int i = 0; i < size(m); i++) {
 		if (flag(atom(m, i)) == HYDRO_BOND_F && dist(coords(atom(m, i)),new_coords) < MINDIS) {
@@ -215,7 +215,7 @@ void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 
 	//Position du deuxième sommet : centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
-	dir = normalization(dir, (DIST_SIMPLE/2)+(MINDIS/2));
+	dir = normalization(dir, DIST_ATOM_H);
 	x2 = addPoint(coords(v), dir);
 	for (int l = 0; l< size(m); l++){
 		if(flag(atom(m,l)) == HYDRO_BOND_F && dist(coords(atom(m,l)),x2) < MINDIS){

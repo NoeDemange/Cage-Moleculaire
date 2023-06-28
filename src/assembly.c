@@ -46,8 +46,11 @@ int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
 void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, Point_t newStartPos, Molecule_t* sub) {
 	
 	for (int i = 0; forEachNeighbor((atom(processedMoc,idStart)), i); i++) { // For every possible plans with starting atom's neighbors
-		int idNext, idAtomCycle;
+		int idNext = -1;
+		int idAtomCycle = -1;
 		Point_t nextPos;
+		Point_t hydrogen;
+		Point_t hydrogen2;
 		Point_t copyNewStartPos = newStartPos;
 		Shell_t* moc = SHL_copy(processedMoc);
 			
@@ -74,11 +77,25 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		idAtomCycle = SHL_addAtom(moc, copyNewStartPos, -1);
 		flag(atom(moc, idAtomCycle)) = CARBON_F;
 		SHL_addEdge(moc, idnewStart, idAtomCycle);
-			
+
 		int idNeighbor = idAtomCycle;
 		for (int i = 0; i < 4; i++) {
 			neighborStartPos = coords(atom(moc, neighbor(atom(moc, idNeighbor), 0)));
 			copyNewStartPos = AX1E2(copyNewStartPos, neighborStartPos, normal, SIMPLE_CYCLE);
+			if(i!=2){
+				hydrogen = AX2E1(coords(atom(moc, idNeighbor)), neighborStartPos, copyNewStartPos, DIST_ATOM_H);
+				if (isHindered(moc, sub, hydrogen)) {
+					SHL_delete(moc);
+					return;
+				}
+			}
+			if(i==3){
+				hydrogen2 = AX2E1(copyNewStartPos, coords(atom(moc, idNeighbor)), coords(atom(moc, idnewStart)), DIST_ATOM_H);
+				if (isHindered(moc, sub, hydrogen2)) {
+					SHL_delete(moc);
+					return;
+				}
+			}
 			if (isHindered(moc, sub, copyNewStartPos)) {
 				SHL_delete(moc);
 				return;
@@ -86,7 +103,17 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 			idAtomCycle = SHL_addAtom(moc, copyNewStartPos, -1);
 			flag(atom(moc, idAtomCycle)) = CARBON_F;
 			SHL_addEdge(moc, idNeighbor, idAtomCycle);
-				
+			if(i!=2){
+				int idHydrogen = SHL_addAtom(moc, hydrogen, -1);
+				flag(atom(moc, idHydrogen)) = HYDROGEN_F;
+				SHL_addEdge(moc, idNeighbor, idHydrogen);
+			}
+			if(i==3){
+				int idHydrogen2 = SHL_addAtom(moc, hydrogen2, -1);
+				flag(atom(moc, idHydrogen2)) = HYDROGEN_F;
+				SHL_addEdge(moc, idAtomCycle, idHydrogen2);
+				}
+
 			if (i == 1) {// Position the next starting atom to continue the path.
 				nextPos = copyNewStartPos;
 				idNext = idAtomCycle;
@@ -100,7 +127,7 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		neighborStartPos = coords(atom(moc, neighbor(atom(moc, idNext), 0)));
 		Point_t v2 = coords(atom(moc, neighbor(atom(moc, idNext), 1)));
 		copyNewStartPos = AX2E1(nextPos, neighborStartPos, v2, DIST_SIMPLE); 
-		if (isHindered(moc, sub, copyNewStartPos) == 1) {
+		if (isHindered(moc, sub, copyNewStartPos)) {
 			SHL_delete(moc);
 			return;
 		}
@@ -221,7 +248,7 @@ void projectionC_AX2E2(Shell_t* processedMoc, List_m* mocsInProgress, int idStar
 	
 	Point_t newStartPos2 = AX3E1(coords(atom(processedMoc, idStart)), coords(atom(processedMoc, idFirstNeighbor)), coords(atom(processedMoc, idSecondNeighbor)), newStartPos, DIST_SIMPLE);
 	
-	if (!isHindered(processedMoc, sub, newStartPos2) == 0) {
+	if (!isHindered(processedMoc, sub, newStartPos2)) {
 		addProjection(processedMoc, mocsInProgress, idStart, newStarts, numPattern, newStartPos2, sub);
 	}
 }

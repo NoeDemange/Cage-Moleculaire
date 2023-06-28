@@ -21,6 +21,7 @@
 #define DIST_SIMPLE 1.5 // Simple covalent bond size.
 #define DIST_ERROR 0.5 // Acceptable error for the covalent bond size. 
 #define MINDIS 0.75 // Minimal distance bewteen two atoms (otherwise they are merged).
+#define DIST_ATOM_H (DIST_SIMPLE/2)+(MINDIS/2) // Distance between one atom and an atom of hydrogen.
 #define DIST_GAP_CAGE 1.34 // Distance between two cage's atoms (defined by trial).
 #define DIST_GAP_SUBSTRATE 1.8 // Distance between an atom of the cage and an atom of the substrate (at least a hydrogen bond size by trial).
 #define DIST_SIMPLE_PATTERN 1.22 // AC/2, with ABC a triangle where each of its vertex is an atom of the path involved in a simple pattern, AB = BC = 1.5 and angle ABC = 109°C.
@@ -41,7 +42,7 @@ A___/   \___B
 #define MAXDIS_CYCLE 1.7 // Maximal distance between two atoms of a cycle (otherwise they can't be both in the same cycle).
 
 // Angle
-#define END_ANGLE 109
+#define END_ANGLE 109.47
 #define ANGLE_ERROR 10
 
 // Path choice
@@ -64,5 +65,6 @@ A___/   \___B
 #define CARBON_F 6
 #define NITROGEN_F 5
 #define OXYGEN_F 4
+#define HYDROGEN_F 7
 
 #endif
