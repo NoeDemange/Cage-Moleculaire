@@ -289,10 +289,8 @@ Point_t minDist(List_s* list, Point_t p) {
 	int distanceMin = INT_MAX;
 	Elem_s* l = list->first;
 	
-	while (l)
-	{
-		if (dist(l->position, p) < distanceMin)
-		{
+	while (l) {
+		if (dist(l->position, p) < distanceMin) {
 			min = l->position;
 			distanceMin = dist(l->position, p);
 		}

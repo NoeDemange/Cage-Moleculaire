@@ -413,10 +413,10 @@ int i, j;
 			for (j = i + 1; j < size(s); j++) {
 				if (flag(atom(s,j)) != NOT_DEF_F && flag(atom(s,j)) != CYCLE_F && flag(atom(s,j)) != SHELL_F) {
 					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS) {
-						if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == HYDRO_BOND_F) {
+						if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == HYDRO_PATTERN_F) {
 							SHL_removeAtom(s, i);
 						}
-						else if (flag(atom(s,i)) == HYDRO_BOND_F && flag(atom(s,j)) == LINKABLE_F) {
+						else if (flag(atom(s,i)) == HYDRO_PATTERN_F && flag(atom(s,j)) == LINKABLE_F) {
 							SHL_removeAtom(s, j);
 						}else {
 							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) 

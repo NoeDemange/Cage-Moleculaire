@@ -85,6 +85,7 @@ struct Element {
 typedef struct {
 	
 	Element *first;	
+	int size;
 
 } List_p;
 
