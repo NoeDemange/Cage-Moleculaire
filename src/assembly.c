@@ -351,9 +351,8 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
  * @param nbAroRings Number of aromatic rings recquiried.
  * @param inputFile Name of the substrate's file.
  * @param sizeMax Maximale size (in patterns) of a path.
- * @param startingMocSize Size (in atoms) of the cage before adding the path.
  */
-void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize, int forceCycle) {
+void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int forceCycle) {
 
 	/*************** Check distances bewteen atoms *****/
 	/*Point_t B = coords(atom(processedMoc, idStart));
@@ -386,7 +385,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 				nbAroRings++;
 			}
 			
-			if(sizeMax >= nbPatterns/*SHL_nbAtom(tempMocsInProg->first->moc) - startingMocSize*/) {
+			if(sizeMax >= nbPatterns) {
 				if (dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(processedMoc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
 					float trA = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))));
 					float trB = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc, idEnd)));
@@ -424,7 +423,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 					}
 				}
 				else if (nbAroRings < 3) {
-					generatePaths(m, mocsInProgress, tempMocsInProg->first->moc, newStarts->first->idAtom, idEnd, nbPatterns, nbAroRings, inputFile, sizeMax, startingMocSize, forceCycle);
+					generatePaths(m, mocsInProgress, tempMocsInProg->first->moc, newStarts->first->idAtom, idEnd, nbPatterns, nbAroRings, inputFile, sizeMax, forceCycle);
 				}
 			}
 			LSTm_removeFirst(tempMocsInProg);
@@ -588,7 +587,6 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 
-		int startingMocSize = SHL_nbAtom(mocsInProgress->first->moc);
 		List_p* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
 		
 		if (!startEndAtoms->first) { // If there is only one grouping of patterns left (connected cage).
@@ -621,7 +619,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 					}
 					Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 					flag(atom(appendedMoc, idStart)) = CARBON_F;
-					generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
+					generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle);
 					SHL_delete(appendedMoc);
 				}
 				LST2_removeFirst(startEndAtoms);
