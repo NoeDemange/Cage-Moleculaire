@@ -46,7 +46,8 @@ A___/   \___B
 #define ANGLE_ERROR 10
 
 // Path choice
-#define NUMBER_POSITION_AX1E3 2
+#define NUMBER_POSITION_AX1E3 3 //Number of position keep to make path
+#define ROTATION_ANGLE_AX1E3 15 //rotation angle to generate position (degree)
 
 /********* not to be modified (the incremental order must be preserved) */
 // Flags atoms in the envelope and cage

@@ -419,9 +419,22 @@ int i, j;
 						else if (flag(atom(s,i)) == HYDRO_BOND_F && flag(atom(s,j)) == LINKABLE_F) {
 							SHL_removeAtom(s, j);
 						}else {
-							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) 
+							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) {
 								flag(atom(s,i)) = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
-							SHL_mergeAtom2(s, i, j);
+								SHL_mergeAtom2(s, i, j);
+
+								Point_t hydrogen1 = AX2E2(coords(atom(s,i)), coords(atom(s,neighbor(atom(s,i),0))), coords(atom(s,neighbor(atom(s,i),1))), DIST_ATOM_H);
+								Point_t hydrogen2 = AX3E1(coords(atom(s,i)), coords(atom(s,neighbor(atom(s,i),0))), coords(atom(s,neighbor(atom(s,i),1))), hydrogen1, DIST_ATOM_H);
+								int idHydrogen = SHL_addAtom(s, hydrogen1, -1);
+								flag(atom(s, idHydrogen)) = HYDROGEN_F;
+								SHL_addEdge(s, i, idHydrogen);
+								idHydrogen = SHL_addAtom(s, hydrogen2, -1);
+								flag(atom(s, idHydrogen)) = HYDROGEN_F;
+								SHL_addEdge(s, i, idHydrogen);
+							}
+							else{
+								SHL_mergeAtom2(s, i, j);
+							}
 						}
 					}
 				}
