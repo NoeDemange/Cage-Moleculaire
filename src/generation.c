@@ -16,7 +16,7 @@ void generateDependancies(Main_t* m) {
 
 	//Création des différents moc en fonction des dépendances.
 	//mocSize change au fur et à mesure des itérations
-	for (i=0; i</*mocSize(m)*/1	; i++) { //Pour tous les mocs
+	for (i=0; i< /*mocSize(m)*/1; i++) { //Pour tous les mocs
 		mo = moc(m,i);
 		if (size(moc(m,i)) != 0) {
 			for (j=0; j<size(bond(moc(m,i))); j++) {//Pour tous les sommets
@@ -88,7 +88,7 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	AtomShl_t* v = atom(m,idv);
 	List_t* l = LST_create();
 
-	flag(v) = HYDRO_BOND_F;
+	flag(v) = HYDRO_PATTERN_F;
 	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
 
 	// Remove the edges between v and its neighbors and add them to the list.
@@ -138,7 +138,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	AtomShl_t* v = atom(m, idv), *c;
 	List_t* neighborsFirstAtom = LST_create();
 
-	flag(v) = HYDRO_BOND_F;
+	flag(v) = HYDRO_PATTERN_F;
 
 	// Remove the edges between v and its neighbors and add them to the list.
 	while (neighbor(v,0) != -1) {
@@ -151,7 +151,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	dir = normalization(dir, DIST_ATOM_H);
 	new_coords = addPoint(coords(v), dir);
 	for (int i = 0; i < size(m); i++) {
-		if (flag(atom(m, i)) == HYDRO_BOND_F && dist(coords(atom(m, i)),new_coords) < MINDIS) {
+		if (flag(atom(m, i)) == HYDRO_PATTERN_F && dist(coords(atom(m, i)),new_coords) < MINDIS) {
 			flag(v) = SHELL_F;
 			return;
 		}
@@ -161,7 +161,7 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//checkInsertVertex(m, l, idc);
 	SHL_addEdge(m, idv, idc);
 	c = atom(m,idc);
-	flag(c) = HYDRO_BOND_F;
+	flag(c) = HYDRO_PATTERN_F;
 
 	//Position du deuxième : (rotation de normal, 120, -dir) + coords(v)
 	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
@@ -203,7 +203,7 @@ void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	AtomShl_t* v = atom(m, idv), *c;
 	List_t* l = LST_create();
 
-	flag(v) = HYDRO_BOND_F;
+	flag(v) = HYDRO_PATTERN_F;
 
 	//Insérer tous les voisins de v dans la liste.
 	while (neighbor(v,0) != -1) {
@@ -217,8 +217,8 @@ void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, DIST_ATOM_H);
 	x2 = addPoint(coords(v), dir);
-	for (int l = 0; l< size(m); l++){
-		if(flag(atom(m,l)) == HYDRO_BOND_F && dist(coords(atom(m,l)),x2) < MINDIS){
+	for (int l = 0; l < size(m); l++) {
+		if(flag(atom(m,l)) == HYDRO_PATTERN_F && dist(coords(atom(m,l)),x2) < MINDIS){
 			flag(v) = SHELL_F;
 			return;
 		}
@@ -228,7 +228,7 @@ void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
 	//checkInsertVertex(m, l, idc);
 	SHL_addEdge(m, idv, idc);
 	c = atom(m,idc);
-	flag(c) = HYDRO_BOND_F;
+	flag(c) = HYDRO_PATTERN_F;
 
 	//Deuxième sommet du tétraèdre
 	//x2 = AX1E3(coords(c), x1, normal, DIST_SIMPLE);
@@ -271,39 +271,40 @@ void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
  */
 void generateHydrogenPattern(Main_t* m) {
 
-	AtomShl_t *atomShell;
-	Atom_t *parentAtomSub;
+	AtomShl_t *atomCage;
+	Atom_t *parentAtom; // Corresponding atom in the substrate.
 
 	//TODO choose to keep the loop to make the dependencies graph
-	for (int i = 0; i < 1/*mocSize(m)*/; i++) {
+	for (int i = 0; i < /*mocSize(m)*/1; i++) {
 		for (int j = 0; j < size(bond(moc(m, i))); j++) {
 			// Get the atom id from the dependency graph
-			int idAtomShell = id(vertex(bond(moc(m, i)), j));
+			int idAtomCage = id(vertex(bond(moc(m, i)), j));
 
-			if (idAtomShell != -1) {
-				atomShell = atom(moc(m,i), idAtomShell);
-				int tooClose = 1;
-				for (int l = 0; l< size(moc(m,i)); l++) {
-					if(flag(atom(moc(m, i), l)) == HYDRO_BOND_F && dist(coords(atom(moc(m, i), l)), coords(atomShell)) < MINDIS) {
-						tooClose = 0;
+			if (idAtomCage != -1) {
+				atomCage = atom(moc(m,i), idAtomCage);
+				int idParentAtom = parentAtom(atomCage);
+				int tooClose = 0;
+				for (int k = 0; k < size(moc(m,i)); k++) {
+					if(flag(atom(moc(m, i), k)) == HYDRO_PATTERN_F && dist(coords(atom(moc(m, i), k)), coords(atomCage)) < MINDIS) {
+						tooClose = 1;
 						break;
 					}
 				}
-				if(tooClose) {
-					parentAtomSub = atom(substrat(m), parentAtom(atomShell));
-					if (!strcmp(symbol(parentAtomSub), "H")) {
-						insertAcceptor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
-							vector(coords(parentAtomSub), coords(atomShell)));
+				if(!tooClose) {
+					parentAtom = atom(substrat(m), idParentAtom);
+					if (!strcmp(symbol(parentAtom), "H")) {
+						insertAcceptor1(moc(m,i), idAtomCage, MOL_seekNormal(substrat(m), idParentAtom, -1), 
+							vector(coords(parentAtom), coords(atomCage)));
 					}
 					else {
-						int haveTriangularGeometry = (steric(parentAtomSub) == 3);
+						int haveTriangularGeometry = (steric(parentAtom) == 3);
 						if (haveTriangularGeometry) {
-							insertDonor1(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
-								vector(coords(parentAtomSub), coords(atomShell)));
+							insertDonor1(moc(m,i), idAtomCage, MOL_seekNormal(substrat(m), idParentAtom, -1), 
+								vector(coords(parentAtom), coords(atomCage)));
 						}
 						else {
-							insertDonor2(moc(m,i), idAtomShell, MOL_seekNormal(substrat(m), parentAtom(atomShell), -1), 
-								vector(coords(parentAtomSub), coords(atomShell)));
+							insertDonor2(moc(m,i), idAtomCage, MOL_seekNormal(substrat(m), idParentAtom, -1), 
+								vector(coords(parentAtom), coords(atomCage)));
 						}
 					}
 				}

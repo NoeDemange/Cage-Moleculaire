@@ -139,43 +139,49 @@ void LST_delete(List_t* l) {
 }
 
 /******************************/
+Element* LST_pairs_init(void) {
 
-List_p* LST2_init() {
-	
-	List_p* list = malloc(sizeof(List_p));
-	list->first = NULL;
-	
+	Element* list = malloc(sizeof(Element));
+	list = NULL;
 	return list;
 }
 
-// Ajout au début
-void LST2_addElement(List_p* list, int depart, int arrivee) {
+// Add at the beginning
+void LST_pairs_addElement(Element** list, int start, int end) {
 	
 	Element* elem = malloc(sizeof(Element));
-	
-	elem->start = depart;
-	elem->end = arrivee;
-	elem->next = list->first;
-	
-	list->first = elem;
+	elem->start = start;
+	elem->end = end;
+	elem->next = *list;
+
+	*list = elem;
 }
 
-void LST2_removeFirst(List_p* list) {
+void LST_pairs_removeFirst(Element* list) {
 	
-	Element* suppr = list->first;
-	list->first = list->first->next;
-	free(suppr);
-}
-
-void LST2_delete(List_p* list) {
-
-	while (list->first)
-	{
-		LST2_removeFirst(list);
+	if (list) {
+		Element* delete = list;
+		list = list->next;
+		free(delete);
 	}
-	free(list);
+	else {
+		fprintf(stderr, "Can't remove first, list is empty.\n");
+	}
 }
 
+void LST_pairs_delete(Element* list) {
+
+	if (list) {
+		while (list) {
+			Element* delete = list;
+			list = list->next;
+			free(delete);
+		}
+	}
+	else {
+		fprintf(stderr, "List is already deleted.\n");
+	}
+}
 /******************************/
 
 List_m* LSTm_init() {
@@ -289,10 +295,8 @@ Point_t minDist(List_s* list, Point_t p) {
 	int distanceMin = INT_MAX;
 	Elem_s* l = list->first;
 	
-	while (l)
-	{
-		if (dist(l->position, p) < distanceMin)
-		{
+	while (l) {
+		if (dist(l->position, p) < distanceMin) {
 			min = l->position;
 			distanceMin = dist(l->position, p);
 		}

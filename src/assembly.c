@@ -3,6 +3,7 @@
 #include "output.h"
 #include "constant.h"
 #include <math.h>
+#include <omp.h>
 
 /**
  * @brief Checks if a point is far enough away from the other atoms 
@@ -196,22 +197,22 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 	List_s* positions = LSTs_init();
 	Point_t startPos = coords(atom(processedMoc, idStart));
 	Point_t endPos = coords(atom(processedMoc, idEnd));
-	int idFirstNeighborStart = neighbor(atom(processedMoc, idStart), 0);
-	Point_t firstNeighborStartPos = coords(atom(processedMoc, idFirstNeighborStart));
+	int idStartFirstNeighbor = neighbor(atom(processedMoc, idStart), 0);
+	Point_t startFirstNeighborPos = coords(atom(processedMoc, idStartFirstNeighbor));
 	Point_t neighborOfFirstOnePos; // Neighbor of the the starting point's first neighbor.
 	
-	int idFirstNeighbor = neighbor(atom(processedMoc,idFirstNeighborStart),0);
-	int idSecondNeighbor = neighbor(atom(processedMoc,idFirstNeighborStart),1);
+	int idFirstNeighbor = neighbor(atom(processedMoc,idStartFirstNeighbor),0);
+	int idSecondNeighbor = neighbor(atom(processedMoc,idStartFirstNeighbor),1);
 	if (idFirstNeighbor == idStart)
 		neighborOfFirstOnePos = coords(atom(processedMoc, idSecondNeighbor));
 	else
 		neighborOfFirstOnePos = coords(atom(processedMoc, idFirstNeighbor));
 
-	Point_t normal = planNormal(startPos, firstNeighborStartPos, neighborOfFirstOnePos);
+	Point_t normal = planNormal(startPos, startFirstNeighborPos, neighborOfFirstOnePos);
 	
-	Point_t newStartPos = AX1E3(startPos, firstNeighborStartPos, normal, DIST_SIMPLE);
-	Point_t hydrogen1 = AX2E2(startPos, firstNeighborStartPos, newStartPos, DIST_ATOM_H);
-	Point_t hydrogen2 = AX3E1(startPos, firstNeighborStartPos, newStartPos, hydrogen1, DIST_ATOM_H);
+	Point_t newStartPos = AX1E3(startPos, startFirstNeighborPos, normal, DIST_SIMPLE);
+	Point_t hydrogen1 = AX2E2(startPos, startFirstNeighborPos, newStartPos, DIST_ATOM_H);
+	Point_t hydrogen2 = AX3E1(startPos, startFirstNeighborPos, newStartPos, hydrogen1, DIST_ATOM_H);
 	
 	if (!isHindered(processedMoc, sub, newStartPos)) {	
 		if (!isHindered(processedMoc, sub, hydrogen1) && !isHindered(processedMoc, sub, hydrogen2)) {
@@ -220,10 +221,10 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 	}
 	
 	for (int i = 0; i < (360/ROTATION_ANGLE_AX1E3)-1; i++) { // 360° rotation.
-		normal = rotation(normalization(vector(startPos, firstNeighborStartPos), 1),  ROTATION_ANGLE_AX1E3, normal); // ROTATION_ANGLE_AX1E3° rotation from normal.
-		newStartPos = AX1E3(startPos, firstNeighborStartPos, normal, DIST_SIMPLE);
-		hydrogen1 = AX2E2(startPos, firstNeighborStartPos, newStartPos, DIST_ATOM_H);
-		hydrogen2 = AX3E1(startPos, firstNeighborStartPos, newStartPos, hydrogen1, DIST_ATOM_H);
+		normal = rotation(normalization(vector(startPos, startFirstNeighborPos), 1),  ROTATION_ANGLE_AX1E3, normal); // ROTATION_ANGLE_AX1E3° rotation from normal.
+		newStartPos = AX1E3(startPos, startFirstNeighborPos, normal, DIST_SIMPLE);
+		hydrogen1 = AX2E2(startPos, startFirstNeighborPos, newStartPos, DIST_ATOM_H);
+		hydrogen2 = AX3E1(startPos, startFirstNeighborPos, newStartPos, hydrogen1, DIST_ATOM_H);
 		
 		if (!isHindered(processedMoc, sub, newStartPos)) {	
 			if (!isHindered(processedMoc, sub, hydrogen1) && !isHindered(processedMoc, sub, hydrogen2)) {
@@ -233,11 +234,11 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 	}
 	
 	for (int i = 0; i < NUMBER_POSITION_AX1E3 && positions->first; i++) { // Best placed position (min distance to the end)
-		newStartPos = minDist(positions, endPos); 
+		newStartPos = minDist(positions, endPos);
 		LSTs_removeElement(positions, newStartPos);
 		Shell_t* moc = SHL_copy(processedMoc);
-		hydrogen1 = AX2E2(startPos, firstNeighborStartPos, newStartPos, DIST_ATOM_H);
-		hydrogen2 = AX3E1(startPos, firstNeighborStartPos, newStartPos, hydrogen1, DIST_ATOM_H);
+		hydrogen1 = AX2E2(startPos, startFirstNeighborPos, newStartPos, DIST_ATOM_H);
+		hydrogen2 = AX3E1(startPos, startFirstNeighborPos, newStartPos, hydrogen1, DIST_ATOM_H);
 		int idHydrogen = SHL_addAtom(moc, hydrogen1, -1);
 		flag(atom(moc, idHydrogen)) = HYDROGEN_F;
 		SHL_addEdge(moc, idStart, idHydrogen);
@@ -294,7 +295,7 @@ void projectionC_AX2E2(Shell_t* processedMoc, List_m* mocsInProgress, int idStar
 		Shell_t* moc = SHL_copy(processedMoc);
 		addProjection(moc, mocsInProgress, idStart, newStarts, numPattern, newStartPos2, sub);
 	}
-}
+}																																																																																																																																						
 
 // Projection for a carbone with 3 neighbors.
 void projectionC_AX3E1(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern,Molecule_t* sub) {
@@ -360,25 +361,8 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
  * @param inputFile Name of the substrate's file.
  * @param sizeMax Maximale size (in patterns) of a path.
  */
-void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int forceCycle) {
-
-	/*************** Check distances bewteen atoms *****/
-	/*Point_t B = coords(atom(processedMoc, idStart));
-	for (int i = 0; i < size(processedMoc); i++) {
-		if (i != idStart) {
-			Point_t A = coords(atom(processedMoc, i));
-			if (dist(A, B) < DIST_GAP_CAGE) {
-				return;
-			}
-		}
-	}
-	for (int i = 0; i < size(substrat(m)); i++){
-		Point_t A = coords(atom(substrat(m), i));
-		if (dist(A, B) < DIST_GAP_SUBSTRATE) {
-			return;
-		}
-	}*/
-	/***************************************************/
+void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize, int forceCycle) {
+	
 	// Count the number of patterns.
 			nbPatterns++;
 	for (int i = 0; i < NB_PATTERNS; i++) {
@@ -390,7 +374,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 		while (tempMocsInProg->first) {
 			// Count the number of aromatic rings.
 			if (i == CYCLE_PATTERN) {
-				nbAroRings++;
+				nbAroRings++;																																																		
 			}
 			
 			if(sizeMax >= nbPatterns) {
@@ -507,19 +491,19 @@ int checkExistsPath(Shell_t* s, int index1, int index2) {
  * They must belong to different connected components.
  * 
  * @param s Cage without any added paths.
- * @return (List_p*) List of pair of atoms to be connected.
+ * @param sub Substrate molecule.
+ * @return (Element*) List of pair of atoms to be connected.
  */
-List_p* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
-
-	List_p* startEndAtoms = LST2_init();
+Element* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
+	
+	Element* startEndAtoms = LST_pairs_init();
 	int* isHindered = malloc(size(s) * sizeof(int));
-	startEndAtoms->size = 0;
 
-	for(int i = 0; i < size(s); i++){
-		if(flag(atom(s, i)) == LINKABLE_F && isHinderedSubstrate(sub, coords(atom(s, i)))){
+	for (int i = 0; i < size(s); i++) {
+		if(flag(atom(s, i)) == LINKABLE_F && isHinderedSubstrate(sub, coords(atom(s, i)))) {
 			isHindered[i] = 1;
 		}
-		else{
+		else {
 			isHindered[i] = 0;
 		}
 	}
@@ -528,8 +512,7 @@ List_p* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
 			for (int j = i + 1; j < size(s); j++) {
 				if (flag(atom(s, j)) == LINKABLE_F && !isHindered[j]) {
 					if (!checkExistsPath(s, i, j)) {
-						LST2_addElement(startEndAtoms, i, j);
-						(startEndAtoms->size)++;
+						LST_pairs_addElement(&startEndAtoms, i, j);
 					}
 				}
 			}
@@ -597,15 +580,17 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 
-		List_p* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
+		int startingMocSize = SHL_nbAtom(mocsInProgress->first->moc);
+		Element* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
+		Element* currentPair;
 		
-		if (!startEndAtoms->first) { // If there is only one grouping of patterns left (connected cage).
+		if (!startEndAtoms) { // If there is only one grouping of patterns left (connected cage).
 			if (countResults++ < options.maxResults) {
 				writeShellOutput(options.input, mocsInProgress->first->moc, pathelessMocSize);
 				LSTm_removeFirst(mocsInProgress);
 			}
 			else {
-				LST2_delete(startEndAtoms);
+				free(startEndAtoms);
 				free(mocsInProgress);
 				return;
 			}
@@ -614,43 +599,37 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			Shell_t* processedMoc = mocsInProgress->first->moc;
 			mocsInProgress->first->moc = NULL;
 			LSTm_removeFirst(mocsInProgress);
-
-			Element* startEndAtomsTable = malloc(startEndAtoms->size * sizeof(Element));
-			int i = 0;
-			while (startEndAtoms->first) {
-				startEndAtomsTable[i].start = startEndAtoms->first->start;
-				startEndAtomsTable[i].end = startEndAtoms->first->end;
-				LST2_removeFirst(startEndAtoms);
-				i++;
-			}
-			
-			#pragma omp parallel for
-			for (int i = 0; i < startEndAtoms->size; i++) {
-				int idStart = startEndAtomsTable[i].start;
-				int idEnd = startEndAtomsTable[i].end;
-			/*while (startEndAtoms->first) { // For all pairs of atoms to connect.  On peut peut-être paralléliser ici
-			//for(;startEndAtoms->first;LST2_removeFirst(startEndAtoms)){
-				int idStart = startEndAtoms->first->start;
-				int idEnd = startEndAtoms->first->end;*/
-				int forceCycle = 0;
-				float startEndDist = dist(coords(atom(processedMoc,idStart)),coords(atom(processedMoc,idEnd)));
-				
-				if (startEndDist <= DIST_SIMPLE_PATTERN * options.sizeMax + DIST_SIMPLE + DIST_ERROR) {
-					if (startEndDist <= DIST_SIMPLE_PATTERN * (options.sizeMax - 1/*NB_ATOMS_IN_CYCLE*/) + DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR
-					&& startEndDist > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR) {
-						forceCycle = 1;
+			#pragma omp parallel
+			{
+				currentPair = startEndAtoms;
+				#pragma omp single
+				{
+					while (currentPair) { // For all pairs of atoms to connect.
+					#pragma omp task firstprivate(currentPair)
+					{
+						int idStart = currentPair->start;
+						int idEnd = currentPair->end;
+						int forceCycle = 0;
+						float startEndDist = dist(coords(atom(processedMoc,idStart)),coords(atom(processedMoc,idEnd)));
+						if (startEndDist <= DIST_SIMPLE_PATTERN * options.sizeMax + DIST_SIMPLE + DIST_ERROR) {
+							if (startEndDist <= DIST_SIMPLE_PATTERN * (options.sizeMax - 1/*NB_ATOMS_IN_CYCLE*/) + DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR
+									&& startEndDist > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR) {
+										forceCycle = 1;
+							}
+							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
+							flag(atom(appendedMoc, idStart)) = CARBON_F;
+							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
+					
+							SHL_delete(appendedMoc);
+						}
 					}
-					Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
-					flag(atom(appendedMoc, idStart)) = CARBON_F;
-					generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle);
-					SHL_delete(appendedMoc);
+						currentPair = currentPair->next;
+					}
 				}
-				//LST2_removeFirst(startEndAtoms);
 			}
-			free(startEndAtomsTable);
 			SHL_delete(processedMoc);
+			LST_pairs_delete(startEndAtoms);
 		}
-		LST2_delete(startEndAtoms);
 	}
 	free(mocsInProgress);
 }

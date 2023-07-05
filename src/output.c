@@ -211,9 +211,9 @@ void SHL_writeMol2(char* output, Shell_t* s) {
       index[i] = j;
       if (flag(atom(s,i)) == CYCLE_F)
         ret = fprintf(filestream, " %3d S", j);
-      else if (flag(atom(s,i)) == HYDRO_BOND_F)
+      else if (flag(atom(s,i)) == HYDRO_PATTERN_F)
         if(LST_nbElements(neighborhood(atom(s,i))) == 1){
-          if(flag(atom(s, neighbor(atom(s,i), 0))) == HYDRO_BOND_F){
+          if(flag(atom(s, neighbor(atom(s,i), 0))) == HYDRO_PATTERN_F){
             ret = fprintf(filestream, " %3d H", j);
           }else {ret = fprintf(filestream, " %3d U", j);}
         }else ret = fprintf(filestream, " %3d U", j);
@@ -238,9 +238,9 @@ void SHL_writeMol2(char* output, Shell_t* s) {
       ret = fprintf(filestream, "   %3.4f", atomZ(atom(s,i)));
       if (flag(atom(s,i)) == CYCLE_F)
         ret = fprintf(filestream, "   S\n");
-      else if (flag(atom(s,i)) == HYDRO_BOND_F)
+      else if (flag(atom(s,i)) == HYDRO_PATTERN_F)
         if(LST_nbElements(neighborhood(atom(s,i))) == 1){
-          if(flag(atom(s, neighbor(atom(s,i), 0))) == HYDRO_BOND_F){
+          if(flag(atom(s, neighbor(atom(s,i), 0))) == HYDRO_PATTERN_F){
             ret = fprintf(filestream, "   H\n");
           }else {ret = fprintf(filestream, "   U\n");}
         }else ret = fprintf(filestream, "   U\n");
@@ -293,7 +293,7 @@ void writeShellOutput(char* inputFile, Shell_t* s, int tailleMocInit) {
 	
 	sprintf(outputname, "%s/%s_mot%d.mol2", dirName, name, i);
 	SHL_writeMol2(outputname, s);
-	printf("Result : %d\n", i);
+	printf("### Writing result %d ###\n", i);
 	free(name);
 	free(dirName);
 	i++;
@@ -317,6 +317,11 @@ void writeMainOutput(char* inputFile, Main_t* m) {
 
   sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, 0);
   SHL_writeMol2(outputname, moc(m,0));
+
+  /*for (int i = 1; i < mocSize(m); i++) {
+    sprintf(outputname, "%s/%s_moc%d.mol2", dirName, name, i);
+    SHL_writeMol2(outputname, moc(m,i));
+  }*/
 
   free(name);
   free(dirName);

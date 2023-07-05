@@ -55,7 +55,7 @@ A___/   \___B
 #define SHELL_F 0 // Atom of the shell
 #define LINKABLE_F 1 // Atom at the edge of a pattern that can still make another bond (unless it's a hydrogen).
 #define CYCLE_F 2 // Atom in an aromatic ring that can't make another bond.
-#define HYDRO_BOND_F 3 // Atom involved in a hydrogen bond that can't make another bond.
+#define HYDRO_PATTERN_F 3 // Atom involved in a hydrogen pattern that can't make another bond.
 /***********************************************************************/
 
 // Path (in the cage)
