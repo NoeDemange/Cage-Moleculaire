@@ -21,7 +21,7 @@
 #define DIST_SIMPLE 1.5 // Simple covalent bond size.
 #define DIST_ERROR 0.5 // Acceptable error for the covalent bond size. 
 #define MINDIS 0.75 // Minimal distance bewteen two atoms (otherwise they are merged).
-#define DIST_GAP_CAGE 1.34 // Distance between two cage's atoms (defined by trial).
+#define DIST_GAP_CAGE ((DIST_SIMPLE/2)+(MINDIS/2)-0.0001) // Distance between two cage's atoms (defined by trial). distance H-C
 #define DIST_GAP_SUBSTRATE 1.8 // Distance between an atom of the cage and an atom of the substrate (at least a hydrogen bond size by trial).
 #define DIST_SIMPLE_PATTERN 1.22 // AC/2, with ABC a triangle where each of its vertex is an atom of the path involved in a simple pattern, AB = BC = 1.5 and angle ABC = 109°C.
 /*  B
