@@ -242,7 +242,7 @@ void projectionC_AX2E2(Shell_t* processedMoc, List_m* mocsInProgress, int idStar
 	if (!isHindered(processedMoc, sub, newStartPos2)) {
 		addProjection(processedMoc, mocsInProgress, idStart, newStarts, numPattern, newStartPos2, sub);
 	}
-}
+}																																																																																																																																						
 
 // Projection for a carbone with 3 neighbors.
 void projectionC_AX3E1(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern,Molecule_t* sub) {
@@ -310,26 +310,17 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
  */
 void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbCarbonyls, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize, int forceCycle) {
 	
-	static int iter = 0;
-	
 	for (int i = 0; i < NB_PATTERNS; i++) {
 		List_m* tempMocsInProg = LSTm_init();
 		List_d* newStarts = LSTd_init();
 		
 		insertPattern(processedMoc, tempMocsInProg, idStart, newStarts, i, idEnd, substrat(m));
-		
+																																																																														 
 		while (tempMocsInProg->first ) {
 			// Count the number of aromatic rings.
 			if (i == CYCLE_PATTERN) {
-				nbAroRings++;
+				nbAroRings++;																																																		
 			}
-
-				/*char outputname[512];
-				sprintf(outputname, "../results/ADENOS10/mot%d.mol2", iter);
-				SHL_writeMol2(outputname, tempMocsInProg->first->moc);
-				iter++;
-				if (iter > 100) exit(0);*/
-				iter++;
 			
 			if(sizeMax >= SHL_nbAtom(tempMocsInProg->first->moc) - startingMocSize) {
 				if (dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(processedMoc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
@@ -502,12 +493,11 @@ int checkExistsPath(Shell_t* s, int index1, int index2) {
  * 
  * @param s Cage without any added paths.
  * @param sub Substrate molecule.
- * @return (List_p*) List of pair of atoms to be connected.
+ * @return (Element*) List of pair of atoms to be connected.
  */
-List_p* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
+Element* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
 	
-	List_p* startEndAtoms = LST2_init();
-	startEndAtoms->size = 0;
+	Element* startEndAtoms = LST_pairs_init();
 	int* isHindered = malloc(size(s) * sizeof(int));
 
 	for (int i = 0; i < size(s); i++) {
@@ -523,8 +513,7 @@ List_p* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
 			for (int j = i + 1; j < size(s); j++) {
 				if (flag(atom(s, j)) == LINKABLE_F && !isHindered[j]) {
 					if (!checkExistsPath(s, i, j)) {
-						LST2_addElement(startEndAtoms, i, j);
-						(startEndAtoms->size)++;
+						LST_pairs_addElement(&startEndAtoms, i, j);
 					}
 				}
 			}
@@ -593,15 +582,16 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 
 		int startingMocSize = SHL_nbAtom(mocsInProgress->first->moc);
-		List_p* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
+		Element* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
+		Element* currentPair;
 		
-		if (!startEndAtoms->first) { // If there is only one grouping of patterns left (connected cage).
+		if (!startEndAtoms) { // If there is only one grouping of patterns left (connected cage).
 			if (countResults++ < options.maxResults) {
 				writeShellOutput(options.input, mocsInProgress->first->moc, pathelessMocSize);
 				LSTm_removeFirst(mocsInProgress);
 			}
 			else {
-				LST2_delete(startEndAtoms);
+				free(startEndAtoms);
 				free(mocsInProgress);
 				return;
 			}
@@ -611,41 +601,37 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			mocsInProgress->first->moc = NULL;
 			LSTm_removeFirst(mocsInProgress);
 
-			Element* startEndAtomsTable = malloc(startEndAtoms->size * sizeof(Element));
-			int i = 0;
-			while (startEndAtoms->first) {
-				startEndAtomsTable[i].start = startEndAtoms->first->start;
-				startEndAtomsTable[i].end = startEndAtoms->first->end;
-				LST2_removeFirst(startEndAtoms);
-				i++;
-			}
-			
-			//#pragma omp parallel for
-				for (int i = 0; i < startEndAtoms->size; i++) {
-				int idStart = startEndAtomsTable[i].start;
-				int idEnd = startEndAtomsTable[i].end;
-			/*while (startEndAtoms->first) { // For all pairs of atoms to connect.
-				int idStart = startEndAtoms->first->start;
-				int idEnd = startEndAtoms->first->end;*/
-				int forceCycle = 0;
-				float startEndDist = dist(coords(atom(processedMoc,idStart)),coords(atom(processedMoc,idEnd)));
-				if (startEndDist <= DIST_SIMPLE_PATTERN * options.sizeMax + DIST_SIMPLE + DIST_ERROR) {
-					if (startEndDist <= DIST_SIMPLE_PATTERN * (options.sizeMax - NB_ATOMS_IN_CYCLE) + DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR
-					&& startEndDist > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR) {
-						forceCycle = 1;
-					}
-					Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
-					flag(atom(appendedMoc, idStart)) = CARBON_F;
-					generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
+			#pragma omp parallel
+			{
+				currentPair = startEndAtoms;
+				#pragma omp single
+				{
+					while (currentPair) { // For all pairs of atoms to connect.
+					#pragma omp task firstprivate(currentPair)
+					{
+						int idStart = currentPair->start;
+						int idEnd = currentPair->end;
+						int forceCycle = 0;
+						float startEndDist = dist(coords(atom(processedMoc,idStart)),coords(atom(processedMoc,idEnd)));
+						if (startEndDist <= DIST_SIMPLE_PATTERN * options.sizeMax + DIST_SIMPLE + DIST_ERROR) {
+							if (startEndDist <= DIST_SIMPLE_PATTERN * (options.sizeMax - NB_ATOMS_IN_CYCLE) + DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR
+								&& startEndDist > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR) {
+								forceCycle = 1;
+							}
+							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
+							flag(atom(appendedMoc, idStart)) = CARBON_F;
+							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
 					
-					SHL_delete(appendedMoc);
+							SHL_delete(appendedMoc);
+						}
+					}
+						currentPair = currentPair->next;
+					}
 				}
-				//LST2_removeFirst(startEndAtoms);
 			}
 			SHL_delete(processedMoc);
-			free(startEndAtomsTable);
+			LST_pairs_delete(startEndAtoms);
 		}
-		LST2_delete(startEndAtoms);
 	}
 	free(mocsInProgress);
 }

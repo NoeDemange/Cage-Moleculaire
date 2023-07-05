@@ -409,18 +409,20 @@ void SHL_testDis(Shell_t* s) {
 
 int i, j;
 	for (i = 0; i < size(s); i++) {
-		if (flag(atom(s,i)) != NOT_DEF_F && flag(atom(s,i)) != CYCLE_F && flag(atom(s,i)) != SHELL_F) {
+		int flag_i = flag(atom(s,i));
+		if (flag_i != NOT_DEF_F && flag_i != CYCLE_F && flag_i != SHELL_F) {
 			for (j = i + 1; j < size(s); j++) {
-				if (flag(atom(s,j)) != NOT_DEF_F && flag(atom(s,j)) != CYCLE_F && flag(atom(s,j)) != SHELL_F) {
+				int flag_j = flag(atom(s,j));
+				if (flag_j != NOT_DEF_F && flag_j != CYCLE_F && flag_j != SHELL_F) {
 					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS) {
-						if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == HYDRO_PATTERN_F) {
+						if (flag_i == LINKABLE_F && flag_j == HYDRO_PATTERN_F) {
 							SHL_removeAtom(s, i);
 						}
-						else if (flag(atom(s,i)) == HYDRO_PATTERN_F && flag(atom(s,j)) == LINKABLE_F) {
+						else if (flag_i == HYDRO_PATTERN_F && flag_j == LINKABLE_F) {
 							SHL_removeAtom(s, j);
 						}else {
-							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) 
-								flag(atom(s,i)) = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
+							if (flag_i == LINKABLE_F && flag_j == LINKABLE_F) 
+								flag_i = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
 							SHL_mergeAtom2(s, i, j);
 						}
 					}

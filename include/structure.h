@@ -56,6 +56,7 @@
 #define moc(m,i) (m)->mocs[i]
 #define mocSize(m) (m)->mocSize
 
+#define getName(var)  #var
 
 typedef struct {
 	float x;
@@ -81,13 +82,6 @@ struct Element {
 	int end;
 	Element *next;
 };
-
-typedef struct {
-	
-	Element *first;	
-	int size;
-
-} List_p;
 
 // Liste des sommets intermediaires
 typedef struct Elem_s Elem_s;
@@ -260,10 +254,10 @@ List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei);
 List_t* LST_addList(List_t*, List_t*);
 void LST_delete(List_t*);
 
-List_p* LST2_init();
-void LST2_addElement(List_p* list, int depart, int arrivee);
-void LST2_removeFirst(List_p* list);
-void LST2_delete(List_p* list);
+Element* LST_pairs_init(void);
+void LST_pairs_addElement(Element** list, int start, int end);
+void LST_pairs_removeFirst(Element* list);
+void LST_pairs_delete(Element* list);
 
 List_m* LSTm_init();
 void LSTm_addElement(List_m* list, Shell_t* moc);
