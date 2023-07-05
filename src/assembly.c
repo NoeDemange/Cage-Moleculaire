@@ -361,7 +361,7 @@ void insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
  * @param inputFile Name of the substrate's file.
  * @param sizeMax Maximale size (in patterns) of a path.
  */
-void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int startingMocSize, int forceCycle) {
+void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int forceCycle) {
 	
 	// Count the number of patterns.
 			nbPatterns++;
@@ -580,7 +580,6 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 
-		int startingMocSize = SHL_nbAtom(mocsInProgress->first->moc);
 		Element* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
 		Element* currentPair;
 		
@@ -618,7 +617,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 							}
 							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 							flag(atom(appendedMoc, idStart)) = CARBON_F;
-							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, startingMocSize, forceCycle);
+							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle);
 					
 							SHL_delete(appendedMoc);
 						}
