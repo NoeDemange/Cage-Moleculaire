@@ -418,12 +418,102 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 					generatePaths(m, mocsInProgress, tempMocsInProg->first->moc, newStarts->first->idAtom, idEnd, nbPatterns, nbAroRings, inputFile, sizeMax, forceCycle);
 				}
 			}
-			LSTm_removeFirst(tempMocsInProg);
+			LSTm_removeFirst(tempMocsInProg); // TODO test whether the cage was added, and delete if not the case. Otherwise, loose the pointer.
 			LSTd_removeFirst(newStarts);
 		}
 		LSTm_delete(tempMocsInProg);
 		LSTd_delete(newStarts);
 	}
+}
+
+void generatePathsIterative(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int TO_DELETE, int nbAroRings, char* inputFile, int sizeMax, int forceCycle) {
+	
+	List_m* tempMocsInProg = LSTm_init();
+	List_d* newStarts = LSTd_init();
+
+	LSTm_addElement(tempMocsInProg, SHL_copy(processedMoc));
+	LSTd_addElement(newStarts, idStart);
+	tempMocsInProg->first->nbPatterns = 0;
+
+	static int iter = 0;
+
+	while (tempMocsInProg->first && iter < 500) {
+
+		List_m* mocs = LSTm_init();
+		List_d* newStartsMocs = LSTd_init();
+
+		for (int i = 0; i < NB_PATTERNS; i++) {
+
+			insertPattern(tempMocsInProg->first->moc, mocs, newStarts->first->idAtom, newStartsMocs, i, idEnd, substrat(m));
+		
+			// Count the number of aromatic rings.
+			/*if (i == CYCLE_PATTERN) {
+				nbAroRings++;
+			}*/
+
+			char outputname[512];
+			sprintf(outputname, "../results/YILLAG/mot%daft.mol2", iter);
+			if (iter % 10 == 0) SHL_writeMol2(outputname, tempMocsInProg->first->moc);
+			iter++;
+		}
+		int nbPatterns = tempMocsInProg->first->nbPatterns + 1;
+		LSTm_removeFirst(tempMocsInProg);
+		LSTd_removeFirst(newStarts);
+
+		while (mocs->first) {
+			mocs->first->nbPatterns = nbPatterns;
+			if(sizeMax >= mocs->first->nbPatterns) {
+				int wasAdded = 0;
+				if (dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
+					float trA = dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))));
+					float trB = dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc, idEnd)));
+					float trC = dist(coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)));
+					float trD = dist( coords(atom(mocs->first->moc, idEnd)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))));
+					float trE = dist(coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))), coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)));
+					float beforeLastAngle = radianToDegre(acosf(((trC * trC) - (trA * trA) - (trB * trB)) / (-2 * trA * trB)));
+					float lastAngle = radianToDegre(acosf(((trE * trE) - (trD * trD) - (trB * trB)) / (-2 * trD * trB)));
+					Point_t hydrogen1 = AX2E2(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)), DIST_ATOM_H);
+					Point_t hydrogen2 = AX3E1(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)), hydrogen1, DIST_ATOM_H);
+					Point_t hydrogenEnd1 = AX2E2(coords(atom(mocs->first->moc, idEnd)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))), coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), DIST_ATOM_H);
+					Point_t hydrogenEnd2 = AX3E1(coords(atom(mocs->first->moc, idEnd)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))), coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), hydrogenEnd1, DIST_ATOM_H);
+
+					if (!isHindered(mocs->first->moc, substrat(m), hydrogen1) && !isHindered(mocs->first->moc, substrat(m), hydrogen2) && !isHindered(mocs->first->moc, substrat(m), hydrogenEnd1) && !isHindered(mocs->first->moc, substrat(m), hydrogenEnd2)) {
+						if(beforeLastAngle >= (END_ANGLE - ANGLE_ERROR) && beforeLastAngle <= (END_ANGLE + ANGLE_ERROR) && lastAngle <= (END_ANGLE + ANGLE_ERROR) && lastAngle >= (END_ANGLE - ANGLE_ERROR)) {
+							if(!forceCycle || (forceCycle && nbAroRings > 0) || 1) { // Only if there is a cycle in the path and we force the presence of a cycle.
+								int idHydrogen = SHL_addAtom(mocs->first->moc, hydrogen1, -1);
+								flag(atom(mocs->first->moc, idHydrogen)) = HYDROGEN_F;
+								SHL_addEdge(mocs->first->moc, newStartsMocs->first->idAtom, idHydrogen);
+								idHydrogen = SHL_addAtom(mocs->first->moc, hydrogen2, -1);
+								flag(atom(mocs->first->moc, idHydrogen)) = HYDROGEN_F;
+								SHL_addEdge(mocs->first->moc, newStartsMocs->first->idAtom, idHydrogen);
+								idHydrogen = SHL_addAtom(mocs->first->moc, hydrogenEnd1, -1);
+								flag(atom(mocs->first->moc, idHydrogen)) = HYDROGEN_F;
+								SHL_addEdge(mocs->first->moc, idEnd, idHydrogen);
+								idHydrogen = SHL_addAtom(mocs->first->moc, hydrogenEnd2, -1);
+								flag(atom(mocs->first->moc, idHydrogen)) = HYDROGEN_F;
+								SHL_addEdge(mocs->first->moc, idEnd, idHydrogen);
+								flag(atom(mocs->first->moc, idEnd)) = CARBON_F; // Change end atom (arrival) flag.
+								SHL_addEdge(mocs->first->moc, newStartsMocs->first->idAtom, idEnd); //Add a link between last atom of the path and arrival.
+								LSTm_addElement(mocsInProgress, SHL_copy(mocs->first->moc));// Add to the list to be processed.
+
+								wasAdded = 1;
+							}
+						}
+					}
+				}
+				if (!wasAdded) {
+					LSTm_addElement(tempMocsInProg, SHL_copy(mocs->first->moc));
+					LSTd_addElement(newStarts, newStartsMocs->first->idAtom);
+				}
+			}
+			LSTm_removeFirst(mocs);
+			LSTd_removeFirst(newStartsMocs);
+		}
+		LSTm_delete(mocs);
+		LSTd_delete(newStartsMocs);
+	}
+	LSTm_delete(tempMocsInProg);
+	LSTd_delete(newStarts);
 }
 
 /*************************************************/
@@ -536,7 +626,7 @@ List_m* initMocsInProgress(Main_t* m){
 	for (int i = 0; i < mocSize(m); i++) {
 		if (moc(m,i) != NULL) {
 			if (i == 0) { // Only the first moc. TODO? change it
-				LSTm_addElement(mocsInProgress, moc(m, i));
+				LSTm_addElement(mocsInProgress, SHL_copyCageAtoms(moc(m, i)));
 			}
 			if (i != 0) {
 				SHL_delete(moc(m,i)); // delete from final solutions list.
@@ -565,17 +655,6 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	printf("\n####### Start of paths generation #######\n");
 	List_m* mocsInProgress = initMocsInProgress(m); // ! Take only the first moc.
 	static int countResults = 0;
-
-	// Remove the envelope's atoms.
-	Shell_t* trimmedMoc;
-	for (int j = 0; j < size(mocsInProgress->first->moc); j++) {
-		if (flag(atom(mocsInProgress->first->moc,j)) == 0) {
-			SHL_removeAtom(mocsInProgress->first->moc, j);
-		}
-	}
-	trimmedMoc = SHL_copyCageAtoms(mocsInProgress->first->moc);
-	LSTm_removeFirst(mocsInProgress);
-	LSTm_addElement(mocsInProgress, trimmedMoc);
 
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
