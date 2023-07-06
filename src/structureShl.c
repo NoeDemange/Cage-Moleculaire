@@ -328,42 +328,55 @@ Shell_t* SHL_copy(Shell_t* s) {
 	return copy;
 }
 
-Shell_t* SHL_copyCageAtoms(Shell_t* s) { //copie un shell_t en enelevant les atomes de flag 0 et -1
+/**
+ * @brief Copies a shell by removing unused atoms or
+ * atoms belonging to the envelope.
+ * 
+ * @param s Cage with unused atoms.
+ * @return (Shell_t*) Trimmed cage.
+ */
+Shell_t* SHL_copyCageAtoms(Shell_t* s) {
 
-	int cpt = 0;
-	int pos = 0;
+	int notDefsCounter = 0;
+	int index = 0;
 	Shell_t* copy = malloc(sizeof(Shell_t));
+	int* relativeEmptyPositions = malloc(size(s) * sizeof(int));
+
+	// Remove the envelope's atoms (change them to unused).
+	for (int j = 0; j < size(s); j++) {
+		if (flag(atom(s, j)) == SHELL_F) {
+			SHL_removeAtom(s, j);
+		}
+	}
 
 	size(copy) = SHL_nbAtom(s);
-	copy->atoms = malloc(size(copy)*sizeof(AtomShl_t));
+	copy->atoms = malloc(size(copy) * sizeof(AtomShl_t));
 	copy->cycle = LST_copy(s->cycle);
 	copy->bond = GPH_copy(s->bond);
 
-	int* mod_pos_nei;
-	mod_pos_nei = malloc(size(s)*sizeof(int));
-
-	for (int i=0; i<size(s); i++) {
-		if ((flag(atom(s,i)) == NOT_DEF_F)){
-			cpt++;
+	// Count the offset in position for each kept atom (to copy the list of neighbors).
+	for (int i = 0; i < size(s); i++) {
+		if ((flag(atom(s, i)) == NOT_DEF_F)) {
+			notDefsCounter++;
 		}
-		else{
-			mod_pos_nei[i] = cpt;
-			flag(atom(copy,pos)) = flag(atom(s,i));
-			coords(atom(copy,pos)) = coords(atom(s,i));
-			parentAtom(atom(copy,pos)) = parentAtom(atom(s,i));
-			//neighborhood(atom(copy,pos)) = LST_copy(neighborhood(atom(s,i)));
-			pos++;
+		else {
+			relativeEmptyPositions[i] = notDefsCounter;
+			index++;
 		}
 	}
 
-	pos = 0;
-	for(int i=0; i<size(s); i++) {
-		if ((flag(atom(s,i)) != NOT_DEF_F)){
-			neighborhood(atom(copy,pos)) = LST_copyWithShift(neighborhood(atom(s,i)),mod_pos_nei);
-			pos++;
+	// Copy only used atoms.
+	index = 0;
+	for(int i = 0; i < size(s); i++) {
+		if ((flag(atom(s,i)) != NOT_DEF_F)) {
+			flag(atom(copy,index)) = flag(atom(s,i));
+			coords(atom(copy,index)) = coords(atom(s,i));
+			parentAtom(atom(copy,index)) = parentAtom(atom(s,i));
+			neighborhood(atom(copy,index)) = LST_copyWithShift(neighborhood(atom(s,i)), relativeEmptyPositions);
+			index++;
 		}
 	}
-	free(mod_pos_nei);
+	free(relativeEmptyPositions);
 	return copy;
 }
 
@@ -409,20 +422,18 @@ void SHL_testDis(Shell_t* s) {
 
 int i, j;
 	for (i = 0; i < size(s); i++) {
-		int flag_i = flag(atom(s,i));
-		if (flag_i != NOT_DEF_F && flag_i != CYCLE_F && flag_i != SHELL_F) {
+		if (flag(atom(s,i)) != NOT_DEF_F && flag(atom(s,i)) != CYCLE_F && flag(atom(s,i)) != SHELL_F) {
 			for (j = i + 1; j < size(s); j++) {
-				int flag_j = flag(atom(s,j));
-				if (flag_j != NOT_DEF_F && flag_j != CYCLE_F && flag_j != SHELL_F) {
+				if (flag(atom(s,j)) != NOT_DEF_F && flag(atom(s,j)) != CYCLE_F && flag(atom(s,j)) != SHELL_F) {
 					if (dist(coords(atom(s,i)), coords(atom(s,j))) < MINDIS) {
-						if (flag_i == LINKABLE_F && flag_j == HYDRO_PATTERN_F) {
+						if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == HYDRO_PATTERN_F) {
 							SHL_removeAtom(s, i);
 						}
-						else if (flag_i == HYDRO_PATTERN_F && flag_j == LINKABLE_F) {
+						else if (flag(atom(s,i)) == HYDRO_PATTERN_F && flag(atom(s,j)) == LINKABLE_F) {
 							SHL_removeAtom(s, j);
 						}else {
-							if (flag_i == LINKABLE_F && flag_j == LINKABLE_F) 
-								flag_i = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
+							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) 
+								flag(atom(s,i)) = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
 							SHL_mergeAtom2(s, i, j);
 						}
 					}

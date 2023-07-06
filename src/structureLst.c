@@ -103,17 +103,25 @@ List_t* LST_copy(List_t* l) {
 	return copy;
 }
 
-List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei) { //copie de la liste avec décalage de la numérotation de l'éléments en fonction de la valeur du taleau mod_pos_nei
+/**
+ * @brief Copies the list with offset of the numbering of elements 
+ * according to the value of the array passed in argument.
+ * 
+ * @param l List to copy.
+ * @param shifts Array of offsets.
+ * @return (List_t*) Copied list with shifts. 
+ */
+List_t* LST_copyWithShift(List_t* l, int* shifts) {
 
 	int i;
 	List_t* copy = LST_create();
 
 	size(copy) = LST_nbElements(l);
 
-	copy->elts = malloc(size(copy)*sizeof(int));
+	copy->elts = malloc(size(copy) * sizeof(int));
 
-	for (i=0; i<size(copy); i++)
-		elts(copy,i) = elts(l,i)-mod_pos_nei[elts(l,i)];
+	for (i = 0; i < size(copy); i++)
+		elts(copy,i) = elts(l,i) - shifts[elts(l,i)];
 
 	return copy;
 }
@@ -198,6 +206,7 @@ void LSTm_addElement(List_m* list, Shell_t* moc) {
 	Elem* elem = malloc(sizeof(Elem));
 	
 	elem->moc = moc;
+	elem->deadEnd = 0;
 	elem->next = list->first;
 	
 	list->first = elem;

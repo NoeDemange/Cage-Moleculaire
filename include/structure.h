@@ -221,6 +221,7 @@ typedef struct Elem Elem;
 struct Elem {
 	
 	Shell_t* moc;
+	int deadEnd;
 	Elem *next;	
 };
 
