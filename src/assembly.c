@@ -618,8 +618,6 @@ void generateWholeCages(Main_t* m, Options_t options) {
 							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 							flag(atom(appendedMoc, idStart)) = CARBON_F;
 							generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle);
-					
-							SHL_delete(appendedMoc);
 						}
 					}
 						currentPair = currentPair->next;

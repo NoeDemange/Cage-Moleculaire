@@ -88,6 +88,14 @@ Point_t normalization(Point_t normal, float length) {
 	return a;
 }
 
+/**
+ * @brief Compute the angle at A of a ABC triangle. 
+ * 
+ * @param A The first vertex of the triangle.
+ * @param B The second vertex of the triangle.
+ * @param C The third vertex of the triangle.
+ * @return (float) Angle value in degree. 
+ */
 float angle(Point_t A, Point_t B, Point_t C) {
 	float AB = dist(A,B), AC = dist(A,C), BC = dist(B,C);
 
