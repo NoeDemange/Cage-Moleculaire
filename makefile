@@ -1,7 +1,7 @@
 # project name (generate executable with this name)
 TARGET   = cageMol.exe
 
-CFLAGS=-Wall -g
+CFLAGS=-Wall #-g
 LDFLAGS=-lR -lm
 
 INCPATH=-I/usr/share/R/include
@@ -10,7 +10,7 @@ OBJDIR=obj
 SRCDIR=src
 BINDIR=bin
 
-CC=gcc -fopenmp
+CC=gcc -fopenmp -O3
 EXEC=clean dir $(BINDIR)/$(TARGET)
 SRC:=$(wildcard $(SRCDIR)/*.c)
 OBJ:=$(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)

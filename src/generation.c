@@ -77,48 +77,55 @@ void generateDependancies(Main_t* m) {
  * @brief Insert an acceptor hydrogen pattern with a triangular geometry.
  * 
  * @param m Envelope with the beginning of the cage.
- * @param idv Index of the heteroatom involved in the H-bond.
+ * @param idcenter Index of the heteroatom involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
-void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+void insertAcceptor1(Shell_t* m, unsigned idcenter, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
 	int index;
-	Point_t new_coords;
-	AtomShl_t* v = atom(m,idv);
+	Point_t x1,x2;
+	AtomShl_t* center = atom(m,idcenter);
 	List_t* l = LST_create();
 
-	flag(v) = HYDRO_PATTERN_F;
+	flag(center) = HYDRO_PATTERN_F;
 	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
 
-	// Remove the edges between v and its neighbors and add them to the list.
-	while (neighbor(v,0) != -1) {
-		LST_addElement(l,neighbor(v,0));
-		SHL_removeEdge(m, idv, neighbor(v,0));
+	// Remove the edges between center and its neighbors and add them to the list.
+	while (neighbor(center,0) != -1) {
+		LST_addElement(l,neighbor(center,0));
+		SHL_removeEdge(m, idcenter, neighbor(center,0));
 	}
 
-	//Position du deuxième : (rotation de normal, 120, -dir) + coords(v)
-	new_coords = addPoint(coords(v), rotation(normal, 120, dir));
-	index = SHL_addAtom(m, new_coords, -1);
+	//Position du deuxième
+	x1 = addPoint(coords(center), rotation(normal, 120, dir));
+	//Position du troisième
+	x2 = addPoint(coords(center), rotation(normal, -120, dir));
 
+	for (int i = 0; i < size(m); i++) {
+		if ((flag(atom(m, i)) != NOT_DEF_F) && (flag(atom(m,i)) != SHELL_F) 
+			&& ((dist(coords(atom(m, i)),x1) < DIST_GAP_CAGE)|| (dist(coords(atom(m, i)),x2) < DIST_GAP_CAGE))) {
+			flag(center) = SHELL_F;
+			return;
+		}
+	}
+
+	//Ajout du deuxième
+	index = SHL_addAtom(m, x1, -1);
 	//checkInsertVertex(m, l, index);
-	SHL_addEdge(m, idv, index);
+	SHL_addEdge(m, idcenter, index);
 	if (flag(atom(m,index)) < LINKABLE_F)
 		flag(atom(m,index)) = LINKABLE_F;
 	
-	v = atom(m,idv);
-	
-	//Position du troisième : (rotation de normal, -120, -dir) + coords(v)
-	new_coords = addPoint(coords(v), rotation(normal, -120, dir));
-	index = SHL_addAtom(m, new_coords, -1);
-
+	//Ajout du troisième
+	index = SHL_addAtom(m, x2, -1);
 	//checkInsertVertex(m, l, index);
-	SHL_addEdge(m, idv, index);
+	SHL_addEdge(m, idcenter, index);
 	if (flag(atom(m,index)) < LINKABLE_F)
 		flag(atom(m,index)) = LINKABLE_F;
 
 	//Rattacher les nouveaux sommets à ceux de la liste l.
-	//SHL_linkBorder(m, idv, l);
+	//SHL_linkBorder(m, idcenter, l);
 
 	LST_delete(l);
 }
@@ -127,56 +134,60 @@ void insertAcceptor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
  * @brief Insert a donor hydrogen pattern with a triangular geometry.  
  * 
  * @param m Envelope with the beginning of the cage.
- * @param idv Index of the hydrogen involved in the H-bond.
+ * @param idhydro Index of the hydrogen involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
-void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
+void insertDonor1(Shell_t* m, unsigned idhydro, Point_t normal, Point_t dir) {
 	//La position de v est la position du premier.
 	int index, idc;
-	Point_t new_coords;
-	AtomShl_t* v = atom(m, idv), *c;
+	Point_t center,x1,x2;
+	AtomShl_t* hydro = atom(m, idhydro);
 	List_t* neighborsFirstAtom = LST_create();
 
-	flag(v) = HYDRO_PATTERN_F;
+	flag(hydro) = HYDRO_PATTERN_F;
 
-	// Remove the edges between v and its neighbors and add them to the list.
-	while (neighbor(v,0) != -1) {
-		LST_addElement(neighborsFirstAtom, neighbor(v,0));
-		SHL_removeEdge(m, idv, neighbor(v,0));
+	// Remove the edges between hydro and its neighbors and add them to the list.
+	while (neighbor(hydro,0) != -1) {
+		LST_addElement(neighborsFirstAtom, neighbor(hydro,0));
+		SHL_removeEdge(m, idhydro, neighbor(hydro,0));
 	}
 
 	//Position du deuxième sommet : centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, DIST_ATOM_H);
-	new_coords = addPoint(coords(v), dir);
+	center = addPoint(coords(hydro), dir);
+	//Position du deuxième :
+	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
+	x1 = addPoint(center, rotation(normal, 120, dir));
+	//Position du troisième :
+	x2 = addPoint(center, rotation(normal, -120, dir));
+
+
 	for (int i = 0; i < size(m); i++) {
-		if (flag(atom(m, i)) == HYDRO_PATTERN_F && dist(coords(atom(m, i)),new_coords) < MINDIS) {
-			flag(v) = SHELL_F;
+		if ((flag(atom(m, i)) != NOT_DEF_F) && (flag(atom(m,i)) != SHELL_F) 
+			&& ((dist(coords(atom(m, i)),center) < DIST_GAP_CAGE)||(dist(coords(atom(m, i)),x1) < DIST_GAP_CAGE)||(dist(coords(atom(m, i)),x2) < DIST_GAP_CAGE))) {
+			flag(hydro) = SHELL_F;
 			return;
 		}
 	}
-	idc = SHL_addAtom(m, new_coords, -1);
 
+	//Ajout du centre
+	idc = SHL_addAtom(m, center, -1);
 	//checkInsertVertex(m, l, idc);
-	SHL_addEdge(m, idv, idc);
-	c = atom(m,idc);
-	flag(c) = HYDRO_PATTERN_F;
+	SHL_addEdge(m, idhydro, idc);
+	flag(atom(m,idc)) = HYDRO_PATTERN_F;
 
-	//Position du deuxième : (rotation de normal, 120, -dir) + coords(v)
-	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
-	new_coords = addPoint(coords(c), rotation(normal, 120, dir));
-	index = SHL_addAtom(m, new_coords, -1);
+	//Ajout du deuxième
+	index = SHL_addAtom(m, x1, -1);
 
 	//checkInsertVertex(m, l, index);
 	SHL_addEdge(m, idc, index);
 	if (flag(atom(m,index)) < LINKABLE_F)
 		flag(atom(m,index)) = LINKABLE_F;
 
-	//Position du troisième : (rotation de normal, 120, -dir) + coords(v)
-	new_coords = addPoint(coords(c), rotation(normal, -120, dir));
-	index = SHL_addAtom(m, new_coords, -1);
-
+	//Ajout du troisième
+	index = SHL_addAtom(m, x2, -1);
 	//checkInsertVertex(m, l, index);
 	SHL_addEdge(m, idc, index);
 	if (flag(atom(m,index)) < LINKABLE_F)
@@ -192,68 +203,68 @@ void insertDonor1(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
  * @brief Insert a donor hydrogen pattern with a tetrahedral geometry.  
  * 
  * @param m Envelope with the beginning of the cage.
- * @param idv Index of the hydrogen involved in the H-bond.
+ * @param idhydro Index of the hydrogen involved in the H-bond.
  * @param normal Normal vector starting point.
  * @param dir Direction (terminal point) of the normal vector.
  */
-void insertDonor2(Shell_t* m, unsigned idv, Point_t normal, Point_t dir) {
-	//La position de v est la position du premier.
+void insertDonor2(Shell_t* m, unsigned idhydro, Point_t normal, Point_t dir) {
+	//La position de v est la position du premier. Premier sommet du tétraèdre
 	int index, idc;
-	Point_t x1, x2, x3, x4;
-	AtomShl_t* v = atom(m, idv), *c;
+	Point_t x1, center, x2, x3, x4;
+	AtomShl_t* hydro = atom(m, idhydro), *c;
 	List_t* l = LST_create();
 
-	flag(v) = HYDRO_PATTERN_F;
+	flag(hydro) = HYDRO_PATTERN_F;
 
-	//Insérer tous les voisins de v dans la liste.
-	while (neighbor(v,0) != -1) {
-		LST_addElement(l,neighbor(v,0));
-		SHL_removeEdge(m, idv, neighbor(v,0));
+	//Insérer tous les voisins de hydro dans la liste.
+	while (neighbor(hydro,0) != -1) {
+		LST_addElement(l,neighbor(hydro,0));
+		SHL_removeEdge(m, idhydro, neighbor(hydro,0));
 	}
 
-	x1 = coords(v);
+	x1 = coords(hydro);
 
-	//Position du deuxième sommet : centre du motif
+	//Position du centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, DIST_ATOM_H);
-	x2 = addPoint(coords(v), dir);
+	center = addPoint(x1, dir);
+	//Deuxième sommet du tétraèdre
+	normal = planNormal(center, x1, normal);
+	normal = normalization(normal,1);
+	x2 = AX1E3(center, x1, normal, DIST_SIMPLE);
+	//Troisième sommet du tétraèdre
+	x3 = AX2E2(center, x1, x2, DIST_SIMPLE);
+	//Quatrième sommet du tétraèdre
+	x4 = AX3E1(center, x1, x2, x3, DIST_SIMPLE);
 	for (int l = 0; l < size(m); l++) {
-		if(flag(atom(m,l)) == HYDRO_PATTERN_F && dist(coords(atom(m,l)),x2) < MINDIS){
-			flag(v) = SHELL_F;
+		if((flag(atom(m, l)) != NOT_DEF_F) && (flag(atom(m,l)) != SHELL_F) 
+		&& ((dist(coords(atom(m,l)),center) < DIST_GAP_CAGE) || (dist(coords(atom(m,l)),x2) < DIST_GAP_CAGE)
+		|| (dist(coords(atom(m,l)),x3) < DIST_GAP_CAGE) || (dist(coords(atom(m,l)),x4) < DIST_GAP_CAGE))){
+			flag(hydro) = SHELL_F;
 			return;
 		}
 	}
-	idc = SHL_addAtom(m, x2, -1);
-
+	//Ajout centre du motif
+	idc = SHL_addAtom(m, center, -1);
 	//checkInsertVertex(m, l, idc);
-	SHL_addEdge(m, idv, idc);
+	SHL_addEdge(m, idhydro, idc);
 	c = atom(m,idc);
 	flag(c) = HYDRO_PATTERN_F;
 
-	//Deuxième sommet du tétraèdre
-	//x2 = AX1E3(coords(c), x1, normal, DIST_SIMPLE);
-	x2 = normalization(vector(x1, coords(c)), 1);
-	x2 = rotation(normal, 109.47, x2);
-	x2 = normalization(x2, DIST_SIMPLE);
-	x2 = addPoint(coords(c), x2);
+	//Ajout deuxième sommet du tétraèdre
 	index = SHL_addAtom(m, x2, -1);
-
 	//checkInsertVertex(m, l, index);
 	SHL_addEdge(m, idc, index);
 	flag(atom(m,index)) = LINKABLE_F;
 
-	//Troisième sommet du tétraèdre
-	x3 = AX2E2(coords(c), x1, x2, DIST_SIMPLE);
+	//Ajout Troisième sommet du tétraèdre
 	index = SHL_addAtom(m, x3, -1);
-
 	//checkInsertVertex(m, l, index);
 	SHL_addEdge(m, idc, index);
 	flag(atom(m,index)) = LINKABLE_F;
 
-	//Troisième sommet du tétraèdre
-	x4 = AX3E1(coords(c), x1, x2, x3, DIST_SIMPLE);
+	//Ajout quatrième sommet du tétraèdre
 	index = SHL_addAtom(m, x4, -1);
-
 	//checkInsertVertex(m, l, index);
 	SHL_addEdge(m, idc, index);
 	flag(atom(m,index)) = LINKABLE_F;
@@ -285,7 +296,7 @@ void generateHydrogenPattern(Main_t* m) {
 				int idParentAtom = parentAtom(atomCage);
 				int tooClose = 0;
 				for (int k = 0; k < size(moc(m,i)); k++) {
-					if(flag(atom(moc(m, i), k)) == HYDRO_PATTERN_F && dist(coords(atom(moc(m, i), k)), coords(atomCage)) < MINDIS) {
+					if((k != idAtomCage) && (flag(atom(moc(m, i), k)) != NOT_DEF_F) && (flag(atom(moc(m, i), k)) != SHELL_F) && (dist(coords(atom(moc(m, i), k)), coords(atomCage)) < DIST_GAP_CAGE)) {
 						tooClose = 1;
 						break;
 					}
@@ -310,7 +321,7 @@ void generateHydrogenPattern(Main_t* m) {
 				}
 			}
 		}
-		SHL_testDis(moc(m,i));
+		//SHL_testDis(moc(m,i));
 	}
 }
 
