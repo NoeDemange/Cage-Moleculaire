@@ -195,7 +195,7 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   filestream = fopen(output, "w");
   if (filestream == NULL)
   {
-	  printf("Th file %s could not be open for writting.\n", output);
+	  printf("The file %s could not be open for writting.\n", output);
 	  if(index) free(index);
 	  return;
   }
