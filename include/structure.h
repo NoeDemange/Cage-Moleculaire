@@ -258,6 +258,7 @@ void LST_delete(List_t*);
 
 Element* LST_pairs_init(void);
 void LST_pairs_addElement(Element** list, int start, int end);
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end);
 void LST_pairs_removeFirst(Element* list);
 void LST_pairs_delete(Element* list);
 
