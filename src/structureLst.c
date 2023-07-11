@@ -355,6 +355,25 @@ Point_t minDist(List_s* list, Point_t p) {
 	return min;
 }
 
+// Retourne le point de la liste le plus proche du point en argument
+Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
+	Point_t min = PT_init();
+	float minDist = __FLT_MAX__;
+	float computedDist;
+	Elem_s* l = list->first;
+	printf("2\n");
+	while (l) {
+		computedDist = dist_obstacle(l->position, p, sub);
+		if (computedDist < minDist) {
+			min = l->position;
+			minDist = computedDist;
+			minDist = computedDist;
+		}
+		l = l->next;
+	}
+	return min;
+}
+
 /******************************/
 
 List_d* LSTd_init() {

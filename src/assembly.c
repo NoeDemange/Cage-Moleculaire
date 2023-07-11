@@ -241,6 +241,7 @@ int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInProgress, int idSta
 	int addedCounter = 0;
 
 	for (int i = 0; i < NUMBER_POSITION_AX1E3 && positions->first; i++) { // Best placed position (min distance to the end)
+		//newStartPos = minDist_obstacle(positions, endPos,sub);
 		newStartPos = minDist(positions, endPos);
 		LSTs_removeElement(positions, newStartPos);
 		Shell_t* moc = SHL_copy(processedMoc);
@@ -394,15 +395,10 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 		insertPattern(processedMoc, tempMocsInProg, idStart, newStarts, i, idEnd, substrat(m));
 
 		while (tempMocsInProg->first) {
-			if(sizeMax >= nbPatterns && nbAroRings < 3) {
-				if (dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
-					float trA = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))));
-					float trB = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc, idEnd)));
-					float trC = dist(coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(tempMocsInProg->first->moc, idEnd)));
-					float trD = dist( coords(atom(tempMocsInProg->first->moc, idEnd)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))));
-					float trE = dist(coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))), coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)));
-					float beforeLastAngle = radianToDegre(acosf(((trC * trC) - (trA * trA) - (trB * trB)) / (-2 * trA * trB)));
-					float lastAngle = radianToDegre(acosf(((trE * trE) - (trD * trD) - (trB * trB)) / (-2 * trD * trB)));
+			if(sizeMax >= nbPatterns && nbAroRings <= 3) {
+				if (dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(processedMoc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
+					float beforeLastAngle = angle(coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)),coords(atom(tempMocsInProg->first->moc, idEnd)),coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))));
+					float lastAngle = angle(coords(atom(tempMocsInProg->first->moc, idEnd)),coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)),coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))));
 					Point_t hydrogen1 = AX2E2(coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(processedMoc, idEnd)), DIST_ATOM_H);
 					Point_t hydrogen2 = AX3E1(coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(processedMoc, idEnd)), hydrogen1, DIST_ATOM_H);
 					Point_t hydrogenEnd1 = AX2E2(coords(atom(processedMoc, idEnd)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))), coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), DIST_ATOM_H);
@@ -481,13 +477,9 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 			}
 			if(sizeMax >= mocs->first->nbPatterns && mocs->first->nbCycles < 3) {
 				if (dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
-					float trA = dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))));
-					float trB = dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc, idEnd)));
-					float trC = dist(coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)));
-					float trD = dist( coords(atom(mocs->first->moc, idEnd)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))));
-					float trE = dist(coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))), coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)));
-					float beforeLastAngle = radianToDegre(acosf(((trC * trC) - (trA * trA) - (trB * trB)) / (-2 * trA * trB)));
-					float lastAngle = radianToDegre(acosf(((trE * trE) - (trD * trD) - (trB * trB)) / (-2 * trD * trB)));
+					float beforeLastAngle = angle(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)),coords(atom(mocs->first->moc, idEnd)),coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))));
+					float lastAngle = angle(coords(atom(mocs->first->moc, idEnd)),coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)),coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))));
+				
 					Point_t hydrogen1 = AX2E2(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)), DIST_ATOM_H);
 					Point_t hydrogen2 = AX3E1(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)), hydrogen1, DIST_ATOM_H);
 					Point_t hydrogenEnd1 = AX2E2(coords(atom(mocs->first->moc, idEnd)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))), coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), DIST_ATOM_H);
@@ -714,6 +706,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 							flag(atom(appendedMoc, idStart)) = CARBON_F;
 							generatePathsIteratively(m, mocsInProgress, appendedMoc, idStart, idEnd, options.input, options.sizeMax, forceCycle);
+							//generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle);
 						}
 					}
 						currentPair = currentPair->next;
