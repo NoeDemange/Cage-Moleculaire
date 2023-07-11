@@ -11,8 +11,11 @@ Point_t subPoint(Point_t, Point_t);
 Point_t mulPoint(Point_t, float);
 Point_t divPoint(Point_t, float);
 Point_t merPoint(Point_t, Point_t);
-
+int EqualPoint(Point_t A, Point_t B);
 float dist(Point_t, Point_t);
+float dist_manhattan(Point_t, Point_t);
+float dist_cercle(Point_t, Point_t);
+float dist_obstacle(Point_t A, Point_t B, Molecule_t* sub);
 Point_t normalization(Point_t, float);
 float angle(Point_t, Point_t, Point_t);
 Point_t vector(Point_t, Point_t);

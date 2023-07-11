@@ -1,5 +1,6 @@
 #include "util.h"
 #include <math.h>
+#include "output.h"
 
 float radianToDegre(float a) {
 	return a * 180 / M_PI;
@@ -70,9 +71,133 @@ Point_t merPoint(Point_t A, Point_t B) {
 	return _new;
 }
 
-//Calcul de la distance entre deux points.
+int EqualPoint(Point_t A, Point_t B) { //1 if equal, if not 0
+	if(A.x == B.x && A.y == B.y && A.z == B.z) return 1;
+	return 0;
+}
+
+//Calcul de la distance euclidienne entre deux points.
 float dist(Point_t A, Point_t B) {
-	return sqrt(pow((A.x - B.x), 2) + pow((A.y - B.y), 2)	+ pow((A.z - B.z), 2));
+	return sqrt(pow((A.x - B.x), 2) + pow((A.y - B.y), 2)	+ pow((A.z - B.z), 2)); //euclidian
+}
+
+//Calcul de la distance de manhattan entre deux points.
+float dist_manhattan(Point_t A, Point_t B) {
+	return (fabs(A.x - B.x)+fabs(A.y - B.y)+fabs(A.z - B.z));//manhattan
+}
+
+//Calcul de la distance entre deux points (demi-périmètre d'un cercle). TEST
+float dist_cercle(Point_t A, Point_t B) {
+	float r = dist(A,B)/2;
+	return M_PI * r;
+}
+
+//intersection ligne et sphere
+void interLineSphere(Point_t Start, Point_t End, Point_t P, Point_t* x1, Point_t* x2){
+		Point_t vec = vector(Start, End);
+		float a = pow(vec.x,2)+pow(vec.y,2)+pow(vec.z,2);
+		float b = 2*(vec.x*(Start.x-P.x)+vec.y*(Start.y-P.y)+vec.z*(Start.z-P.z));
+		float c = pow(Start.x-P.x,2)+pow(Start.y-P.y,2)+pow(Start.z-P.z,2)-pow(DIST_GAP_SUBSTRATE,2);
+		float delta = pow(b,2)-4*a*c;
+		if(delta>0){
+			float d = (-b+sqrt(delta))/(2*a);
+			Point_t dir;
+			dir.x = d * vec.x;
+			dir.y = d * vec.y;
+			dir.z = d * vec.z;
+			*x1 = addPoint(Start,dir);
+			d = (-b-sqrt(delta))/(2*a);
+			dir.x = d * vec.x;
+			dir.y = d * vec.y;
+			dir.z = d * vec.z;
+			*x2 = addPoint(Start,dir);
+		}
+}
+
+Point_t newPointOnSphere(Point_t x1, Point_t x2, Point_t P){
+	Point_t vec = vector(x1,x2);
+	Point_t dir, middle;
+	float d = dist(x1,x2)/2;
+	dir.x = d * vec.x;
+	dir.y = d * vec.y;
+	dir.z = d * vec.z;
+	middle = addPoint(x1,dir);
+	vec = vector(P,middle);
+	dir = normalization(vec,DIST_GAP_SUBSTRATE);
+	return addPoint(P,dir);
+}
+
+
+//Calcul de la distance entre deux points avec obstacle. TEST
+float dist_obstacle(Point_t Start, Point_t End, Molecule_t* sub) {
+	//printf("dist init : %f\n", dist(Start,End));
+	int passage = 0;
+	/*Shell_t* moc = SHL_create();
+	int idStart = SHL_addAtom(moc,Start,-1);
+	int idEnd = SHL_addAtom(moc,End,-1);
+	flag(atom(moc,idEnd)) = CARBON_F;*/
+
+	float minDistInter;
+	float distTotal = 0.0;
+	int minID;
+	Point_t x1, x2, minPInter, secondPInter;
+
+	while(!EqualPoint(Start,End)){
+		minDistInter = __FLT_MAX__;
+		minID = -1;
+		x1 = initPoint(-1);
+		x2 = initPoint(-1);
+		for(int i = 0; i < size(sub); i++) {
+			interLineSphere(Start,End,coords(atom(sub,i)),&x1,&x2);
+			if(x1.x != -1 && x1.y != -1 && x1.z != -1 && x2.x != -1 && x2.y != -1 && x2.z != -1){
+				float distx1 = dist(Start,x1);
+				float distx2 = dist(Start,x2);
+				if(distx1<distx2){
+					if(distx1<minDistInter){
+						minDistInter = distx1;
+						minID = i;
+						minPInter = x1;
+						secondPInter = x2;
+					}
+				}else{
+					if(distx2<minDistInter){
+						minDistInter = distx2;
+						minID = i;
+						minPInter = x2;
+						secondPInter = x1;
+					}
+				}
+			}
+		}
+		float distInit = dist(Start,End);
+		//printf("minID = %d ,distInit : %f et minDistInter : %f\n",minID,distInit,minDistInter);
+		if(minID != -1 && distInit>minDistInter && minDistInter>0.001){
+			/*int idx1 = SHL_addAtom(moc,minPInter,-1);
+			int idx2 = SHL_addAtom(moc,secondPInter,-1);
+			flag(atom(moc,idx1)) = CYCLE_F;
+			flag(atom(moc,idx2)) = CYCLE_F;*/
+			Point_t deriv = newPointOnSphere(minPInter, secondPInter, coords(atom(sub,minID)));
+			distTotal += dist(Start,deriv);
+			/*int idDeriv = SHL_addAtom(moc,deriv,-1);
+			flag(atom(moc,idDeriv)) = LINKABLE_F;
+			idStart = idDeriv;*/
+			Start = deriv;
+			passage++;
+			/*if(passage >4){
+			SHL_writeMol2("Test_dist_inter.mol2",moc);
+			exit(EXIT_SUCCESS);
+			}*/
+		}
+		else{
+			distTotal += distInit;
+			Start = End;
+		}
+	}
+	//printf("dist: %f\n",distTotal);
+	/*if(passage>3){
+		SHL_writeMol2("Test_dist.mol2",moc);
+		exit(EXIT_SUCCESS);}*/
+	return distTotal;
 }
 
 //Normaliser un vecteur à la longueur length.

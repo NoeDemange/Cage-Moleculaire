@@ -270,6 +270,7 @@ void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
 void LSTs_removeElement(List_s* list, Point_t p);
 Point_t minDist(List_s* list, Point_t p) ;
+Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub);
 
 List_d* LSTd_init();
 void LSTd_addElement(List_d* list, int sommet);

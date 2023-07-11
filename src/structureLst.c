@@ -292,13 +292,31 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 // Retourne le point de la liste le plus proche du point en argument
 Point_t minDist(List_s* list, Point_t p) {
 	Point_t min = PT_init();
-	int distanceMin = INT_MAX;
+	float distanceMin = __FLT_MAX__;
 	Elem_s* l = list->first;
-	
+	printf("1\n");
 	while (l) {
-		if (dist(l->position, p) < distanceMin) {
+		float newDist = dist(l->position, p);
+		if (newDist < distanceMin) {
 			min = l->position;
-			distanceMin = dist(l->position, p);
+			distanceMin = newDist;
+		}
+		l = l->next;
+	}
+	return min;
+}
+
+// Retourne le point de la liste le plus proche du point en argument
+Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
+	Point_t min = PT_init();
+	float distanceMin = __FLT_MAX__;
+	Elem_s* l = list->first;
+	printf("2\n");
+	while (l) {
+		float newDist = dist_obstacle(l->position, p, sub);
+		if (newDist < distanceMin) {
+			min = l->position;
+			distanceMin = newDist;
 		}
 		l = l->next;
 	}

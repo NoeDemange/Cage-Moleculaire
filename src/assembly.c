@@ -234,6 +234,7 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 	}
 	
 	for (int i = 0; i < NUMBER_POSITION_AX1E3 && positions->first; i++) { // Best placed position (min distance to the end)
+		//newStartPos = minDist_obstacle(positions, endPos,sub);
 		newStartPos = minDist(positions, endPos);
 		LSTs_removeElement(positions, newStartPos);
 		Shell_t* moc = SHL_copy(processedMoc);
@@ -245,7 +246,6 @@ void projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idS
 		idHydrogen = SHL_addAtom(moc, hydrogen2, -1);
 		flag(atom(moc, idHydrogen)) = HYDROGEN_F;
 		SHL_addEdge(moc, idStart, idHydrogen);
-
 		addProjection(moc, mocsInsProgress, idStart, newStarts, numPattern, newStartPos, sub);
 	}
 	LSTs_delete(positions);
@@ -379,13 +379,8 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 			
 			if(sizeMax >= nbPatterns) {
 				if (dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(processedMoc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
-					float trA = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))));
-					float trB = dist( coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc, idEnd)));
-					float trC = dist(coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(tempMocsInProg->first->moc, idEnd)));
-					float trD = dist( coords(atom(tempMocsInProg->first->moc, idEnd)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))));
-					float trE = dist(coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))), coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)));
-					float beforeLastAngle = radianToDegre(acosf(((trC * trC) - (trA * trA) - (trB * trB)) / (-2 * trA * trB)));
-					float lastAngle = radianToDegre(acosf(((trE * trE) - (trD * trD) - (trB * trB)) / (-2 * trD * trB)));
+					float beforeLastAngle = angle(coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)),coords(atom(tempMocsInProg->first->moc, idEnd)),coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))));
+					float lastAngle = angle(coords(atom(tempMocsInProg->first->moc, idEnd)),coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)),coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))));
 					Point_t hydrogen1 = AX2E2(coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(processedMoc, idEnd)), DIST_ATOM_H);
 					Point_t hydrogen2 = AX3E1(coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, newStarts->first->idAtom),0))), coords(atom(processedMoc, idEnd)), hydrogen1, DIST_ATOM_H);
 					Point_t hydrogenEnd1 = AX2E2(coords(atom(processedMoc, idEnd)), coords(atom(tempMocsInProg->first->moc,neighbor(atom(tempMocsInProg->first->moc, idEnd),0))), coords(atom(tempMocsInProg->first->moc, newStarts->first->idAtom)), DIST_ATOM_H);
