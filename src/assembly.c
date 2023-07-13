@@ -198,7 +198,7 @@ int addProjection(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, Li
 /**************************************/
 
 // Projection for an atom with one neighbor.
-int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idStart, int idEnd, List_d* newStarts, int numPattern, Molecule_t* sub) {
+int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, int idEnd, List_d* newStarts, int numPattern, Molecule_t* sub) {
 	
 	List_s* positions = LSTs_init();
 	Point_t startPos = coords(atom(processedMoc, idStart));
@@ -253,8 +253,8 @@ int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInsProgress, int idSt
 		idHydrogen = SHL_addAtom(moc, hydrogen2, -1);
 		flag(atom(moc, idHydrogen)) = HYDROGEN_F;
 		SHL_addEdge(moc, idStart, idHydrogen);
-
-		addedCounter += addProjection(moc, mocsInsProgress, idStart, newStarts, numPattern, newStartPos, sub);
+		
+		addedCounter += addProjection(moc, mocsInProgress, idStart, newStarts, numPattern, newStartPos, sub);
 	}
 	LSTs_delete(positions);
 	return addedCounter;
@@ -448,14 +448,15 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 	tempMocsInProg->first->nbPatterns = 0;
 	tempMocsInProg->first->nbCycles = 0;
 
-	//int iter = 0;
-
 	while (tempMocsInProg->first) {
 
 		List_m* mocs = LSTm_init();
 		List_d* newStartsMocs = LSTd_init();
 		int addedCyclesCounter = 0;
 		int counter = 0;
+
+		// char outputname[512];
+		// sprintf(outputname, "../results/ADENOS10/mot%daft.mol2", iter);
 
 		for (int i = 0; i < NB_PATTERNS; i++) {
 			// Keep the last count of paths with inserted pattern number i.
@@ -467,10 +468,6 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 		LSTd_removeFirst(newStarts);
 
 		while (mocs->first) {
-			// char outputname[512];
-			// sprintf(outputname, "../results/YOHPIU/mot%daft.mol2", iter);
-			// SHL_writeMol2(outputname, mocs->first->moc);
-			// iter++;
 			mocs->first->nbPatterns = nbPatterns + 1;
 			if (addedCyclesCounter > counter++) {
 				mocs->first->nbCycles = nbCycles + 1;
@@ -478,10 +475,11 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 			else {
 				mocs->first->nbCycles = nbCycles;
 			}
-			if(sizeMax >= mocs->first->nbPatterns && mocs->first->nbCycles <= 3) {
+			if(sizeMax >= mocs->first->nbPatterns && mocs->first->nbCycles < 3) {
 				if (dist( coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc, idEnd)) ) < DIST_SIMPLE + DIST_ERROR) {
 					float beforeLastAngle = angle(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)),coords(atom(mocs->first->moc, idEnd)),coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))));
 					float lastAngle = angle(coords(atom(mocs->first->moc, idEnd)),coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)),coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))));
+				
 					Point_t hydrogen1 = AX2E2(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)), DIST_ATOM_H);
 					Point_t hydrogen2 = AX3E1(coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, newStartsMocs->first->idAtom),0))), coords(atom(mocs->first->moc, idEnd)), hydrogen1, DIST_ATOM_H);
 					Point_t hydrogenEnd1 = AX2E2(coords(atom(mocs->first->moc, idEnd)), coords(atom(mocs->first->moc,neighbor(atom(mocs->first->moc, idEnd),0))), coords(atom(mocs->first->moc, newStartsMocs->first->idAtom)), DIST_ATOM_H);
@@ -612,7 +610,8 @@ Element* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub) {
 			for (int j = i + 1; j < size(s); j++) {
 				if (flag(atom(s, j)) == LINKABLE_F && !isHindered[j]) {
 					if (!checkExistsPath(s, i, j)) {
-						LST_pairs_addElement(&startEndAtoms, i, j);
+						LST_pairs_addElementInOrder(s, &startEndAtoms, i, j);
+						//LST_pairs_addElement(&startEndAtoms, i, j);
 					}
 				}
 			}

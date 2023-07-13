@@ -165,6 +165,46 @@ void LST_pairs_addElement(Element** list, int start, int end) {
 	*list = elem;
 }
 
+/**
+ * @brief Adds the pairs of atoms to connect with sorting them 
+ * by ascending euclidean distance.
+ * 
+ * @param s Cage in progress.
+ * @param list List of pairs of atoms to connect.
+ * @param start Index of the starting atom of the path in the cage.
+ * @param end Index of the ending atom of the path in the cage.
+ */
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end) {
+	
+	float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
+	float distOtherPair;
+	Element* currentElem = *list;
+	Element* previousElem = NULL;
+
+	if (currentElem) { // If the list is not empty.
+		distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
+
+		while (currentElem && distPair > distOtherPair) {
+			previousElem = currentElem;
+			currentElem = currentElem->next;
+			if (currentElem) {
+				distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
+			}
+		}
+	}
+
+	Element* elem = malloc(sizeof(Element));
+	elem->start = start;
+	elem->end = end;
+	elem->next = currentElem;
+	if (previousElem) {
+		previousElem->next = elem;
+	}
+	else {
+		*list = elem;
+	}
+}
+
 void LST_pairs_removeFirst(Element* list) {
 	
 	if (list) {
@@ -300,13 +340,14 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 // Retourne le point de la liste le plus proche du point en argument
 Point_t minDist(List_s* list, Point_t p) {
 	Point_t min = PT_init();
-	float distanceMin = __FLT_MAX__; //si déclarer comme un int permet un choix entre le plus optimal et un sous-opitmal (marche mieux que float pour l'instant)
+	float minDist = __FLT_MAX__; //si déclarer comme un int permet un choix entre le plus optimal et un sous-opitmal (marche mieux que float pour l'instant)
+	float computedDist;
 	Elem_s* l = list->first;
 	while (l) {
-		float newDist = dist(l->position, p);
-		if (newDist < distanceMin) {
+		computedDist = dist(l->position, p);
+		if (computedDist < minDist) {
 			min = l->position;
-			distanceMin = newDist;
+			minDist = computedDist;
 		}
 		l = l->next;
 	}
@@ -316,13 +357,15 @@ Point_t minDist(List_s* list, Point_t p) {
 // Retourne le point de la liste le plus proche du point en argument
 Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
 	Point_t min = PT_init();
-	float distanceMin = __FLT_MAX__;
+	float minDist = __FLT_MAX__;
+	float computedDist;
 	Elem_s* l = list->first;
 	while (l) {
-		float newDist = dist_obstacle(l->position, p, sub);
-		if (newDist < distanceMin) {
+		computedDist = dist_obstacle(l->position, p, sub);
+		if (computedDist < minDist) {
 			min = l->position;
-			distanceMin = newDist;
+			minDist = computedDist;
+			minDist = computedDist;
 		}
 		l = l->next;
 	}
