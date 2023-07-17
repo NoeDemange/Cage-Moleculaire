@@ -166,7 +166,7 @@ void LST_pairs_addElement(Element** list, int start, int end) {
 }
 
 /**
- * @brief Adds the pairs of atoms to connect with sorting them 
+ * @brief Adds the pairs of atoms to connect by sorting them 
  * by ascending euclidean distance.
  * 
  * @param s Cage in progress.
@@ -340,8 +340,8 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 // Retourne le point de la liste le plus proche du point en argument
 Point_t minDist(List_s* list, Point_t p) {
 	Point_t min = PT_init();
-	float minDist = INT_MAX;
-	float computedDist;
+	int minDist = INT_MAX;
+	int computedDist;
 	Elem_s* l = list->first;
 	
 	while (l) {

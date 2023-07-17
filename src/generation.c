@@ -368,10 +368,10 @@ void generateCycle(Shell_t* s) {
 			}
 			flag(atom) = CYCLE_F;
 			if (SHL_nbNeighborhood(atom) == 2) {
-				int idNewNeigbor = -1;
+				int idNewNeighbor = -1;
 				Point_t newNeighborPoint = addThirdPoint(coords(atom), coords(atom(s, neighbor(atom, 0))),
 							coords(atom(s, neighbor(atom, 1))), SIMPLE_CYCLE);
-				idNewNeigbor = SHL_addAtom(s, newNeighborPoint, -1);
+				idNewNeighbor = SHL_addAtom(s, newNeighborPoint, -1);
 
 				for (int j = 0; j < size(s); j++) {
 					if (flag(atom(s, j)) != NOT_DEF_F && dist(newNeighborPoint, coords(atom(s, j))) < MINDIS_CYCLE) {
@@ -380,17 +380,17 @@ void generateCycle(Shell_t* s) {
 						}
 						if (cycle(s, j)) {
 							//TODO remove this condition unless needed
-							LST_addElement(atomsInCycle, idNewNeigbor);
+							LST_addElement(atomsInCycle, idNewNeighbor);
 						}
 						if (flag(atom(s, j)) != SHELL_F) {
-							SHL_mergeAtom(s, idNewNeigbor, j);
+							SHL_mergeAtom(s, idNewNeighbor, j);
 						}
 					}
 				}
-				if (flag(atom(s, idNewNeigbor)) <= LINKABLE_F) {
-					flag(atom(s, idNewNeigbor)) = LINKABLE_F;
+				if (flag(atom(s, idNewNeighbor)) <= LINKABLE_F) {
+					flag(atom(s, idNewNeighbor)) = LINKABLE_F;
 				}
-				SHL_addEdge(s, elts(atomsInCycle, i), idNewNeigbor);
+				SHL_addEdge(s, elts(atomsInCycle, i), idNewNeighbor);
 			}
 			//SHL_linkBorder(s, elts(atomT,i), nei);
 		}

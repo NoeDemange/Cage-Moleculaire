@@ -50,7 +50,7 @@ void SHL_addAllocAtom(Shell_t* s) {
 
 	AtomShl_t* tmp = realloc(s->atoms, (size(s) + REALLOCSIZE) * sizeof(AtomShl_t));
 	if (tmp == NULL) {       
-    fprintf(stderr, "Un problème est survenu lors de la réallocation (structureShl.c:53).\n");
+    fprintf(stderr, "A problem occurred during the reallocation (structureShl.c:53).\n");
     exit(EXIT_FAILURE);
 	}
 	else {
