@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 					 options.input, options.alpha, options.sizeMax, options.maxResults);
 
 	Main_t* m = MN_create();
-	substrat(m) = initMolecule(options.input);
+	substrat(m) = initMolecule(options.input); //charge le substrat depuis un fichier .xyz et la centre en (0,0,0)
 
 	/*************************************** R *****/
 

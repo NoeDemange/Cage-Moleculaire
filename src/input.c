@@ -16,6 +16,9 @@ Molecule_t* readInput_xyz(char* inputname) {
 	FILE* filestream = NULL;
 	int size, ret;
 	Molecule_t* m;
+  float Ex = 0; //esperance
+  float Ey = 0;
+  float Ez = 0;
 	
 	filestream = fopen(inputname, "r");
 
@@ -30,7 +33,21 @@ Molecule_t* readInput_xyz(char* inputname) {
 	for (int i = 0; i < size(m); i++) {
 		ret = fscanf(filestream, "%s %f %f %f", symbol(atom(m,i)), 
 			&atomX(atom(m,i)), &atomY(atom(m,i)),	&atomZ(atom(m,i)));
+      Ex += atomX(atom(m,i));
+      Ey += atomY(atom(m,i));
+      Ez += atomZ(atom(m,i));
 	}
+
+  Ex/=size(m);
+  Ey/=size(m);
+  Ez/=size(m);
+
+  for (int i = 0; i < size(m); i++) {
+      atomX(atom(m,i)) -= Ex;
+      atomY(atom(m,i)) -= Ey;
+      atomZ(atom(m,i)) -= Ez;
+	}
+
 	
 	fclose(filestream);
 	

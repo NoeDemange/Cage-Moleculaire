@@ -1,6 +1,5 @@
 #include "util.h"
 #include <math.h>
-#include "output.h"
 
 float radianToDegre(float a) {
 	return a * 180 / M_PI;
@@ -130,18 +129,11 @@ Point_t newPointOnSphere(Point_t x1, Point_t x2, Point_t P){
 
 //Calcul de la distance entre deux points avec obstacle. TEST
 float dist_obstacle(Point_t Start, Point_t End, Molecule_t* sub) {
-	//printf("dist init : %f\n", dist(Start,End));
-	int passage = 0;
-	/*Shell_t* moc = SHL_create();
-	int idStart = SHL_addAtom(moc,Start,-1);
-	int idEnd = SHL_addAtom(moc,End,-1);
-	flag(atom(moc,idEnd)) = CARBON_F;*/
-
 	float minDistInter;
 	float distTotal = 0.0;
+	float distInit = 0.0;
 	int minID;
 	Point_t x1, x2, minPInter, secondPInter;
-
 	while(!EqualPoint(Start,End)){
 		minDistInter = __FLT_MAX__;
 		minID = -1;
@@ -169,34 +161,17 @@ float dist_obstacle(Point_t Start, Point_t End, Molecule_t* sub) {
 				}
 			}
 		}
-		float distInit = dist(Start,End);
-		//printf("minID = %d ,distInit : %f et minDistInter : %f\n",minID,distInit,minDistInter);
+		distInit = dist(Start,End);
 		if(minID != -1 && distInit>minDistInter && minDistInter>0.001){
-			/*int idx1 = SHL_addAtom(moc,minPInter,-1);
-			int idx2 = SHL_addAtom(moc,secondPInter,-1);
-			flag(atom(moc,idx1)) = CYCLE_F;
-			flag(atom(moc,idx2)) = CYCLE_F;*/
 			Point_t deriv = newPointOnSphere(minPInter, secondPInter, coords(atom(sub,minID)));
 			distTotal += dist(Start,deriv);
-			/*int idDeriv = SHL_addAtom(moc,deriv,-1);
-			flag(atom(moc,idDeriv)) = LINKABLE_F;
-			idStart = idDeriv;*/
 			Start = deriv;
-			passage++;
-			/*if(passage >4){
-			SHL_writeMol2("Test_dist_inter.mol2",moc);
-			exit(EXIT_SUCCESS);
-			}*/
 		}
 		else{
 			distTotal += distInit;
 			Start = End;
 		}
 	}
-	//printf("dist: %f\n",distTotal);
-	/*if(passage>3){
-		SHL_writeMol2("Test_dist.mol2",moc);
-		exit(EXIT_SUCCESS);}*/
 	return distTotal;
 }
 
