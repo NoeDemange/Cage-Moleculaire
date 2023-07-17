@@ -374,14 +374,15 @@ int insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, Li
  * @brief Recursively generates paths between two grouping of bonding patterns.
  * 
  * @param m Grouping of the main structures (substrate and envelope).
- * @param mocsInProgress List of cages in construction to be processed.
+ * @param mocsInProgress Stack of cages in construction to be processed.
  * @param processedMoc Molecular cage being generated.
  * @param idStart Index of the first linkable atom in the path in construction.
  * @param idEnd Index of the atom the path in construction is to be connected to.
- * @param nbPatterns Number of patterns to compare to number autorized.
+ * @param nbPatterns Number of patterns in the path to compare to the autorized number.
  * @param nbAroRings Number of aromatic rings recquiried.
  * @param inputFile Name of the substrate's file.
  * @param sizeMax Maximale size (in patterns) of a path.
+ * @param forceCycle Forces the presence of a cycle in the path if true. 
  */
 void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int forceCycle) {
 	
@@ -460,7 +461,7 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 		int counter = 0;
 
 		for (int i = 0; i < NB_PATTERNS; i++) {
-			// Keep the last count of paths with inserted pattern number i.
+			// Keep the last count of mocs with inserted pattern number i.
 			addedCyclesCounter = insertPattern(localMocsInProgress->first->moc, mocs, newStarts->first->idAtom, newStartsMocs, i, idEnd, substrat(m), 0, 0);
 		}
 		int nbPatterns = localMocsInProgress->first->nbPatterns;
@@ -535,22 +536,7 @@ void generatePathsIteratively2(Main_t* m, List_m* mocsInProgress, Shell_t* moc, 
 	localMocsInProgress->first->nbPatterns = 0;
 	localMocsInProgress->first->nbCycles = 0;
 
-	static int iter = 0;
-
 	while (localMocsInProgress->first) {
-
-		// if (iter > 1000000) {
-		// 	int i = 0;
-		// 	while (localMocsInProgress->first) {
-		// 		char outputname[100];
-		// 		sprintf(outputname, "../results/YILLAG/mot%d.mol2", i);
-		// 		SHL_writeMol2(outputname, localMocsInProgress->first->moc);
-		// 		LSTm_removeFirst(localMocsInProgress);
-		// 		i++;
-		// 	}
-		// 	exit(0);
-		// }
-		iter++;
 
 		Shell_t* processedMoc = localMocsInProgress->first->moc;
 		localMocsInProgress->first->moc = NULL;
@@ -745,7 +731,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	printf("\n####### Start of paths generation #######\n");
 	List_m* mocsInProgress = initMocsInProgress(m); // ! Take only the first moc.
 	static int countResults = 0;
-	int iter = 0;
+
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 
@@ -767,13 +753,13 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			Shell_t* processedMoc = mocsInProgress->first->moc;
 			mocsInProgress->first->moc = NULL;
 			LSTm_removeFirst(mocsInProgress);
-			//#pragma omp parallel
+			#pragma omp parallel
 			{
 				currentPair = startEndAtoms;
-				//#pragma omp single
+				#pragma omp single
 				{
 					while (currentPair) { // For all pairs of atoms to connect.
-					//#pragma omp task firstprivate(currentPair)
+					#pragma omp task firstprivate(currentPair)
 					{
 						int idStart = currentPair->start;
 						int idEnd = currentPair->end;
@@ -787,27 +773,6 @@ void generateWholeCages(Main_t* m, Options_t options) {
 							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 							flag(atom(appendedMoc, idStart)) = CARBON_F;
 							generatePathsIteratively(m, mocsInProgress, appendedMoc, idStart, idEnd, options.input, options.sizeMax, forceCycle);
-							// if (mocsInProgress->first) {
-							// 	int iter = 0;
-							// while (mocsInProgress->first) {
-							// 	char outputname[100];
-							// 	sprintf(outputname, "../results/ADENOS10/mot%d.mol2", iter);
-							// 	SHL_writeMol2(outputname, mocsInProgress->first->moc);
-							// 	LSTm_removeFirst(mocsInProgress);
-							// 	iter++;
-							// }
-							// free(mocsInProgress);
-							// return;
-							// }
-
-							// if (mocsInProgress->first) {
-							// 	if (iter%50 == 0) {
-							// 		char outputname[100];
-							// 		sprintf(outputname, "../results/ADENOS10/mot%d.mol2", iter);
-							// 		SHL_writeMol2(outputname, mocsInProgress->first->moc);
-							// 	}
-							// }
-							iter++;
 							//generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle);
 						}
 					}
