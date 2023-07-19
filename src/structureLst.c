@@ -167,7 +167,7 @@ void LST_pairs_addElement(Element** list, int start, int end) {
 }
 
 /**
- * @brief Adds the pairs of atoms to connect with sorting them 
+ * @brief Adds the pairs of atoms to connect by sorting them 
  * by ascending euclidean distance.
  * 
  * @param s Cage in progress.
