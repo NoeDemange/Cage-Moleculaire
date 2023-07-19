@@ -68,4 +68,15 @@ A___/   \___B
 #define OXYGEN_F 4
 #define HYDROGEN_F 7
 
+// Voxelization
+#define GRID_SIZE_X 101
+#define GRID_SIZE_Y 101
+#define GRID_SIZE_Z 101
+#define START_GRID_X -30.0
+#define START_GRID_Y -30.0
+#define START_GRID_Z -30.0
+#define LENGTH_GRID_X (-START_GRID_X*2)/GRID_SIZE_X
+#define LENGTH_GRID_Y (-START_GRID_Y*2)/GRID_SIZE_Y
+#define LENGTH_GRID_Z (-START_GRID_Z*2)/GRID_SIZE_Z
+
 #endif

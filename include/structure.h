@@ -80,6 +80,7 @@ struct Element {
 	
 	int start;
 	int end;
+	float distance;
 	Element *next;
 };
 
@@ -88,6 +89,7 @@ typedef struct Elem_s Elem_s;
 struct Elem_s {
 	
 	Point_t position;
+	float distance;
 	Elem_s *next;
 };
 
@@ -128,6 +130,29 @@ typedef struct {
 	Vertex_t* vertices;
 	unsigned size;
 } Graph_t;
+
+/**************************************/
+/* VOXEL ***************************/
+/**************************************/
+
+typedef int*** VOXELGRID;
+
+/**************************************/
+/* A-Star ***************************/
+/**************************************/
+
+typedef struct {
+    int x, y, z;
+} Point3D;
+
+typedef struct {
+    Point3D point;
+    float f, g, h;
+} Node;
+
+Node createNode(Point3D point, int g, int h);
+Point3D createPoint3D(Point_t p);
+Point_t createPoint_t(Point3D point);
 
 /**************************************/
 /* MOLECULE ***************************/
@@ -258,7 +283,7 @@ void LST_delete(List_t*);
 
 Element* LST_pairs_init(void);
 void LST_pairs_addElement(Element** list, int start, int end);
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end);
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid);
 void LST_pairs_removeFirst(Element* list);
 void LST_pairs_delete(Element* list);
 
@@ -269,11 +294,11 @@ void LSTm_delete(List_m* list);
 
 List_s* LSTs_init();
 void LSTs_addElement(List_s* list, Point_t sommet);
+void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid);
 void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
 void LSTs_removeElement(List_s* list, Point_t p);
 Point_t minDist(List_s* list, Point_t p) ;
-Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub);
 
 List_d* LSTd_init();
 void LSTd_addElement(List_d* list, int sommet);
