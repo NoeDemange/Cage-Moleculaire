@@ -541,23 +541,7 @@ void generatePathsIteratively2(Main_t* m, List_m* mocsInProgress, Shell_t* moc, 
 	localMocsInProgress->first->nbPatterns = 0;
 	localMocsInProgress->first->nbCycles = 0;
 
-	static int iter = 0;
-
 	while (localMocsInProgress->first) {
-
-		// if (iter > 1000000) {
-		// 	int i = 0;
-		// 	while (localMocsInProgress->first) {
-		// 		char outputname[100];
-		// 		sprintf(outputname, "../results/YILLAG/mot%d.mol2", i);
-		// 		SHL_writeMol2(outputname, localMocsInProgress->first->moc);
-		// 		LSTm_removeFirst(localMocsInProgress);
-		// 		i++;
-		// 	}
-		// 	exit(0);
-		// }
-		iter++;
-
 		Shell_t* processedMoc = localMocsInProgress->first->moc;
 		localMocsInProgress->first->moc = NULL;
 		int nbPatterns = localMocsInProgress->first->nbPatterns;
@@ -753,7 +737,6 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	printf("\n####### Start of paths generation #######\n");
 	List_m* mocsInProgress = initMocsInProgress(m); // ! Take only the first moc.
 	static int countResults = 0;
-	int iter = 0;
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 

@@ -201,8 +201,8 @@ void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end,
 	Point3D startPoint = createPoint3D(startPos);
 	float startDist = dist(startPos, createPoint_t(startPoint));
 	float computedDist = aStarPathfinding(startPoint, endPoint, voxelGrid);
-	Elem_s* currentElem = *list;
-	Elem_s* previousElem = NULL;
+	Element* currentElem = *list;
+	Element* previousElem = NULL;
 
 	computedDist = computedDist + EndDist + startDist;
 	while(currentElem){
