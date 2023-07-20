@@ -69,7 +69,7 @@ Ashape_t* Cashape3d(Shell_t* s, double alpha) {
 	return as3d;
 }
 
-int* Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
+/*int* Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
 	SEXP triang;
 	PROTECT(triang = allocVector(REALSXP, as3d->nb_triang));
 	memcpy (REAL(triang), as3d->triang, as3d->nb_triang*sizeof(double));
@@ -98,4 +98,4 @@ int* Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
 
 	UNPROTECT(5);
 	return LOGICAL(ret);
-}
+}*/

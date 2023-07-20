@@ -397,9 +397,9 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 	}
 }
 
-// Retourne le point de la liste le plus proche du point en argument
+/*// Retourne le point de la liste le plus proche du point en argument
 Point_t minDist(List_s* list, Point_t p) {
-	Point_t min = PT_init();
+	Point_t min = PT_init(0);
 	float minDist = __FLT_MAX__; //si déclarer comme un int permet un choix entre le plus optimal et un sous-opitmal (marche mieux que float pour l'instant)
 	float computedDist;
 	Elem_s* l = list->first;
@@ -412,7 +412,7 @@ Point_t minDist(List_s* list, Point_t p) {
 		l = l->next;
 	}
 	return min;
-}
+}*/
 
 /******************************/
 

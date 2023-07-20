@@ -150,10 +150,6 @@ typedef struct {
     float f, g, h;
 } Node;
 
-Node createNode(Point3D point, int g, int h);
-Point3D createPoint3D(Point_t p);
-Point_t createPoint_t(Point3D point);
-
 /**************************************/
 /* MOLECULE ***************************/
 /**************************************/
@@ -258,12 +254,15 @@ typedef struct {
 
 
 //Point
-Point_t PT_init();
+Point_t PT_init(float);
 Point_t PT_add(Point_t, Point_t);
 Point_t PT_sub(Point_t, Point_t);
 Point_t PT_mul(Point_t, float);
 Point_t PT_div(Point_t, float);
-float PT_distance(Point_t, Point_t);
+Point_t PT_merge(Point_t A, Point_t B);
+int PT_equal(Point_t A, Point_t B);
+Point3D createPoint3D(Point_t p);
+Point_t createPoint_t(Point3D point);
 
 //Liste
 
@@ -324,6 +323,7 @@ unsigned GPH_checkBond(Graph_t*, unsigned, unsigned);
 Graph_t* GPH_create();
 void GPH_delete(Graph_t*);
 Graph_t* GPH_copy(Graph_t*);
+Node createNode(Point3D point, int g, int h);
 
 //Molecule
 
@@ -354,7 +354,7 @@ void SHL_removeBond(Shell_t*, unsigned, unsigned);
 void SHL_linkBorder(Shell_t*, unsigned, List_t*);
 void SHL_addCycle(Shell_t*, unsigned);
 void SHL_mergeAtom(Shell_t*, unsigned, unsigned);
-void SHL_testDis(Shell_t*);
+//void SHL_testDis(Shell_t*);
 Shell_t* SHL_create();
 Shell_t* SHL_copy(Shell_t*);
 Shell_t* SHL_copyCageAtoms(Shell_t* s);

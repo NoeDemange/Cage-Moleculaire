@@ -7,9 +7,9 @@
 
 // Helper function to calculate the Manhattan distance between two points
 float manhattanDistance(Point3D a, Point3D b) {
-    return abs((START_GRID_X + a.x * LENGTH_GRID_X) - (START_GRID_X + b.x * LENGTH_GRID_X)) 
-        + abs((START_GRID_Y + a.y * LENGTH_GRID_Y) - (START_GRID_Y + b.y * LENGTH_GRID_Y)) 
-        + abs((START_GRID_Z + a.z * LENGTH_GRID_Z) - (START_GRID_Z + b.z * LENGTH_GRID_Z));
+    return fabs((START_GRID_X + a.x * LENGTH_GRID_X) - (START_GRID_X + b.x * LENGTH_GRID_X)) 
+        + fabs((START_GRID_Y + a.y * LENGTH_GRID_Y) - (START_GRID_Y + b.y * LENGTH_GRID_Y)) 
+        + fabs((START_GRID_Z + a.z * LENGTH_GRID_Z) - (START_GRID_Z + b.z * LENGTH_GRID_Z));
 }
 
 // Helper function to calculate the distance between two points,  src: The Jump Point Search Pathfinding System in 3D
@@ -18,9 +18,9 @@ in each respective axis. Let dmax=max(∆x,∆y,∆z), dmin=min(∆x,∆y,∆z),
   The voxel distance between nodes n and n′ is subsequently calculated as:h(n,n′) = (√3−√2)dmin+ (√2−1)dmid+dmax
 */
 float dist26C(Point3D a, Point3D b) {
-    float deltaX = abs((START_GRID_X + a.x * LENGTH_GRID_X) - (START_GRID_X + b.x * LENGTH_GRID_X));
-    float deltaY = abs((START_GRID_Y + a.y * LENGTH_GRID_Y) - (START_GRID_Y + b.y * LENGTH_GRID_Y));
-    float deltaZ = abs((START_GRID_Z + a.z * LENGTH_GRID_Z) - (START_GRID_Z + b.z * LENGTH_GRID_Z));
+    float deltaX = fabs((START_GRID_X + a.x * LENGTH_GRID_X) - (START_GRID_X + b.x * LENGTH_GRID_X));
+    float deltaY = fabs((START_GRID_Y + a.y * LENGTH_GRID_Y) - (START_GRID_Y + b.y * LENGTH_GRID_Y));
+    float deltaZ = fabs((START_GRID_Z + a.z * LENGTH_GRID_Z) - (START_GRID_Z + b.z * LENGTH_GRID_Z));
     float dmax = (deltaX > deltaY) ? ((deltaX > deltaZ) ? deltaX : deltaZ) : ((deltaY > deltaZ) ? deltaY : deltaZ);
     float dmin = (deltaX < deltaY) ? ((deltaX < deltaZ) ? deltaX : deltaZ) : ((deltaY < deltaZ) ? deltaY : deltaZ);
     float dmid = deltaX + deltaY + deltaZ - dmax - dmin;
@@ -68,10 +68,13 @@ void freeCloseSet(int*** closedSet){
 // A* algorithm for pathfinding in voxel grid
 float aStarPathfinding(Point3D start, Point3D goal, VOXELGRID voxelGrid) {
     float*** gScores = (float***)malloc(GRID_SIZE_X * sizeof(float**));
+    int*** closedSet = (int***)calloc(GRID_SIZE_X, sizeof(int**));
     for (int x = 0; x < GRID_SIZE_X; x++) {
         gScores[x] = (float**)malloc(GRID_SIZE_Y * sizeof(float*));
+        closedSet[x] = (int**)calloc(GRID_SIZE_Y, sizeof(int*));
         for (int y = 0; y < GRID_SIZE_Y; y++) {
             gScores[x][y] = (float*)malloc(GRID_SIZE_Z * sizeof(float));
+            closedSet[x][y] = (int*)calloc(GRID_SIZE_Z, sizeof(int));
             for (int z = 0; z < GRID_SIZE_Z; z++) {
                 gScores[x][y][z] = __FLT_MAX__;
             }
@@ -84,14 +87,6 @@ float aStarPathfinding(Point3D start, Point3D goal, VOXELGRID voxelGrid) {
     Node* openSet = (Node*)malloc(GRID_SIZE_X * GRID_SIZE_Y * GRID_SIZE_Z * sizeof(Node));
     int openSetSize = 0;
     openSet[openSetSize++] = startNode;
-
-    int*** closedSet = (int***)calloc(GRID_SIZE_X, sizeof(int**));
-    for (int x = 0; x < GRID_SIZE_X; x++) {
-        closedSet[x] = (int**)calloc(GRID_SIZE_Y, sizeof(int*));
-        for (int y = 0; y < GRID_SIZE_Y; y++) {
-            closedSet[x][y] = (int*)calloc(GRID_SIZE_Z, sizeof(int));
-        }
-    }
 
     while (openSetSize > 0) {
         // Find the node with the lowest f value

@@ -69,9 +69,9 @@ A___/   \___B
 #define HYDROGEN_F 7
 
 // Voxelization
-#define GRID_SIZE_X 101
-#define GRID_SIZE_Y 101
-#define GRID_SIZE_Z 101
+#define GRID_SIZE_X 51
+#define GRID_SIZE_Y 51
+#define GRID_SIZE_Z 51
 #define START_GRID_X -30.0
 #define START_GRID_Y -30.0
 #define START_GRID_Z -30.0
