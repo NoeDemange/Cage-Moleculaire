@@ -231,8 +231,30 @@ typedef struct {
 	Elem *first;	
 } List_m;
 
+/**************************************/
+/* PATHS ******************************/
+/**************************************/
+
+typedef struct {
+	int idStart;
+	int idEnd;
+	int index;
+	Point_t** patternsBuffer;
+	Point_t* positionsBuffer;
+	int* numPatternArray;
+
+} Path_t;
+
+
+//Path
+
+Path_t* PTH_init(int size, Element* elem);
+void PTH_delete(Path_t*, int);
+Point_t** keptPositions_init();
+void keptPositions_delete(Point_t** table);
 
 //Point
+
 Point_t PT_init();
 Point_t PT_add(Point_t, Point_t);
 Point_t PT_sub(Point_t, Point_t);
@@ -240,7 +262,7 @@ Point_t PT_mul(Point_t, float);
 Point_t PT_div(Point_t, float);
 float PT_distance(Point_t, Point_t);
 
-//Liste
+//List
 
 void LST_init(List_t*);
 void LST_addAlloc(List_t*);
@@ -282,7 +304,7 @@ void LSTd_removeSommet(List_d* list, int sommet);
 void LSTd_delete(List_d* list);
 
 
-//Graphe
+//Graph
 
 void GPH_addNeighbor(Vertex_t*, unsigned);
 void GPH_removeNeighbor(Vertex_t*, unsigned);
@@ -313,6 +335,8 @@ void MOL_createBond(Molecule_t*);
 Molecule_t* MOL_create(unsigned);
 void MOL_deleteAtom(Atom_t*);
 void MOL_delete(Molecule_t*);
+
+//Cage/Envelope
 
 int SHL_nbNeighborhood(AtomShl_t*);
 int SHL_nbAtom(Shell_t*);

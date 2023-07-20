@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 	/***************************** Whole cages *****/
 
 	writeMainOutput(options.input, m);
-	
+
 	generateWholeCages(m, options);
 	
 	MN_delete(m);

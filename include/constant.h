@@ -48,6 +48,7 @@ A___/   \___B
 // Path choice
 #define NUMBER_POSITION_AX1E3 3 //Number of position keep to make path
 #define ROTATION_ANGLE_AX1E3 15 //rotation angle to generate position (degree)
+#define MAX_ATOMS_NB_IN_PATTERN 11 // Maximum number of atoms belonging to a pattern (for a cycle : 7 C and 4 H atoms)
 
 /********* not to be modified (the incremental order must be preserved) */
 // Flags atoms in the envelope and cage
