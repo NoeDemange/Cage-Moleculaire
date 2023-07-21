@@ -63,83 +63,92 @@ int isHinderedSubstrate(Molecule_t* sub, Point_t p) {
  * @param sub Substrate molecule.
  */
 int addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, Point_t newStartPos, Molecule_t* sub, int nbPatterns, int nbCycles) {
-	
-	int addedCounter = 0;
 
-	for (int i = 0; forEachNeighbor((atom(processedMoc,idStart)), i); i++) { // For every possible plans with starting atom's neighbors
+	Point_t neighborStartPos = coords(atom(processedMoc, neighbor(atom(processedMoc, idStart), 0)));
+	Point_t startPos = coords(atom(processedMoc, idStart));
+
+	// Look for a normal to position the ring.
+	Point_t normal = planNormal(newStartPos, startPos, neighborStartPos);
+	normal = rotation(vector(newStartPos, startPos),  45, normal);
+
+	for (int i = 0; i < 4; i++) { // Test 4 different orientations of the ring.
 		int idNext = -1;
-		int idAtomCycle = -1;
-		Point_t nextPos;
-		Point_t hydrogen;
-		Point_t hydrogen2;
-		Point_t copyNewStartPos = newStartPos;
-		Shell_t* moc = SHL_copy(processedMoc);
-			
-		Point_t neighborStartPos = coords(atom(moc, neighbor(atom(moc, idStart), i)));
-		Point_t startPos = coords(atom(moc, idStart));
-			
+	  int idAtomCycle = -1;
+	  Point_t nextPos;
+	  Point_t hydrogen;
+	  Point_t hydrogen2;
+	  Shell_t* moc = SHL_copy(processedMoc);
+		Point_t startCyclePos = newStartPos;
+		normal = rotation(vector(startCyclePos, startPos),  45, normal);
+
 		// Add the first ring atom of already known position.
-		int idnewStart = SHL_addAtom(moc, copyNewStartPos, -1);
+		int idnewStart = SHL_addAtom(moc, startCyclePos, -1);
 		flag(atom(moc, idnewStart)) = CARBON_F;
 		SHL_addEdge(moc, idStart, idnewStart);
 
-		// Look for the normal to position the ring.
-		Point_t normal = planNormal(copyNewStartPos, startPos, neighborStartPos);
-		normal = rotation(normalization(vector(copyNewStartPos, startPos), 1),  90, normal); // Perpendicular
-			
 		// Position the other atoms of the cycle.
-		neighborStartPos = AX1E2(copyNewStartPos, coords(atom(moc, idStart)), normal, SIMPLE_CYCLE); // Neighbor
-		copyNewStartPos = AX2E1(copyNewStartPos, coords(atom(moc, idStart)), neighborStartPos, SIMPLE_CYCLE); 
-		if (isHindered(moc, sub, copyNewStartPos)) {
+		neighborStartPos = AX1E2(startCyclePos, coords(atom(moc, idStart)), normal, SIMPLE_CYCLE); // Neighbor
+		startCyclePos = AX2E1(startCyclePos, coords(atom(moc, idStart)), neighborStartPos, SIMPLE_CYCLE); 
+		if (isHindered(moc, sub, startCyclePos)) {
 			SHL_delete(moc);
-			return addedCounter;
+			continue;
 		}
 
-		idAtomCycle = SHL_addAtom(moc, copyNewStartPos, -1);
+		idAtomCycle = SHL_addAtom(moc, startCyclePos, -1);
 		flag(atom(moc, idAtomCycle)) = CARBON_F;
 		SHL_addEdge(moc, idnewStart, idAtomCycle);
 
 		int idNeighbor = idAtomCycle;
-		for (int i = 0; i < 4; i++) {
+		int wasHindered = 0;
+
+		for (int j = 0; j < 4; j++) {
 			neighborStartPos = coords(atom(moc, neighbor(atom(moc, idNeighbor), 0)));
-			copyNewStartPos = AX1E2(copyNewStartPos, neighborStartPos, normal, SIMPLE_CYCLE);
-			if(i!=2){
-				hydrogen = AX2E1(coords(atom(moc, idNeighbor)), neighborStartPos, copyNewStartPos, DIST_ATOM_H);
+			startCyclePos = AX1E2(startCyclePos, neighborStartPos, normal, SIMPLE_CYCLE);
+
+			if (j != 2) {
+				hydrogen = AX2E1(coords(atom(moc, idNeighbor)), neighborStartPos, startCyclePos, DIST_ATOM_H);
 				if (isHindered(moc, sub, hydrogen)) {
 					SHL_delete(moc);
-					return addedCounter;
+					wasHindered = 1;
+					break;
 				}
 			}
-			if(i==3){
-				hydrogen2 = AX2E1(copyNewStartPos, coords(atom(moc, idNeighbor)), coords(atom(moc, idnewStart)), DIST_ATOM_H);
+			if (j == 3) {
+				hydrogen2 = AX2E1(startCyclePos, coords(atom(moc, idNeighbor)), coords(atom(moc, idnewStart)), DIST_ATOM_H);
 				if (isHindered(moc, sub, hydrogen2)) {
 					SHL_delete(moc);
-					return addedCounter;
+					wasHindered = 1;
+					break;
 				}
 			}
-			if (isHindered(moc, sub, copyNewStartPos)) {
+			if (isHindered(moc, sub, startCyclePos)) {
 				SHL_delete(moc);
-				return addedCounter;
+				wasHindered = 1;
+				break;
 			}
-			idAtomCycle = SHL_addAtom(moc, copyNewStartPos, -1);
+			idAtomCycle = SHL_addAtom(moc, startCyclePos, -1);
 			flag(atom(moc, idAtomCycle)) = CARBON_F;
 			SHL_addEdge(moc, idNeighbor, idAtomCycle);
-			if(i!=2){
+
+			if (j != 2) { 
 				int idHydrogen = SHL_addAtom(moc, hydrogen, -1);
 				flag(atom(moc, idHydrogen)) = HYDROGEN_F;
 				SHL_addEdge(moc, idNeighbor, idHydrogen);
 			}
-			if(i==3) {
+			if (j == 3) {
 				int idHydrogen2 = SHL_addAtom(moc, hydrogen2, -1);
 				flag(atom(moc, idHydrogen2)) = HYDROGEN_F;
 				SHL_addEdge(moc, idAtomCycle, idHydrogen2);
-				}
+			}
 
-			if (i == 1) {// Position the next starting atom to continue the path.
-				nextPos = copyNewStartPos;
+			if (j == 1) {// Position the next starting atom to continue the path.
+				nextPos = startCyclePos;
 				idNext = idAtomCycle;
 			}
 			idNeighbor = idAtomCycle;
+		}
+		if (wasHindered) {
+			continue;
 		}
 
 		SHL_addEdge(moc, idnewStart, idAtomCycle);
@@ -147,22 +156,23 @@ int addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, 
 		// Position atom after the cycle.
 		neighborStartPos = coords(atom(moc, neighbor(atom(moc, idNext), 0)));
 		Point_t v2 = coords(atom(moc, neighbor(atom(moc, idNext), 1)));
-		copyNewStartPos = AX2E1(nextPos, neighborStartPos, v2, DIST_SIMPLE); 
-		if (isHindered(moc, sub, copyNewStartPos)) {
+		startCyclePos = AX2E1(nextPos, neighborStartPos, v2, DIST_SIMPLE); 
+		if (isHindered(moc, sub, startCyclePos)) {
 			SHL_delete(moc);
-			return addedCounter;
+			continue;
 		}
-		int idSuiv2 = SHL_addAtom(moc, copyNewStartPos, -1);
+		int idSuiv2 = SHL_addAtom(moc, startCyclePos, -1);
 		flag(atom(moc, idSuiv2)) = CARBON_F;
 		SHL_addEdge(moc, idNext, idSuiv2);
-			
+		
+
 		LSTm_addElement(mocsInProgress, moc);
 		mocsInProgress->first->nbPatterns = nbPatterns + 1;
 		mocsInProgress->first->nbCycles = nbCycles + 1;
 		LSTd_addElement(newStarts, idSuiv2);
-		addedCounter++;
+		return 1; // We arbitrarily choose to keep only the first valid cycle inserted. 
 	}
-	return addedCounter;
+	return 0;
 }
 
 /**
