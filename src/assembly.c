@@ -165,7 +165,7 @@ void addAromaticRing(Shell_t* processedMoc, List_m* mocsInProgress, int idStart,
 		mocsInProgress->first->nbPatterns = nbPatterns + 1;
 		mocsInProgress->first->nbCycles = nbCycles + 1;
 		LSTd_addElement(newStarts, idSuiv2);
-		return; // Keep only the first valid cycle inserted.
+		return; // We arbitrarily choose to keep only the first valid cycle inserted. 
 	}
 }
 
@@ -206,15 +206,12 @@ void addProjection(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, L
 void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Point_t** keptPositions, Molecule_t* sub) {
 	
 	int idBeforeStart = neighbor(atom(processedMoc, idStart), 0);
-	int idFirstNeighbor = neighbor(atom(processedMoc,idBeforeStart), 0);
-	int idSecondNeighbor = neighbor(atom(processedMoc,idBeforeStart), 1);
 
 	Point_t startPos = coords(atom(processedMoc, idStart));
 	Point_t beforeStartPos = coords(atom(processedMoc, idBeforeStart));
-	Point_t beforeStartNeighborPos = (idFirstNeighbor == idStart) ? coords(atom(processedMoc, idSecondNeighbor)) : 
-																	                                coords(atom(processedMoc, idFirstNeighbor));
 
-	Point_t normal = planNormal(startPos, beforeStartPos, beforeStartNeighborPos);
+	Point_t direction = vector(startPos, beforeStartPos);
+	Point_t normal = {-(direction.y + direction.z) / direction.x, 1, 1}; // Orthogonal vector to direction.
 	
 	Point_t newStartPos = AX1E3(startPos, beforeStartPos, normal, DIST_SIMPLE);
 	Point_t hydrogen1Pos = AX2E2(startPos, beforeStartPos, newStartPos, DIST_ATOM_H);
