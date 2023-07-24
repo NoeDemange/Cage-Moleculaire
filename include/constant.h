@@ -69,14 +69,8 @@ A___/   \___B
 #define HYDROGEN_F 7
 
 // Voxelization
-#define GRID_SIZE_X 51
-#define GRID_SIZE_Y 51
-#define GRID_SIZE_Z 51
-#define START_GRID_X -30.0
-#define START_GRID_Y -30.0
-#define START_GRID_Z -30.0
-#define LENGTH_GRID_X (-START_GRID_X*2)/GRID_SIZE_X
-#define LENGTH_GRID_Y (-START_GRID_Y*2)/GRID_SIZE_Y
-#define LENGTH_GRID_Z (-START_GRID_Z*2)/GRID_SIZE_Z
+#define GRID_SIZE 201 //le nombre de voxel qu'on veut +1 car on place les points
+#define START_GRID -30.0
+#define LENGTH_GRID (-START_GRID*2)/GRID_SIZE
 
 #endif

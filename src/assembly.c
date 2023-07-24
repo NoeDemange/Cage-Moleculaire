@@ -5,7 +5,6 @@
 #include <math.h>
 #include <omp.h>
 #include "voxelization.h"
-#include "AStar.h"
 
 /**
  * @brief Checks if a point is far enough away from the other atoms 
@@ -758,13 +757,13 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			Shell_t* processedMoc = mocsInProgress->first->moc;
 			mocsInProgress->first->moc = NULL;
 			LSTm_removeFirst(mocsInProgress);
-			//#pragma omp parallel
+			#pragma omp parallel
 			{
 				currentPair = startEndAtoms;
-				//#pragma omp single
+				#pragma omp single
 				{
 					while (currentPair) { // For all pairs of atoms to connect.
-					//#pragma omp task firstprivate(currentPair)
+					#pragma omp task firstprivate(currentPair)
 					{
 						int idStart = currentPair->start;
 						int idEnd = currentPair->end;

@@ -39,7 +39,7 @@ Graph_t* ShlToGph(Shell_t* s) {
 }
 
 // Helper function to create a new node
-Node createNode(Point3D point, int g, int h) {
+Node createNode(Point3D point, float g, float h) {
     Node node;
     node.point = point;
     node.g = g;

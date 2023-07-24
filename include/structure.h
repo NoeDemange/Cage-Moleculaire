@@ -114,6 +114,15 @@ typedef struct {
 } List_d;
 
 /**************************************/
+/* POINT ***************************/
+/**************************************/
+
+typedef struct {
+    int x, y, z;
+} Point3D;
+
+
+/**************************************/
 /* GRAPHE *****************************/
 /**************************************/
 typedef struct {
@@ -131,24 +140,17 @@ typedef struct {
 	unsigned size;
 } Graph_t;
 
+typedef struct {
+    Point3D point;
+    float g, h, f;
+} Node;
+
 /**************************************/
 /* VOXEL ***************************/
 /**************************************/
 
 typedef int*** VOXELGRID;
 
-/**************************************/
-/* A-Star ***************************/
-/**************************************/
-
-typedef struct {
-    int x, y, z;
-} Point3D;
-
-typedef struct {
-    Point3D point;
-    float f, g, h;
-} Node;
 
 /**************************************/
 /* MOLECULE ***************************/
@@ -252,6 +254,27 @@ typedef struct {
 	Elem *first;	
 } List_m;
 
+/**************************************/
+/* NODE HEAP **************************/
+/**************************************/
+typedef struct{
+	float dist;
+	int indexHeap; //-1 already seen
+	//int seen;
+}VMap; //voxel map for pathfinding
+
+typedef struct{
+	int size;
+	Node* node;
+}NodeHeap;
+
+//NodeHeap
+NodeHeap NH_initAlloc(int size);
+void NH_free(NodeHeap nodeHeap);
+void NH_insert(NodeHeap* nodeHeap, Node p, VMap*** vMap);
+Node NH_extractMin(NodeHeap* nodeHeap, VMap*** vMap);
+void NH_decrease_priority(NodeHeap* nodeHeap, VMap*** vMap, Point3D point, float distG);
+void NH_print(NodeHeap nodeHeap);
 
 //Point
 Point_t PT_init(float);
@@ -323,7 +346,7 @@ unsigned GPH_checkBond(Graph_t*, unsigned, unsigned);
 Graph_t* GPH_create();
 void GPH_delete(Graph_t*);
 Graph_t* GPH_copy(Graph_t*);
-Node createNode(Point3D point, int g, int h);
+Node createNode(Point3D point, float g, float h);
 
 //Molecule
 

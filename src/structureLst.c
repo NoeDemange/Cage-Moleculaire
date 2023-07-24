@@ -1,6 +1,6 @@
 #include "structure.h"
 #include "util.h"
-#include "AStar.h"
+#include "pathFinding.h"
 #include <limits.h>
 
 /**************************************/

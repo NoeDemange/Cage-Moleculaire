@@ -72,32 +72,32 @@ int PT_equal(Point_t A, Point_t B) { //1 if equal, if not 0
 // Helper function to create a new Point3D from Point_t
 Point3D createPoint3D(Point_t p) {
     Point3D point;
-    point.x = (int)((abs(START_GRID_X) + (p.x))/(LENGTH_GRID_X));
+    point.x = (int)((abs(START_GRID) + (p.x))/(LENGTH_GRID));
     if(point.x<0){ 
 		printf("grid too small\n");
 		point.x = 0;
 	} //Pour éviter d'être en dehors de la grille peut-être à changer par autre méthode meilleur
-    if(point.x>=GRID_SIZE_X) {
+    if(point.x>=GRID_SIZE) {
 		printf("grid too small\n");
-		point.x = GRID_SIZE_X-1;
+		point.x = GRID_SIZE-1;
 	}//Pour éviter d'être en dehors de la grille peut-être à changer par autre méthode meilleur
-    point.y = (int)((abs(START_GRID_Y) + (p.y))/(LENGTH_GRID_Y));
+    point.y = (int)((abs(START_GRID) + (p.y))/(LENGTH_GRID));
     if(point.y<0) {
 		printf("grid too small\n");
 		point.y = 0;
 	}//Pour éviter d'être en dehors de la grille peut-être à changer par autre méthode meilleur
-    if(point.y>=GRID_SIZE_Y) {
+    if(point.y>=GRID_SIZE) {
 		printf("grid too small\n");
-		point.y = GRID_SIZE_Y-1;
+		point.y = GRID_SIZE-1;
 	}//Pour éviter d'être en dehors de la grille peut-être à changer par autre méthode meilleur
-    point.z = (int)((abs(START_GRID_Z) + (p.z))/(LENGTH_GRID_Z));
+    point.z = (int)((abs(START_GRID) + (p.z))/(LENGTH_GRID));
     if(point.z<0) {
 		printf("grid too small\n");
 		point.z = 0;
 	}//Pour éviter d'être en dehors de la grille peut-être à changer par autre méthode meilleur
-    if(point.z>=GRID_SIZE_Z) {
+    if(point.z>=GRID_SIZE) {
 		printf("grid too small\n");
-		point.z = GRID_SIZE_Z-1;
+		point.z = GRID_SIZE-1;
 	}//Pour éviter d'être en dehors de la grille peut-être à changer par autre méthode meilleur
     return point;
 }
@@ -105,8 +105,8 @@ Point3D createPoint3D(Point_t p) {
 // Helper function to create a new Point_t from Point3D
 Point_t createPoint_t(Point3D point) {
     Point_t p;
-    p.x = (START_GRID_X + (point.x*LENGTH_GRID_X));
-    p.y = (START_GRID_Y + (point.y*LENGTH_GRID_Y));
-    p.z = (START_GRID_Z + (point.z*LENGTH_GRID_Z));
+    p.x = (START_GRID + (point.x*LENGTH_GRID));
+    p.y = (START_GRID + (point.y*LENGTH_GRID));
+    p.z = (START_GRID + (point.z*LENGTH_GRID));
     return p;
 }
