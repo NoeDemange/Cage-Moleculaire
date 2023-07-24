@@ -147,17 +147,17 @@ void LST_delete(List_t* l) {
 }
 
 /******************************/
-Element* LST_pairs_init(void) {
+Pair_t* LST_pairs_init(void) {
 
-	Element* list = malloc(sizeof(Element));
+	Pair_t* list = malloc(sizeof(Pair_t));
 	list = NULL;
 	return list;
 }
 
 // Add at the beginning
-void LST_pairs_addElement(Element** list, int start, int end) {
+void LST_pairs_addElement(Pair_t** list, int start, int end) {
 	
-	Element* elem = malloc(sizeof(Element));
+	Pair_t* elem = malloc(sizeof(Pair_t));
 	elem->start = start;
 	elem->end = end;
 	elem->next = *list;
@@ -174,12 +174,12 @@ void LST_pairs_addElement(Element** list, int start, int end) {
  * @param start Index of the starting atom of the path in the cage.
  * @param end Index of the ending atom of the path in the cage.
  */
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end) {
+void LST_pairs_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end) {
 	
 	float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
 	float distOtherPair;
-	Element* currentElem = *list;
-	Element* previousElem = NULL;
+	Pair_t* currentElem = *list;
+	Pair_t* previousElem = NULL;
 
 	if (currentElem) { // If the list is not empty.
 		distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
@@ -193,7 +193,7 @@ void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end)
 		}
 	}
 
-	Element* elem = malloc(sizeof(Element));
+	Pair_t* elem = malloc(sizeof(Pair_t));
 	elem->start = start;
 	elem->end = end;
 	elem->next = currentElem;
@@ -205,10 +205,10 @@ void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end)
 	}
 }
 
-void LST_pairs_removeFirst(Element* list) {
+void LST_pairs_removeFirst(Pair_t* list) {
 	
 	if (list) {
-		Element* delete = list;
+		Pair_t* delete = list;
 		list = list->next;
 		free(delete);
 	}
@@ -217,11 +217,11 @@ void LST_pairs_removeFirst(Element* list) {
 	}
 }
 
-void LST_pairs_delete(Element* list) {
+void LST_pairs_delete(Pair_t* list) {
 
 	if (list) {
 		while (list) {
-			Element* delete = list;
+			Pair_t* delete = list;
 			list = list->next;
 			free(delete);
 		}

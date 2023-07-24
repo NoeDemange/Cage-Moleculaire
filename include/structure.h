@@ -31,6 +31,7 @@
 // (in a loop) Browse a list of neighbors until it finds a -1 element (an unused value).
 // The unused values of neighbors must be at the end. 
 #define forEachNeighbor(a,i) (i) < neighborhoodSize((a)) && neighbor((a),(i)) != -1
+#define coordsNeighbor(s, a, i) coords(atom((s), neighbor(atom((s), (a)), (i))))
 
 ///macro molecule
 #define symbol(a) (a)->info.symbol
@@ -75,12 +76,12 @@ typedef struct {
 } List_t;
 
 // Liste des sommets a relier
-typedef struct Element Element;
-struct Element {
+typedef struct Pair_t Pair_t;
+struct Pair_t {
 	
 	int start;
 	int end;
-	Element *next;
+	Pair_t *next;
 };
 
 // Liste des sommets intermediaires
@@ -235,23 +236,27 @@ typedef struct {
 /* PATHS ******************************/
 /**************************************/
 
+
 typedef struct {
 	int idStart;
 	int idEnd;
-	int index;
-	Point_t** patternsBuffer;
-	Point_t* positionsBuffer;
-	int* numPatternArray;
-
+	int size; // Index on patterns.
+	int sizeMax;
+	Point_t** patterns;
+	//Point_t* positionsBuffer;
+	int* orientations; // Cycle orientation.
+	int* positionNum; // Position number in patterns.
+	int* patternNum; // Pattern number in patterns.
+	int* maxPositions; // Number of kept positions.
 } Path_t;
 
 
 //Path
 
-Path_t* PTH_init(int size, Element* elem);
-void PTH_delete(Path_t*, int);
-Point_t** keptPositions_init();
-void keptPositions_delete(Point_t** table);
+Path_t* PTH_init(int size, Pair_t* pair);
+void PTH_delete(Path_t*);
+int PTH_countAroRings(Path_t*);
+void PTH_printPath(Path_t* path);
 
 //Point
 
@@ -278,11 +283,11 @@ List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei);
 List_t* LST_addList(List_t*, List_t*);
 void LST_delete(List_t*);
 
-Element* LST_pairs_init(void);
-void LST_pairs_addElement(Element** list, int start, int end);
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end);
-void LST_pairs_removeFirst(Element* list);
-void LST_pairs_delete(Element* list);
+Pair_t* LST_pairs_init(void);
+void LST_pairs_addElement(Pair_t** list, int start, int end);
+void LST_pairs_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end);
+void LST_pairs_removeFirst(Pair_t* list);
+void LST_pairs_delete(Pair_t* list);
 
 List_m* LSTm_init();
 void LSTm_addElement(List_m* list, Shell_t* moc);
