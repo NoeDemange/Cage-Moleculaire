@@ -230,7 +230,7 @@ struct Elem {
 typedef struct {
 	
 	Elem *first;	
-} List_m;
+} mStack_t;
 
 /**************************************/
 /* PATHS ******************************/
@@ -256,6 +256,7 @@ typedef struct {
 Path_t* PTH_init(int size, Pair_t* pair);
 void PTH_delete(Path_t*);
 int PTH_countAroRings(Path_t*);
+void PTH_addPath(Shell_t* moc, Path_t* path);
 void PTH_printPath(Path_t* path);
 
 //Point
@@ -283,16 +284,16 @@ List_t* LST_copyWithShift(List_t* l, int* mod_pos_nei);
 List_t* LST_addList(List_t*, List_t*);
 void LST_delete(List_t*);
 
-Pair_t* LST_pairs_init(void);
-void LST_pairs_addElement(Pair_t** list, int start, int end);
-void LST_pairs_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end);
-void LST_pairs_removeFirst(Pair_t* list);
-void LST_pairs_delete(Pair_t* list);
+Pair_t* PR_init(void);
+void PR_addElement(Pair_t** list, int start, int end);
+void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end);
+void PR_removeFirst(Pair_t* list);
+void PR_delete(Pair_t* list);
 
-List_m* LSTm_init();
-void LSTm_addElement(List_m* list, Shell_t* moc);
-void LSTm_removeFirst(List_m* list);
-void LSTm_delete(List_m* list);
+mStack_t* mSTK_init();
+void mSTK_addElement(mStack_t* list, Shell_t* moc);
+void mSTK_removeFirst(mStack_t* list);
+void mSTK_delete(mStack_t* list);
 
 List_s* LSTs_init();
 void LSTs_addElement(List_s* list, Point_t sommet);

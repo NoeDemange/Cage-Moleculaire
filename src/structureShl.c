@@ -165,31 +165,6 @@ void SHL_removeAtom(Shell_t* s, unsigned id) {
 	}
 }
 
-//Relie les éléments de la liste l2 au plus proche de la liste l1
-/*void SHL_avoir2(Shell_t* s, List_t* l1, List_t* l2) {
-
-	int i, j, indiceMin;
-	float distMin, dis;
-
-	for (i=0; i<size(l2) && elts(l2,i)!=-1; i++) {
-
-		indiceMin = elts(l1,0);
-		distMin = dist(coords(atom(s, elts(l2,i))), coords(atom(s, elts(l1,0))));
-		for (j=1; j<size(l1) && elts(l1,j)!=-1; j++) {
-
-			dis = dist(coords(atom(s, elts(l2,i))), coords(atom(s, elts(l1,j))));
-			if (dis < distMin) {
-				indiceMin = elts(l1,j);
-				distMin = dis;
-			}
-		}
-
-
-		if (flag(atom(s, indiceMin)) != 1)
-			SHL_addEdge(s, elts(l2,i), indiceMin);
-	}
-}*/
-
 List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 
 	int i;
@@ -210,7 +185,6 @@ List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 	return out;
 }
 
-//remplacement de avoir2
 /*void SHL_linkBorder(Shell_t* s, unsigned id, List_t* l) {
 
 	int i, j, indiceMin;
@@ -380,44 +354,6 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) {
 	return copy;
 }
 
-//Approxiation des distances
-//Création d'un shell de sommets.
-/*Shell_t* SHL_avoir(Shell_t* s) {
-	int i, j, k, nb;
-	float AB, dis;
-	AtomShl_t* A, *B;
-	Shell_t* out = SHL_create();
-
-	//size(out) = size(s);
-	out->atoms = malloc(size(s)*sizeof(AtomShl_t));
-
-	for (i=0; i<size(s); i++) {
-		SHL_addAtom(out, coords(atom(s,i)), -1);
-	}
-
-	for (i=0; i<size(s); i++) {
-		A = atom(s,i);
-		for (j=0; j<neighborhoodSize(A); j++) {
-			B = atom(s, neighbor(A,j));
-			if (i < neighbor(A,j)) {
-				AB = dist(coords(A), coords(B));
-				nb = roundf(AB/DIST_SIMPLE);
-				dis = AB/nb;
-
-				for (k=1; k<nb; k++)
-					SHL_addAtom(
-						out,
-						addPoint(
-							coords(A),
-							normalization( vector(coords(A),coords(B)), k*dis)),
-						-1);
-			}
-		}
-	}
-
-	return out;
-}*/
-
 void SHL_testDis(Shell_t* s) {
 
 int i, j;
@@ -431,7 +367,8 @@ int i, j;
 						}
 						else if (flag(atom(s,i)) == HYDRO_PATTERN_F && flag(atom(s,j)) == LINKABLE_F) {
 							SHL_removeAtom(s, j);
-						}else {
+						}
+						else {
 							if (flag(atom(s,i)) == LINKABLE_F && flag(atom(s,j)) == LINKABLE_F) {
 								flag(atom(s,i)) = CARBON_F; // Change the flag when both linkable to prevent choosing them as the starting or ending atom.
 								SHL_mergeAtom2(s, i, j);

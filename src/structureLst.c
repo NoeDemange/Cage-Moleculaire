@@ -3,7 +3,7 @@
 #include <limits.h>
 
 /**************************************/
-/* LISTE ******************************/
+/* LIST *******************************/
 /**************************************/
 void LST_init(List_t* l) {
 	l->elts = NULL;
@@ -146,8 +146,10 @@ void LST_delete(List_t* l) {
 	free(l);
 }
 
-/******************************/
-Pair_t* LST_pairs_init(void) {
+/**************************************/
+/* PAIR *******************************/
+/**************************************/
+Pair_t* PR_init(void) {
 
 	Pair_t* list = malloc(sizeof(Pair_t));
 	list = NULL;
@@ -155,7 +157,7 @@ Pair_t* LST_pairs_init(void) {
 }
 
 // Add at the beginning
-void LST_pairs_addElement(Pair_t** list, int start, int end) {
+void PR_addElement(Pair_t** list, int start, int end) {
 	
 	Pair_t* elem = malloc(sizeof(Pair_t));
 	elem->start = start;
@@ -174,7 +176,7 @@ void LST_pairs_addElement(Pair_t** list, int start, int end) {
  * @param start Index of the starting atom of the path in the cage.
  * @param end Index of the ending atom of the path in the cage.
  */
-void LST_pairs_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end) {
+void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end) {
 	
 	float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
 	float distOtherPair;
@@ -205,7 +207,7 @@ void LST_pairs_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end) 
 	}
 }
 
-void LST_pairs_removeFirst(Pair_t* list) {
+void PR_removeFirst(Pair_t* list) {
 	
 	if (list) {
 		Pair_t* delete = list;
@@ -217,7 +219,7 @@ void LST_pairs_removeFirst(Pair_t* list) {
 	}
 }
 
-void LST_pairs_delete(Pair_t* list) {
+void PR_delete(Pair_t* list) {
 
 	if (list) {
 		while (list) {
@@ -230,18 +232,21 @@ void LST_pairs_delete(Pair_t* list) {
 		fprintf(stderr, "List is already deleted.\n");
 	}
 }
-/******************************/
 
-List_m* LSTm_init() {
+/**************************************/
+/* MOC STACK **************************/
+/**************************************/
+
+mStack_t* mSTK_init() {
 	
-	List_m* list = malloc(sizeof(List_m));
+	mStack_t* list = malloc(sizeof(mStack_t));
 	list->first = NULL;
 	
 	return list;
 }
 
-// Ajout au début
-void LSTm_addElement(List_m* list, Shell_t* moc) {
+// Add at the begining.
+void mSTK_addElement(mStack_t* list, Shell_t* moc) {
 	
 	Elem* elem = malloc(sizeof(Elem));
 	
@@ -251,7 +256,7 @@ void LSTm_addElement(List_m* list, Shell_t* moc) {
 	list->first = elem;
 }
 
-void LSTm_removeFirst(List_m* list) {
+void mSTK_removeFirst(mStack_t* list) {
 	
 	Elem* suppr = list->first;
 	list->first = list->first->next;
@@ -259,11 +264,11 @@ void LSTm_removeFirst(List_m* list) {
 	free(suppr);
 }
 
-void LSTm_delete(List_m* list) {
+void mSTK_delete(mStack_t* list) {
 
 	while (list->first)
 	{
-		LSTm_removeFirst(list);
+		mSTK_removeFirst(list);
 	}
 	free(list);
 }
@@ -370,71 +375,4 @@ Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
 		l = l->next;
 	}
 	return min;
-}
-
-/******************************/
-
-List_d* LSTd_init() {
-	
-	List_d* list = malloc(sizeof(List_d));
-	list->first = NULL;
-	
-	return list;
-}
-
-// Ajout au début
-void LSTd_addElement(List_d* list, int sommet) {
-	
-	Elem_d* elem = malloc(sizeof(Elem_d));
-	
-	elem->idAtom = sommet;
-	elem->next = list->first;
-	
-	list->first = elem;
-}
-
-void LSTd_removeFirst(List_d* list) {
-	
-	Elem_d* suppr = list->first;
-	list->first = list->first->next;
-	free(suppr);
-}
-
-void LSTd_removeSommet(List_d* list, int sommet) {
-	Elem_d* cursor = list->first;
-	Elem_d* suppr = NULL;
-	if (cursor)
-	{
-		if (cursor->idAtom == sommet)
-		{
-			LSTd_removeFirst(list);
-		}
-		else
-		{
-			while (cursor->next && !suppr)
-			{
-				if (cursor->next->idAtom == sommet)
-				{
-					suppr = cursor->next;
-					cursor->next = cursor->next->next;
-				}
-				else cursor = cursor->next;
-			}
-		}
-		
-	}
-	if (suppr)
-	{
-		free(suppr);
-	}
-	
-}
-
-void LSTd_delete(List_d* list) {
-
-	while (list->first)
-	{
-		LSTd_removeFirst(list);
-	}
-	free(list);
 }
