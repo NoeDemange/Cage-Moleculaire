@@ -1,5 +1,6 @@
 #include "structure.h"
 #include "util.h"
+#include "pathFinding.h"
 #include <limits.h>
 
 /**************************************/
@@ -173,10 +174,11 @@ void LST_pairs_addElement(Element** list, int start, int end) {
  * @param list List of pairs of atoms to connect.
  * @param start Index of the starting atom of the path in the cage.
  * @param end Index of the ending atom of the path in the cage.
+ * @param voxelGrid Grid of voxelization.
  */
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end) {
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid) {
 	
-	float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
+	/*float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
 	float distOtherPair;
 	Element* currentElem = *list;
 	Element* previousElem = NULL;
@@ -191,11 +193,30 @@ void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end)
 				distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
 			}
 		}
+	}*/
+	Point_t endPos = coords(atom(s, end));
+	Point_t startPos = coords(atom(s, start));
+	Point3D endPoint = createPoint3D(endPos);
+	float EndDist = dist(endPos, createPoint_t(endPoint));
+	Point3D startPoint = createPoint3D(startPos);
+	float startDist = dist(startPos, createPoint_t(startPoint));
+	float computedDist = aStarPathfinding(startPoint, endPoint, voxelGrid);
+	Element* currentElem = *list;
+	Element* previousElem = NULL;
+
+	computedDist = computedDist + EndDist + startDist;
+	while(currentElem){
+		if(currentElem->distance < computedDist){
+			previousElem = currentElem;
+			currentElem = currentElem->next;
+		}
+		else{break;}
 	}
 
 	Element* elem = malloc(sizeof(Element));
 	elem->start = start;
 	elem->end = end;
+	elem->distance = computedDist;
 	elem->next = currentElem;
 	if (previousElem) {
 		previousElem->next = elem;
@@ -291,6 +312,45 @@ void LSTs_addElement(List_s* list, Point_t sommet) {
 	list->first = elem;
 }
 
+/**
+ * @brief Adds the position of atoms with sorting them 
+ * by ascending A* distance.
+ * 
+ * @param list List of pairs of atoms to connect.
+ * @param startPos Position of the atom
+ * @param endPos Position of the objectif atom
+ * @param voxelGrid Grid of voxelization
+ */
+void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid) {
+	Point3D endPoint = createPoint3D(endPos);
+	float EndDist = dist(endPos, createPoint_t(endPoint));
+	Point3D startPoint = createPoint3D(startPos);
+	float startDist = dist(startPos, createPoint_t(startPoint));
+	float computedDist = aStarPathfinding(startPoint, endPoint, voxelGrid);
+	Elem_s* currentElem = list->first;
+	Elem_s* previousElem = NULL;
+
+	computedDist = computedDist + EndDist + startDist;
+	while(currentElem){
+		if(currentElem->distance < computedDist){
+			previousElem = currentElem;
+			currentElem = currentElem->next;
+		}
+		else{break;}
+	}
+
+	Elem_s* elem = malloc(sizeof(Elem_s));
+	elem->position = startPos;
+	elem->distance = computedDist;
+	elem->next = currentElem;
+	if (previousElem) {
+		previousElem->next = elem;
+	}
+	else {
+		list->first = elem;
+	}
+}
+
 void LSTs_removeFirst(List_s* list) {
 	
 	Elem_s* suppr = list->first;
@@ -337,9 +397,9 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 	}
 }
 
-// Retourne le point de la liste le plus proche du point en argument
+/*// Retourne le point de la liste le plus proche du point en argument
 Point_t minDist(List_s* list, Point_t p) {
-	Point_t min = PT_init();
+	Point_t min = PT_init(0);
 	float minDist = __FLT_MAX__; //si déclarer comme un int permet un choix entre le plus optimal et un sous-opitmal (marche mieux que float pour l'instant)
 	float computedDist;
 	Elem_s* l = list->first;
@@ -352,25 +412,7 @@ Point_t minDist(List_s* list, Point_t p) {
 		l = l->next;
 	}
 	return min;
-}
-
-// Retourne le point de la liste le plus proche du point en argument
-Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
-	Point_t min = PT_init();
-	float minDist = __FLT_MAX__;
-	float computedDist;
-	Elem_s* l = list->first;
-	while (l) {
-		computedDist = dist_obstacle(l->position, p, sub);
-		if (computedDist < minDist) {
-			min = l->position;
-			minDist = computedDist;
-			minDist = computedDist;
-		}
-		l = l->next;
-	}
-	return min;
-}
+}*/
 
 /******************************/
 

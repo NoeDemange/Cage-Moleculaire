@@ -271,7 +271,7 @@ void SHL_mergeAtom(Shell_t* s, unsigned eater, unsigned eaten) {
 	}
 }
 
-void SHL_mergeAtom2(Shell_t* s, unsigned id1, unsigned id2) {
+/*void SHL_mergeAtom2(Shell_t* s, unsigned id1, unsigned id2) {
 
 	AtomShl_t* a1, *a2;
 
@@ -288,11 +288,11 @@ void SHL_mergeAtom2(Shell_t* s, unsigned id1, unsigned id2) {
 				flag(a1) = flag(a2);
 		}
 
-		coords(a1) = merPoint(coords(a1), coords(a2));
+		coords(a1) = PT_merge(coords(a1), coords(a2));
 
 		SHL_removeAtom(s, id2);
 	}
-}
+}*/
 
 Shell_t* SHL_create() {
 
@@ -407,7 +407,7 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) {
 				for (k=1; k<nb; k++)
 					SHL_addAtom(
 						out,
-						addPoint(
+						PT_add(
 							coords(A),
 							normalization( vector(coords(A),coords(B)), k*dis)),
 						-1);
@@ -418,7 +418,7 @@ Shell_t* SHL_copyCageAtoms(Shell_t* s) {
 	return out;
 }*/
 
-void SHL_testDis(Shell_t* s) {
+/*void SHL_testDis(Shell_t* s) {
 
 int i, j;
 	for (i = 0; i < size(s); i++) {
@@ -454,7 +454,7 @@ int i, j;
 			}
 		}
 	}
-}
+}*/
 
 void SHL_deleteAtom(AtomShl_t* a) {
 

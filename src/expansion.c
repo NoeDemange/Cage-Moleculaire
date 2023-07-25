@@ -77,12 +77,12 @@ void expansion_steric3(Molecule_t* m, Shell_t* s, unsigned id) {
 	normal = normalization(planNormal(x1, x2, x3), DIST_HYDRO);
 
 	if (cycle(m,id)) {
-		SHL_addCycle(s, SHL_addAtom(s, addPoint(a, normal), id));
-		SHL_addCycle(s, SHL_addAtom(s, subPoint(a, normal), id));
+		SHL_addCycle(s, SHL_addAtom(s, PT_add(a, normal), id));
+		SHL_addCycle(s, SHL_addAtom(s, PT_sub(a, normal), id));
 	}
 	else {
-		SHL_addAtom(s, addPoint(a, normal), id);
-		SHL_addAtom(s, subPoint(a, normal), id);
+		SHL_addAtom(s, PT_add(a, normal), id);
+		SHL_addAtom(s, PT_sub(a, normal), id);
 	}
 }
 
@@ -112,7 +112,7 @@ void expansion_steric4(Molecule_t* m, Shell_t* s, unsigned id) {
 			x2 = coords(atom(m,neighbor(atom(m,neighbor(atom(m,id),0)),0)));
 
 		//à voir si on le garde
-		x2 = addPoint(a, planNormal(a, x1, x2));
+		x2 = PT_add(a, planNormal(a, x1, x2));
 		normal = planNormal(a, x1, x2);
 		x2 = AX1E3(a, x1, normal, DIST_HYDRO);
 		indice = SHL_addAtom(s, x2, id);
@@ -164,15 +164,15 @@ void expansion_AX2E0(Molecule_t* m, Shell_t* s, unsigned id) {
 	newCoords = normalization(
 		planNormal(coords(a), coords(x1), coords(x2)), DIST_HYDRO);
 
-	SHL_addAtom(s, addPoint(coords(a), newCoords), id);
+	SHL_addAtom(s, PT_add(coords(a), newCoords), id);
 
-	SHL_addAtom(s, addPoint(coords(a), normalization(
+	SHL_addAtom(s, PT_add(coords(a), normalization(
 		rotation(normal, 90, newCoords), DIST_HYDRO)), id);
 
-	SHL_addAtom(s, addPoint(coords(a), normalization(
+	SHL_addAtom(s, PT_add(coords(a), normalization(
 		rotation(normal, 180, newCoords), DIST_HYDRO)), id);
 
-	SHL_addAtom(s, addPoint(coords(a), normalization(
+	SHL_addAtom(s, PT_add(coords(a), normalization(
 		rotation(normal, -90, newCoords), DIST_HYDRO)), id);
 }
 

@@ -9,75 +9,9 @@ float degreToRadian(float a) {
 	return a * M_PI / 180;
 }
 
-Point_t initPoint(float scal) {
-	Point_t _new;
-
-	_new.x = scal;
-	_new.y = scal;
-	_new.z = scal;
-
-	return _new;
-}
-
-Point_t addPoint(Point_t A, Point_t B) {
-	Point_t _new;
-
-	_new.x = A.x + B.x;
-	_new.y = A.y + B.y;
-	_new.z = A.z + B.z;
-
-	return _new;
-}
-
-Point_t subPoint(Point_t A, Point_t B) {
-	Point_t _new;
-
-	_new.x = A.x - B.x;
-	_new.y = A.y - B.y;
-	_new.z = A.z - B.z;
-
-	return _new;
-}
-
-Point_t mulPoint(Point_t A, float scal) {
-	Point_t _new;
-
-	_new.x = scal * A.x;
-	_new.y = scal * A.y;
-	_new.z = scal * A.z;
-
-	return _new;
-}
-
-Point_t divPoint(Point_t A, float scal) {
-	Point_t _new;
-
-	_new.x = A.x / scal;
-	_new.y = A.y / scal;
-	_new.z = A.z / scal;
-
-	return _new;
-}
-
-Point_t merPoint(Point_t A, Point_t B) {
-
-	Point_t _new;
-
-	_new.x = (A.x + B.x)/2;
-	_new.y = (A.y + B.y)/2;
-	_new.z = (A.z + B.z)/2;
-
-	return _new;
-}
-
-int EqualPoint(Point_t A, Point_t B) { //1 if equal, if not 0
-	if(A.x == B.x && A.y == B.y && A.z == B.z) return 1;
-	return 0;
-}
-
 //Calcul de la distance euclidienne entre deux points.
 float dist(Point_t A, Point_t B) {
-	return sqrt(pow((A.x - B.x), 2) + pow((A.y - B.y), 2)	+ pow((A.z - B.z), 2)); //euclidian
+	return sqrt((A.x - B.x)*(A.x - B.x) + (A.y - B.y)*(A.y - B.y)	+ (A.z - B.z)*(A.z - B.z)); //euclidian
 }
 
 //Calcul de la distance de manhattan entre deux points.
@@ -85,7 +19,7 @@ float dist_manhattan(Point_t A, Point_t B) {
 	return (fabs(A.x - B.x)+fabs(A.y - B.y)+fabs(A.z - B.z));//manhattan
 }
 
-//Calcul de la distance entre deux points (demi-périmètre d'un cercle). TEST
+/*//Calcul de la distance entre deux points (demi-périmètre d'un cercle). TEST
 float dist_cercle(Point_t A, Point_t B) {
 	float r = dist(A,B)/2;
 	return M_PI * r;
@@ -104,12 +38,12 @@ void interLineSphere(Point_t Start, Point_t End, Point_t P, Point_t* x1, Point_t
 			dir.x = d * vec.x;
 			dir.y = d * vec.y;
 			dir.z = d * vec.z;
-			*x1 = addPoint(Start,dir);
+			*x1 = PT_add(Start,dir);
 			d = (-b-sqrt(delta))/(2*a);
 			dir.x = d * vec.x;
 			dir.y = d * vec.y;
 			dir.z = d * vec.z;
-			*x2 = addPoint(Start,dir);
+			*x2 = PT_add(Start,dir);
 		}
 }
 
@@ -120,10 +54,10 @@ Point_t newPointOnSphere(Point_t x1, Point_t x2, Point_t P){
 	dir.x = d * vec.x;
 	dir.y = d * vec.y;
 	dir.z = d * vec.z;
-	middle = addPoint(x1,dir);
+	middle = PT_add(x1,dir);
 	vec = vector(P,middle);
 	dir = normalization(vec,DIST_GAP_SUBSTRATE);
-	return addPoint(P,dir);
+	return PT_add(P,dir);
 }
 
 
@@ -137,8 +71,8 @@ float dist_obstacle(Point_t Start, Point_t End, Molecule_t* sub) {
 	while(!EqualPoint(Start,End)){
 		minDistInter = __FLT_MAX__;
 		minID = -1;
-		x1 = initPoint(-1);
-		x2 = initPoint(-1);
+		x1 = PT_init(-1);
+		x2 = PT_init(-1);
 		for(int i = 0; i < size(sub); i++) {
 			interLineSphere(Start,End,coords(atom(sub,i)),&x1,&x2);
 			if(x1.x != -1 && x1.y != -1 && x1.z != -1 && x2.x != -1 && x2.y != -1 && x2.z != -1){
@@ -173,7 +107,7 @@ float dist_obstacle(Point_t Start, Point_t End, Molecule_t* sub) {
 		}
 	}
 	return distTotal;
-}
+}*/
 
 //Normaliser un vecteur à la longueur length.
 Point_t normalization(Point_t normal, float length) {
@@ -181,7 +115,7 @@ Point_t normalization(Point_t normal, float length) {
 	Point_t a;
 	float z;
 
-	z = sqrt(pow(length,2) / (pow(normal.x,2) + pow(normal.y,2) + pow(normal.z,2)));
+	z = sqrt((length*length) / (normal.x*normal.x + normal.y*normal.y + normal.z*normal.z));
 	a.x = z * normal.x;
 	a.y = z * normal.y;
 	a.z = z * normal.z;
@@ -199,7 +133,7 @@ Point_t normalization(Point_t normal, float length) {
 float angle(Point_t A, Point_t B, Point_t C) {
 	float AB = dist(A,B), AC = dist(A,C), BC = dist(B,C);
 
-	return acos( (pow(AC,2)+pow(AB,2)-pow(BC,2)) / (2*AC*AB) ) * 180 / M_PI;
+	return acos( (AC*AC+AB*AB-BC*BC) / (2*AC*AB) ) * 180 / M_PI;
 }
 
 Point_t vector(Point_t A, Point_t B) {
@@ -262,12 +196,12 @@ Point_t addThirdPoint(Point_t A, Point_t B, Point_t C, float scal) {
  	normal.z = 2 * A.z - B.z - C.z;
  	normal = normalization(normal, scal);
   			
-  return addPoint(A, normal);
+  return PT_add(A, normal);
 }
 
 Point_t AX1E1(Point_t a, Point_t x1, float length) {
 
-	return addPoint(a, normalization(vector(x1, a), length));
+	return PT_add(a, normalization(vector(x1, a), length));
 }
 
 Point_t AX2E1(Point_t a, Point_t x1, Point_t x2, float length) {
@@ -277,7 +211,7 @@ Point_t AX2E1(Point_t a, Point_t x1, Point_t x2, float length) {
 	v1 = normalization(vector(x1, a), 1);
 	v2 = normalization(vector(x2, a), 1);
 
-	return addPoint(a, normalization(addPoint(v1, v2), length));
+	return PT_add(a, normalization(PT_add(v1, v2), length));
 }
 
 Point_t AX1E2(Point_t a, Point_t x1, Point_t normal, float length) {
@@ -286,7 +220,7 @@ Point_t AX1E2(Point_t a, Point_t x1, Point_t normal, float length) {
 
 	v1 = normalization(vector(a, x1), 1);
 
-	return addPoint(a, normalization(rotation(normal, 120, v1), length));
+	return PT_add(a, normalization(rotation(normal, 120, v1), length));
 }
 
 Point_t AX3E1(Point_t a, Point_t x1, Point_t x2, Point_t x3, float length) {
@@ -297,7 +231,7 @@ Point_t AX3E1(Point_t a, Point_t x1, Point_t x2, Point_t x3, float length) {
 	v2 = normalization(vector(x2, a), 1);
 	v3 = normalization(vector(x3, a), 1);
 
-	return addPoint(a, normalization(addPoint(v1, addPoint(v2,v3)), length));
+	return PT_add(a, normalization(PT_add(v1, PT_add(v2,v3)), length));
 }
 
 Point_t AX2E2(Point_t a, Point_t x1, Point_t x2, float length) {
@@ -308,11 +242,11 @@ Point_t AX2E2(Point_t a, Point_t x1, Point_t x2, float length) {
 	v1 = normalization(vector(a,x1), 1);
 	v2 = normalization(vector(a,x2), 1);
 
-	other = normalization(addPoint(v1,v2), 1);
+	other = normalization(PT_add(v1,v2), 1);
 	normal = normalization(planNormal(zero, planNormal(a, x1, x2), other), 1);
 
 
-	return addPoint(a, normalization(rotation(normal, angle, other), length));
+	return PT_add(a, normalization(rotation(normal, angle, other), length));
 }
 
 Point_t AX1E3(Point_t a, Point_t x1, Point_t normal, float length) {
@@ -321,5 +255,5 @@ Point_t AX1E3(Point_t a, Point_t x1, Point_t normal, float length) {
 
 	v1 = normalization(vector(a, x1), 1);
 
-	return addPoint(a, normalization(rotation(normal, 109.47, v1), length));
+	return PT_add(a, normalization(rotation(normal, 109.47, v1), length));
 }

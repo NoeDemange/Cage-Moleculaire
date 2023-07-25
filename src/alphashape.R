@@ -1,20 +1,20 @@
-#Fichier de script parmettant de calculer l'enveloppe de la molécule.
+#Fichier de script permettant de calculer l'enveloppe de la molécule.
 #Librairie "alphashape3d" utilisée pour calculer l'enveloppe.
-library("alphashape3d")
+library("alphashape3d", attach.required = FALSE)
 
-Rinashape3d <- function(triang, x, alpha, points) {
-	triang = matrix(triang, ncol=9)
-	triang[triang[,9] == 3,9] = 2
-	colnames(triang) <- c("tr1", "tr2", "tr3", "on.ch", "attached", "rhoT", "muT", "MuT", "fc:2")
-	x = matrix(x, ncol=3)
-	points = matrix(points, ncol=3)
-
-	as3d <- list(triang = triang, x = x, alpha = alpha)
-
-	insh <- inashape3d(as3d, points=points)
-
-	return (insh)
-}
+#Rinashape3d <- function(triang, x, alpha, points) {
+#	triang = matrix(triang, ncol=9)
+#	triang[triang[,9] == 3,9] = 2
+#	colnames(triang) <- c("tr1", "tr2", "tr3", "on.ch", "attached", "rhoT", "muT", "MuT", "fc:2")
+#	x = matrix(x, ncol=3)
+#	points = matrix(points, ncol=3)
+#
+#	as3d <- list(triang = triang, x = x, alpha = alpha)
+#
+#	insh <- inashape3d(as3d, points=points)
+#
+#	return (insh)
+#}
 
 Rashape3d <- function(data, alpha) {
 

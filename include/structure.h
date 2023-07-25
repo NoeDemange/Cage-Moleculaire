@@ -80,6 +80,7 @@ struct Element {
 	
 	int start;
 	int end;
+	float distance;
 	Element *next;
 };
 
@@ -88,6 +89,7 @@ typedef struct Elem_s Elem_s;
 struct Elem_s {
 	
 	Point_t position;
+	float distance;
 	Elem_s *next;
 };
 
@@ -112,6 +114,15 @@ typedef struct {
 } List_d;
 
 /**************************************/
+/* POINT ***************************/
+/**************************************/
+
+typedef struct {
+    int x, y, z;
+} Point3D;
+
+
+/**************************************/
 /* GRAPHE *****************************/
 /**************************************/
 typedef struct {
@@ -128,6 +139,18 @@ typedef struct {
 	Vertex_t* vertices;
 	unsigned size;
 } Graph_t;
+
+typedef struct {
+    Point3D point;
+    float g, h, f;
+} Node;
+
+/**************************************/
+/* VOXEL ***************************/
+/**************************************/
+
+typedef int*** VOXELGRID;
+
 
 /**************************************/
 /* MOLECULE ***************************/
@@ -231,14 +254,38 @@ typedef struct {
 	Elem *first;	
 } List_m;
 
+/**************************************/
+/* NODE HEAP **************************/
+/**************************************/
+typedef struct{
+	float dist;
+	int indexHeap; //-1 already seen
+	//int seen;
+}VMap; //voxel map for pathfinding
+
+typedef struct{
+	int size;
+	Node* node;
+}NodeHeap;
+
+//NodeHeap
+NodeHeap NH_initAlloc(int size);
+void NH_free(NodeHeap nodeHeap);
+void NH_insert(NodeHeap* nodeHeap, Node p, VMap*** vMap);
+Node NH_extractMin(NodeHeap* nodeHeap, VMap*** vMap);
+void NH_decrease_priority(NodeHeap* nodeHeap, VMap*** vMap, Point3D point, float distG);
+void NH_print(NodeHeap nodeHeap);
 
 //Point
-Point_t PT_init();
+Point_t PT_init(float);
 Point_t PT_add(Point_t, Point_t);
 Point_t PT_sub(Point_t, Point_t);
 Point_t PT_mul(Point_t, float);
 Point_t PT_div(Point_t, float);
-float PT_distance(Point_t, Point_t);
+Point_t PT_merge(Point_t A, Point_t B);
+int PT_equal(Point_t A, Point_t B);
+Point3D createPoint3D(Point_t p);
+Point_t createPoint_t(Point3D point);
 
 //Liste
 
@@ -258,7 +305,7 @@ void LST_delete(List_t*);
 
 Element* LST_pairs_init(void);
 void LST_pairs_addElement(Element** list, int start, int end);
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end);
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid);
 void LST_pairs_removeFirst(Element* list);
 void LST_pairs_delete(Element* list);
 
@@ -269,11 +316,11 @@ void LSTm_delete(List_m* list);
 
 List_s* LSTs_init();
 void LSTs_addElement(List_s* list, Point_t sommet);
+void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid);
 void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
 void LSTs_removeElement(List_s* list, Point_t p);
 Point_t minDist(List_s* list, Point_t p) ;
-Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub);
 
 List_d* LSTd_init();
 void LSTd_addElement(List_d* list, int sommet);
@@ -299,6 +346,7 @@ unsigned GPH_checkBond(Graph_t*, unsigned, unsigned);
 Graph_t* GPH_create();
 void GPH_delete(Graph_t*);
 Graph_t* GPH_copy(Graph_t*);
+Node createNode(Point3D point, float g, float h);
 
 //Molecule
 
@@ -329,7 +377,7 @@ void SHL_removeBond(Shell_t*, unsigned, unsigned);
 void SHL_linkBorder(Shell_t*, unsigned, List_t*);
 void SHL_addCycle(Shell_t*, unsigned);
 void SHL_mergeAtom(Shell_t*, unsigned, unsigned);
-void SHL_testDis(Shell_t*);
+//void SHL_testDis(Shell_t*);
 Shell_t* SHL_create();
 Shell_t* SHL_copy(Shell_t*);
 Shell_t* SHL_copyCageAtoms(Shell_t* s);
