@@ -6,6 +6,8 @@
 #include "voxelization.h"
 #include "pathFinding.h"
 
+#define nb_instances 1000000
+
 int main(int argc, char** argv) {
 	time_t start = time(NULL);
 
@@ -23,7 +25,7 @@ int main(int argc, char** argv) {
 	
 	Point3D st = {0,0,0}; Point3D Pend = {GRID_SIZE-1,GRID_SIZE-1, GRID_SIZE-1};
 
-	time_t startDij = time(NULL);
+	/*time_t startDij = time(NULL);
 	float Ddist = dijkstra(st, Pend, voxelGrid);
 	time_t endDij = time(NULL);
 	seconds = (long) difftime(endDij, startDij);	
@@ -32,10 +34,17 @@ int main(int argc, char** argv) {
 	minutes = seconds / 60;
 	seconds -= minutes * 60;
 	printf("Dijkstra time : %d hour(s) %d minute(s) %ld second(s)\n", hours, minutes, seconds);
-	printf("dijkstra dist : %f\n\n",Ddist);
+	printf("dijkstra dist : %f\n\n",Ddist);*/
 
 	time_t startA = time(NULL);
-	float Adist = aStarPathfinding(st, Pend, voxelGrid);
+	VMap*** vMap = VMap_alloc();
+	NodeHeap nodeHeap = NH_initAlloc();
+	float Adist = 0.0;
+	for(int i = 0; i<nb_instances; i++){
+		Adist += aStarPathfinding(st, Pend, voxelGrid, vMap, nodeHeap);
+	}
+	VMap_free(vMap);
+	NH_free(nodeHeap);
 	time_t endA = time(NULL);
 	seconds = (long) difftime(endA, startA);	
 	hours = seconds / 3600;
@@ -43,7 +52,7 @@ int main(int argc, char** argv) {
 	minutes = seconds / 60;
 	seconds -= minutes * 60;
 	printf("A* time : %d hour(s) %d minute(s) %ld second(s)\n", hours, minutes, seconds);
-	printf("A* dist : %f\n",Adist);
+	printf("A* dist mean : %f\n",Adist/nb_instances);
 
 	freeVoxelGrid(voxelGrid);
 

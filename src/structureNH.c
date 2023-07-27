@@ -4,10 +4,10 @@
 /* NODE HEAP **************************/
 /**************************************/
 
-NodeHeap NH_initAlloc(int size){
+NodeHeap NH_initAlloc(){
     NodeHeap nodeHeap;
     nodeHeap.size = 0;
-    nodeHeap.node = malloc((size+1) * sizeof(Node));
+    nodeHeap.node = malloc(((GRID_SIZE*GRID_SIZE*GRID_SIZE)+1) * sizeof(Node));
     return nodeHeap;
 }
 
@@ -85,4 +85,26 @@ void NH_print(NodeHeap nodeHeap){
         printf("%f, ",nodeHeap.node[i].f);
     }
     printf("\n");
+}
+
+VMap*** VMap_alloc(){
+    VMap*** vMap = (VMap***)malloc(GRID_SIZE * sizeof(VMap**));
+    for (int x = 0; x < GRID_SIZE; x++) {
+        vMap[x] = (VMap**)malloc(GRID_SIZE * sizeof(VMap*));
+        for (int y = 0; y < GRID_SIZE; y++) {
+            vMap[x][y] = (VMap*)malloc(GRID_SIZE * sizeof(VMap));
+        }
+    }
+    return vMap;
+}
+
+void VMap_free(VMap*** vMap){
+    // Free dynamically allocated memory
+    for (int x = 0; x < GRID_SIZE; x++) {
+        for (int y = 0; y < GRID_SIZE; y++) {
+            free(vMap[x][y]);
+        }
+        free(vMap[x]);
+    }
+    free(vMap);
 }

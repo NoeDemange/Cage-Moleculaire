@@ -176,35 +176,12 @@ void LST_pairs_addElement(Element** list, int start, int end) {
  * @param end Index of the ending atom of the path in the cage.
  * @param voxelGrid Grid of voxelization.
  */
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid) {
-	
-	/*float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
-	float distOtherPair;
-	Element* currentElem = *list;
-	Element* previousElem = NULL;
-
-	if (currentElem) { // If the list is not empty.
-		distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
-
-		while (currentElem && distPair > distOtherPair) {
-			previousElem = currentElem;
-			currentElem = currentElem->next;
-			if (currentElem) {
-				distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
-			}
-		}
-	}*/
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 	Point_t endPos = coords(atom(s, end));
 	Point_t startPos = coords(atom(s, start));
-	Point3D endPoint = createPoint3D(endPos);
-	float EndDist = dist(endPos, createPoint_t(endPoint));
-	Point3D startPoint = createPoint3D(startPos);
-	float startDist = dist(startPos, createPoint_t(startPoint));
-	float computedDist = aStarPathfinding(startPoint, endPoint, voxelGrid);
+	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
 	Element* currentElem = *list;
 	Element* previousElem = NULL;
-
-	computedDist = computedDist + EndDist + startDist;
 	while(currentElem){
 		if(currentElem->distance < computedDist){
 			previousElem = currentElem;
@@ -321,16 +298,10 @@ void LSTs_addElement(List_s* list, Point_t sommet) {
  * @param endPos Position of the objectif atom
  * @param voxelGrid Grid of voxelization
  */
-void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid) {
-	Point3D endPoint = createPoint3D(endPos);
-	float EndDist = dist(endPos, createPoint_t(endPoint));
-	Point3D startPoint = createPoint3D(startPos);
-	float startDist = dist(startPos, createPoint_t(startPoint));
-	float computedDist = aStarPathfinding(startPoint, endPoint, voxelGrid);
+void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
+	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
 	Elem_s* currentElem = list->first;
 	Elem_s* previousElem = NULL;
-
-	computedDist = computedDist + EndDist + startDist;
 	while(currentElem){
 		if(currentElem->distance < computedDist){
 			previousElem = currentElem;

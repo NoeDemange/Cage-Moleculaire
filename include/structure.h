@@ -260,7 +260,6 @@ typedef struct {
 typedef struct{
 	float dist;
 	int indexHeap; //-1 already seen
-	//int seen;
 }VMap; //voxel map for pathfinding
 
 typedef struct{
@@ -269,12 +268,14 @@ typedef struct{
 }NodeHeap;
 
 //NodeHeap
-NodeHeap NH_initAlloc(int size);
-void NH_free(NodeHeap nodeHeap);
-void NH_insert(NodeHeap* nodeHeap, Node p, VMap*** vMap);
-Node NH_extractMin(NodeHeap* nodeHeap, VMap*** vMap);
-void NH_decrease_priority(NodeHeap* nodeHeap, VMap*** vMap, Point3D point, float distG);
-void NH_print(NodeHeap nodeHeap);
+NodeHeap NH_initAlloc();
+void NH_free(NodeHeap);
+void NH_insert(NodeHeap*, Node, VMap***);
+Node NH_extractMin(NodeHeap*, VMap***);
+void NH_decrease_priority(NodeHeap*, VMap***, Point3D, float distG);
+void NH_print(NodeHeap);
+VMap*** VMap_alloc();
+void VMap_free(VMap***);
 
 //Point
 Point_t PT_init(float);
@@ -305,7 +306,7 @@ void LST_delete(List_t*);
 
 Element* LST_pairs_init(void);
 void LST_pairs_addElement(Element** list, int start, int end);
-void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid);
+void LST_pairs_addElementInOrder(Shell_t* s, Element** list, int start, int end, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap);
 void LST_pairs_removeFirst(Element* list);
 void LST_pairs_delete(Element* list);
 
@@ -316,7 +317,7 @@ void LSTm_delete(List_m* list);
 
 List_s* LSTs_init();
 void LSTs_addElement(List_s* list, Point_t sommet);
-void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid);
+void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap);
 void LSTs_removeFirst(List_s* list);
 void LSTs_delete(List_s* list);
 void LSTs_removeElement(List_s* list, Point_t p);

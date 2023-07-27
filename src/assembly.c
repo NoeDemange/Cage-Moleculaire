@@ -2,9 +2,10 @@
 #include "util.h"
 #include "output.h"
 #include "constant.h"
+#include "voxelization.h"
 #include <math.h>
 #include <omp.h>
-#include "voxelization.h"
+
 
 /**
  * @brief Checks if a point is far enough away from the other atoms 
@@ -203,7 +204,7 @@ int addProjection(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, Li
 /**************************************/
 
 // Projection for an atom with one neighbor.
-int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, int idEnd, List_d* newStarts, int numPattern, Molecule_t* sub, int nbPatterns, int nbCycles, VOXELGRID voxelGrid) {
+int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, int idEnd, List_d* newStarts, int numPattern, Molecule_t* sub, int nbPatterns, int nbCycles, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 	
 	List_s* positions = LSTs_init();
 	Point_t startPos = coords(atom(processedMoc, idStart));
@@ -228,7 +229,7 @@ int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInProgress, int idSta
 	if (!isHindered(processedMoc, sub, newStartPos)) {	
 		if (!isHindered(processedMoc, sub, hydrogen1) && !isHindered(processedMoc, sub, hydrogen2)) {
 			//LSTs_addElement(positions, newStartPos);
-			LSTs_addElementInOrder(positions, newStartPos, endPos, voxelGrid);
+			LSTs_addElementInOrder(positions, newStartPos, endPos, voxelGrid, vMap, nodeHeap);
 		}	
 	}
 	
@@ -241,7 +242,7 @@ int projectionOCN_AX1E3(Shell_t* processedMoc, List_m* mocsInProgress, int idSta
 		if (!isHindered(processedMoc, sub, newStartPos)) {	
 			if (!isHindered(processedMoc, sub, hydrogen1) && !isHindered(processedMoc, sub, hydrogen2)) {
 				//LSTs_addElement(positions, newStartPos);
-				LSTs_addElementInOrder(positions, newStartPos, endPos, voxelGrid);
+				LSTs_addElementInOrder(positions, newStartPos, endPos, voxelGrid, vMap, nodeHeap);
 			}	
 		}
 	}
@@ -350,7 +351,7 @@ int projectionC_AX3E1(Shell_t* processedMoc, List_m* mocsInProgress, int idStart
  * @param idEnd Index of the atom the path in construction is to be connected to.
  * @param sub Substrate molecule.
  */
-int insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern, int idEnd, Molecule_t* sub, int nbPatterns, int nbCycles, VOXELGRID voxelGrid){
+int insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, List_d* newStarts, int numPattern, int idEnd, Molecule_t* sub, int nbPatterns, int nbCycles, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap){
 	
 	int numberOfNeighborsStart = LST_nbElements(neighborhood(atom(processedMoc, idStart)));
 	int addedCounter = 0;
@@ -358,7 +359,10 @@ int insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, Li
 	if (numberOfNeighborsStart == 1) {
 		//Projections
 		//Diff rotations
-		addedCounter = projectionOCN_AX1E3(processedMoc, mocsInProgress, idStart, idEnd, newStarts, numPattern, sub, nbPatterns, nbCycles, voxelGrid);
+		//#pragma omp critical
+		//{
+		addedCounter = projectionOCN_AX1E3(processedMoc, mocsInProgress, idStart, idEnd, newStarts, numPattern, sub, nbPatterns, nbCycles, voxelGrid, vMap, nodeHeap);
+		//}
 	}
 	else if (flag(atom(processedMoc, idStart)) == CARBON_F) {
 		if (numberOfNeighborsStart == 2) {
@@ -388,7 +392,7 @@ int insertPattern(Shell_t* processedMoc, List_m* mocsInProgress, int idStart, Li
  * @param inputFile Name of the substrate's file.
  * @param sizeMax Maximale size (in patterns) of a path.
  */
-void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int forceCycle, VOXELGRID voxelGrid) {
+void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, int nbPatterns, int nbAroRings, char* inputFile, int sizeMax, int forceCycle, VOXELGRID voxelGrid,  VMap*** vMap, NodeHeap nodeHeap) {
 	
 	// Count the number of patterns.
 	nbPatterns++;
@@ -401,7 +405,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 		if (i == CYCLE_PATTERN) {
 			nbAroRings++;																																																		
 		}
-		insertPattern(processedMoc, localMocsInProgress, idStart, newStarts, i, idEnd, substrat(m), 0, 0, voxelGrid);
+		insertPattern(processedMoc, localMocsInProgress, idStart, newStarts, i, idEnd, substrat(m), 0, 0, voxelGrid, vMap, nodeHeap);
 
 		while (localMocsInProgress->first) {
 			if(sizeMax >= nbPatterns && nbAroRings < 3) {
@@ -436,7 +440,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 					}
 				}
 				else {
-					generatePaths(m, mocsInProgress, localMocsInProgress->first->moc, newStarts->first->idAtom, idEnd, nbPatterns, nbAroRings, inputFile, sizeMax, forceCycle,voxelGrid);
+					generatePaths(m, mocsInProgress, localMocsInProgress->first->moc, newStarts->first->idAtom, idEnd, nbPatterns, nbAroRings, inputFile, sizeMax, forceCycle,voxelGrid, vMap, nodeHeap);
 				}
 			}
 			LSTm_removeFirst(localMocsInProgress); // TODO test whether the cage was added, and delete if not the case. Otherwise, loose the pointer.
@@ -447,7 +451,7 @@ void generatePaths(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int
 	}
 }
 
-void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, char* inputFile, int sizeMax, int forceCycle, VOXELGRID voxelGrid) {
+void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* processedMoc, int idStart, int idEnd, char* inputFile, int sizeMax, int forceCycle, VOXELGRID voxelGrid,  VMap*** vMap, NodeHeap nodeHeap) {
 	
 	List_m* localMocsInProgress = LSTm_init();
 	List_d* newStarts = LSTd_init();
@@ -466,7 +470,7 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 
 		for (int i = 0; i < NB_PATTERNS; i++) {
 			// Keep the last count of paths with inserted pattern number i.
-			addedCyclesCounter = insertPattern(localMocsInProgress->first->moc, mocs, newStarts->first->idAtom, newStartsMocs, i, idEnd, substrat(m), 0, 0,voxelGrid);
+			addedCyclesCounter = insertPattern(localMocsInProgress->first->moc, mocs, newStarts->first->idAtom, newStartsMocs, i, idEnd, substrat(m), 0, 0,voxelGrid, vMap ,nodeHeap);
 		}
 		int nbPatterns = localMocsInProgress->first->nbPatterns;
 		int nbCycles = localMocsInProgress->first->nbCycles;
@@ -530,7 +534,7 @@ void generatePathsIteratively(Main_t* m, List_m* mocsInProgress, Shell_t* proces
 	LSTd_delete(newStarts);
 }
 
-void generatePathsIteratively2(Main_t* m, List_m* mocsInProgress, Shell_t* moc, int idStart, int idEnd, char* inputFile, int sizeMax, int forceCycle, VOXELGRID voxelGrid) {
+void generatePathsIteratively2(Main_t* m, List_m* mocsInProgress, Shell_t* moc, int idStart, int idEnd, char* inputFile, int sizeMax, int forceCycle, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 	
 	List_m* localMocsInProgress = LSTm_init();
 	List_d* newStarts = LSTd_init();
@@ -583,7 +587,7 @@ void generatePathsIteratively2(Main_t* m, List_m* mocsInProgress, Shell_t* moc, 
 			}
 			else {
 				for (int i = 0; i < NB_PATTERNS; i++) {
-					insertPattern(processedMoc, localMocsInProgress, idnewStart, newStarts, i, idEnd, substrat(m), nbPatterns, nbCycles, voxelGrid);
+					insertPattern(processedMoc, localMocsInProgress, idnewStart, newStarts, i, idEnd, substrat(m), nbPatterns, nbCycles, voxelGrid, vMap, nodeHeap);
 				}
 			}
 		}
@@ -663,7 +667,7 @@ int checkExistsPath(Shell_t* s, int index1, int index2) {
  * @param voxelGrid Grid of voxel.
  * @return (Element*) List of pair of atoms to be connected.
  */
-Element* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub, VOXELGRID voxelGrid) {
+Element* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 	
 	Element* startEndAtoms = LST_pairs_init();
 	int* isHindered = malloc(size(s) * sizeof(int));
@@ -681,7 +685,7 @@ Element* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub, VOXELGRID voxelGrid
 			for (int j = i + 1; j < size(s); j++) {
 				if (flag(atom(s, j)) == LINKABLE_F && !isHindered[j]) {
 					if (!checkExistsPath(s, i, j)) {
-						LST_pairs_addElementInOrder(s, &startEndAtoms, i, j, voxelGrid);
+						LST_pairs_addElementInOrder(s, &startEndAtoms, i, j, voxelGrid, vMap, nodeHeap);
 						//LST_pairs_addElement(&startEndAtoms, i, j);
 					}
 				}
@@ -731,15 +735,16 @@ List_m* initMocsInProgress(Main_t* m){
  * @param options Grouping of inputfile, alpha, sizeMax, maxResults.
  */
 void generateWholeCages(Main_t* m, Options_t options) {
-	VOXELGRID voxelGrid = voxelization(substrat(m));
-	//printVoxelGrid(voxelGrid);
 	printf("\n####### Start of paths generation #######\n");
+	VOXELGRID voxelGrid = voxelization(substrat(m));
+	VMap*** vMap = VMap_alloc();
+	NodeHeap nodeHeap = NH_initAlloc();
 	List_m* mocsInProgress = initMocsInProgress(m); // ! Take only the first moc.
 	static int countResults = 0;
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
 
-		Element* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m), voxelGrid);
+		Element* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m), voxelGrid, vMap, nodeHeap);
 		Element* currentPair;
 		
 		if (!startEndAtoms) { // If there is only one grouping of patterns left (connected cage).
@@ -757,13 +762,13 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			Shell_t* processedMoc = mocsInProgress->first->moc;
 			mocsInProgress->first->moc = NULL;
 			LSTm_removeFirst(mocsInProgress);
-			#pragma omp parallel
+			//#pragma omp parallel
 			{
 				currentPair = startEndAtoms;
-				#pragma omp single
+				//#pragma omp single
 				{
 					while (currentPair) { // For all pairs of atoms to connect.
-					#pragma omp task firstprivate(currentPair)
+					//#pragma omp task firstprivate(currentPair)
 					{
 						int idStart = currentPair->start;
 						int idEnd = currentPair->end;
@@ -776,8 +781,8 @@ void generateWholeCages(Main_t* m, Options_t options) {
 							}
 							Shell_t* appendedMoc = SHL_copy(processedMoc); // Create a new moc in the list to process.
 							flag(atom(appendedMoc, idStart)) = CARBON_F;
-							generatePathsIteratively(m, mocsInProgress, appendedMoc, idStart, idEnd, options.input, options.sizeMax, forceCycle,voxelGrid);
-							//generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle,voxelGrid);
+							generatePathsIteratively(m, mocsInProgress, appendedMoc, idStart, idEnd, options.input, options.sizeMax, forceCycle,voxelGrid, vMap, nodeHeap);
+							//generatePaths(m, mocsInProgress, appendedMoc, idStart, idEnd, 0, 0, options.input, options.sizeMax, forceCycle,voxelGrid, vMap, nodeHeap);
 						}
 					}
 						currentPair = currentPair->next;
@@ -789,5 +794,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 		}
 	}
 	freeVoxelGrid(voxelGrid);
+	VMap_free(vMap);
+	NH_free(nodeHeap);
 	free(mocsInProgress);
 }

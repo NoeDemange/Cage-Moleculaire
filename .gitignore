@@ -2,3 +2,5 @@
 obj/*
 bin/*
 results/*
+callgrind.out.*
+test/*.exe

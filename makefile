@@ -1,7 +1,7 @@
 # project name (generate executable with this name)
 TARGET   = cageMol.exe
 
-CFLAGS=-Wall #-g
+CFLAGS=-Wall -g
 LDFLAGS=-lR -lm
 
 INCPATH=-I/usr/share/R/include
@@ -32,11 +32,11 @@ dir:
 
 .PHONY: clean mrproper all
 
-pathfinding: 
+pathfinding:  #-DDEBUGAstar -DDEBUGDij
 	$(CC) $(INCPATH) $(INCDIR) -o test/initialization.o -c src/initialization.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/input.o -c src/input.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/output.o -c src/output.c $(CFLAGS)
-	$(CC) $(INCPATH) $(INCDIR) -o test/pathFinding.o -c src/pathFinding.c $(CFLAGS) -DDEBUGAstar -DDEBUGDij
+	$(CC) $(INCPATH) $(INCDIR) -o test/pathFinding.o -c src/pathFinding.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/structure.o -c src/structure.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/structureAsp.o -c src/structureAsp.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/structureGph.o -c src/structureGph.c $(CFLAGS)
@@ -52,7 +52,6 @@ pathfinding:
 	$(CC) -o test/pathFinding.exe test/initialization.o test/input.o test/output.o test/pathFinding.o test/structure.o test/structureAsp.o test/structureGph.o test/structureLst.o test/structureMN.o test/structureMol.o test/structureNH.o test/structurePT.o test/structureShl.o test/util.o test/voxelization.o test/pathFindingTest.o $(LDFLAGS)
 	./test/pathFinding.exe
 	rm test/*.o
-	rm test/pathFinding.exe
 
 clean:
 	rm -rf $(OBJDIR)
