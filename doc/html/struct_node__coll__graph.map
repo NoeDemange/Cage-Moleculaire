@@ -1,0 +1,4 @@
+<map id="Node" name="Node">
+<area shape="rect" id="node1" title="Represents a node in the pathfinding algorithm." alt="" coords="14,95,70,121"/>
+<area shape="rect" id="node2" href="$struct_point3_d.html" title="Represents a 3D point with integer coordinates." alt="" coords="5,5,79,32"/>
+</map>

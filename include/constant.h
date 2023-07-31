@@ -1,7 +1,7 @@
 #ifndef __CONSTANT_H
 #define __CONSTANT_H
 
-/** @file
+/** @file constant.h
  *  @brief Constants and options for the program.
  */
 

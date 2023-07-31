@@ -4,7 +4,7 @@
 #include "structure.h"
 #include "main.h"
 
-/** @file
+/** @file assembly.h
  *  @brief Functions related to generating whole cages.
  */
 

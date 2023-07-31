@@ -1,0 +1,12 @@
+<map id="include/output.h" name="include/output.h">
+<area shape="rect" id="node1" title="Output Header File." alt="" coords="587,5,714,32"/>
+<area shape="rect" id="node2" href="$assembly_8c.html" title="This file contains functions for generating connected cages." alt="" coords="5,80,123,107"/>
+<area shape="rect" id="node3" href="$expansion_8c.html" title="This file contains functions related to the expansion of atomic steric groupings and the generation o..." alt="" coords="147,80,269,107"/>
+<area shape="rect" id="node4" href="$generation_8c.html" title="This file contains functions for generating binding patterns in the envelope." alt="" coords="294,80,421,107"/>
+<area shape="rect" id="node5" href="$initialization_8c.html" title="This file contains functions for computing edges, ligands, angles, and lone pairs in a molecule." alt="" coords="445,80,582,107"/>
+<area shape="rect" id="node6" href="$main_8c.html" title="Main program for generating cages for a specific substrate." alt="" coords="606,80,695,107"/>
+<area shape="rect" id="node7" href="$output_8c.html" title="Functions for generating and writing output files." alt="" coords="720,80,819,107"/>
+<area shape="rect" id="node8" href="$structure_m_n_8c.html" title="Structure Main Operations." alt="" coords="843,80,979,107"/>
+<area shape="rect" id="node9" href="$structure_shl_8c.html" title="Shell Data Structure Implementation." alt="" coords="1003,80,1138,107"/>
+<area shape="rect" id="node10" href="$voxelization_8c.html" title="Functions for voxelization of a molecular structure and related operations." alt="" coords="1162,80,1297,107"/>
+</map>

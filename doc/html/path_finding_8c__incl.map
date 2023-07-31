@@ -1,0 +1,12 @@
+<map id="src/pathFinding.c" name="src/pathFinding.c">
+<area shape="rect" id="node1" title="Functions for pathfinding algorithms and heuristics." alt="" coords="224,5,355,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,304,72,331"/>
+<area shape="rect" id="node3" title=" " alt="" coords="318,304,389,331"/>
+<area shape="rect" id="node4" title=" " alt="" coords="393,80,461,107"/>
+<area shape="rect" id="node5" href="$path_finding_8h.html" title="Pathfinding Header File." alt="" coords="127,80,236,107"/>
+<area shape="rect" id="node10" href="$util_8h.html" title="Utility Functions Header File." alt="" coords="262,155,317,181"/>
+<area shape="rect" id="node6" href="$structure_8h.html" title="Structure Header File." alt="" coords="135,229,227,256"/>
+<area shape="rect" id="node9" href="$voxelization_8h.html" title="Voxelization Header File." alt="" coords="125,155,238,181"/>
+<area shape="rect" id="node7" title=" " alt="" coords="103,304,174,331"/>
+<area shape="rect" id="node8" href="$constant_8h.html" title="Constants and options for the program." alt="" coords="199,304,289,331"/>
+</map>

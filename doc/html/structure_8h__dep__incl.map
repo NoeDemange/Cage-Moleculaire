@@ -1,0 +1,34 @@
+<map id="include/structure.h" name="include/structure.h">
+<area shape="rect" id="node1" title="Structure Header File." alt="" coords="1309,5,1452,32"/>
+<area shape="rect" id="node2" href="$assembly_8h.html" title="Functions related to generating whole cages." alt="" coords="954,80,1101,107"/>
+<area shape="rect" id="node4" href="$main_8c.html" title="Main program for generating cages for a specific substrate." alt="" coords="488,155,577,181"/>
+<area shape="rect" id="node5" href="$expansion_8h.html" title="Functions for shell creation and expansion." alt="" coords="599,80,751,107"/>
+<area shape="rect" id="node7" href="$generation_8h.html" title="Pathless Cage Generation." alt="" coords="775,80,930,107"/>
+<area shape="rect" id="node9" href="$initialization_8h.html" title="Initialization of Molecules." alt="" coords="191,80,357,107"/>
+<area shape="rect" id="node11" href="$path_finding_test_8c.html" title="Path Finding Test." alt="" coords="901,229,1063,256"/>
+<area shape="rect" id="node12" href="$input_8h.html" title="Input Handling." alt="" coords="48,80,167,107"/>
+<area shape="rect" id="node14" href="$interface_8h.html" title="Interface Functions." alt="" coords="381,80,524,107"/>
+<area shape="rect" id="node16" href="$output_8h.html" title="Output Header File." alt="" coords="1125,80,1252,107"/>
+<area shape="rect" id="node18" href="$structure_m_n_8c.html" title="Structure Main Operations." alt="" coords="1023,155,1159,181"/>
+<area shape="rect" id="node19" href="$structure_shl_8c.html" title="Shell Data Structure Implementation." alt="" coords="1325,155,1460,181"/>
+<area shape="rect" id="node21" href="$path_finding_8h.html" title="Pathfinding Header File." alt="" coords="2061,155,2221,181"/>
+<area shape="rect" id="node23" href="$structure_lst_8c.html" title="List operations functions for manipulating linked lists." alt="" coords="2074,229,2207,256"/>
+<area shape="rect" id="node24" href="$util_8h.html" title="Utility Functions Header File." alt="" coords="1327,80,1434,107"/>
+<area shape="rect" id="node25" href="$structure_mol_8c.html" title="Molecule Operations." alt="" coords="1847,155,1986,181"/>
+<area shape="rect" id="node27" href="$voxelization_8h.html" title="Voxelization Header File." alt="" coords="1560,80,1724,107"/>
+<area shape="rect" id="node28" href="$structure_8c.html" title="Functions for converting molecular structures to graphs and helper functions." alt="" coords="1850,80,1965,107"/>
+<area shape="rect" id="node29" href="$structure_asp_8c.html" title="Ashape_t functions for allocating and deallocating memory." alt="" coords="1989,80,2127,107"/>
+<area shape="rect" id="node30" href="$structure_gph_8c.html" title="Graph operations functions for allocating, manipulating, and checking a graph." alt="" coords="2152,80,2292,107"/>
+<area shape="rect" id="node31" href="$structure_n_h_8c.html" title="NodeHeap and VMap Data Structure Implementation." alt="" coords="2316,80,2451,107"/>
+<area shape="rect" id="node32" href="$structure_p_t_8c.html" title="Point_t Data Structure Implementation and related operations." alt="" coords="2475,80,2603,107"/>
+<area shape="rect" id="node3" href="$assembly_8c.html" title="This file contains functions for generating connected cages." alt="" coords="1183,155,1301,181"/>
+<area shape="rect" id="node6" href="$expansion_8c.html" title="This file contains functions related to the expansion of atomic steric groupings and the generation o..." alt="" coords="602,155,725,181"/>
+<area shape="rect" id="node8" href="$generation_8c.html" title="This file contains functions for generating binding patterns in the envelope." alt="" coords="872,155,999,181"/>
+<area shape="rect" id="node10" href="$initialization_8c.html" title="This file contains functions for computing edges, ligands, angles, and lone pairs in a molecule." alt="" coords="327,155,464,181"/>
+<area shape="rect" id="node13" href="$input_8c.html" title="This file contains functions that handle the reading of molecule data from input files." alt="" coords="23,155,112,181"/>
+<area shape="rect" id="node15" href="$interface_8c.html" title="This file contain function to interface with R function." alt="" coords="187,155,302,181"/>
+<area shape="rect" id="node17" href="$output_8c.html" title="Functions for generating and writing output files." alt="" coords="749,155,847,181"/>
+<area shape="rect" id="node20" href="$voxelization_8c.html" title="Functions for voxelization of a molecular structure and related operations." alt="" coords="1637,155,1772,181"/>
+<area shape="rect" id="node22" href="$path_finding_8c.html" title="Functions for pathfinding algorithms and heuristics." alt="" coords="1726,229,1857,256"/>
+<area shape="rect" id="node26" href="$util_8c.html" title="Utility functions for mathematical calculations and geometric operations." alt="" coords="1485,155,1562,181"/>
+</map>

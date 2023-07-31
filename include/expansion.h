@@ -3,7 +3,7 @@
 
 #include "structure.h"
 
-/** @file
+/** @file expansion.h
  *  @brief Functions for shell creation and expansion.
  */
 

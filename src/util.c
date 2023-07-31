@@ -9,8 +9,6 @@
  * It includes functions for converting angles between degrees and radians, computing distances
  * between points, normalizing vectors, computing angles between points in a triangle, and performing
  * rotations around points and vectors.
- *
- * @author Your Name
  */
 
 /**

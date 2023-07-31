@@ -1,0 +1,5 @@
+<map id="include/assembly.h" name="include/assembly.h">
+<area shape="rect" id="node1" title="Functions related to generating whole cages." alt="" coords="55,5,201,32"/>
+<area shape="rect" id="node2" href="$assembly_8c.html" title="This file contains functions for generating connected cages." alt="" coords="5,80,123,107"/>
+<area shape="rect" id="node3" href="$main_8c.html" title="Main program for generating cages for a specific substrate." alt="" coords="147,80,237,107"/>
+</map>

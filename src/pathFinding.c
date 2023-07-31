@@ -123,7 +123,7 @@ float dijkstra(Point3D start, Point3D goal, VOXELGRID voxelGrid, VMap*** vMap, N
                             Node neighborNode = createNode(neighbor, tentativeGScore, 0.0);
                             NH_insert(&nodeHeap,neighborNode,vMap);
                         } else{
-                            NH_decrease_priority(&nodeHeap, vMap, neighbor, tentativeGScore);
+                            NH_increase_priority(&nodeHeap, vMap, neighbor, tentativeGScore);
                         }  
                     }
                 }
@@ -196,7 +196,7 @@ float aStarPathfinding(Point3D start, Point3D goal, VOXELGRID voxelGrid, VMap***
                             Node neighborNode = createNode(neighbor, tentativeGScore, voxelDist(neighbor,goal));
                             NH_insert(&nodeHeap,neighborNode,vMap);
                         } else{
-                            NH_decrease_priority(&nodeHeap, vMap, neighbor, tentativeGScore);
+                            NH_increase_priority(&nodeHeap, vMap, neighbor, tentativeGScore);
                         }  
                     }
                 }

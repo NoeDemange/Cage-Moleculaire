@@ -107,7 +107,6 @@ unsigned LST_getIndice(List_t* l, unsigned id) {
  * @param id Identifier of the element to check for.
  * @return 1 if the element with the specified identifier exists, 0 otherwise.
  */
-
 unsigned LST_check(List_t* l, unsigned id) {
 
 	if (LST_getIndice(l,id) == -1)
@@ -266,7 +265,6 @@ Element* LST_pairs_init(void) {
 	return list;
 }
 
-// Add at the 
 /**
  * @brief Adds an Element to the beginning of the list.
  *

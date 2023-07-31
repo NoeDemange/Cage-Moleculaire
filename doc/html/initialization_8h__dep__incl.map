@@ -1,0 +1,6 @@
+<map id="include/initialization.h" name="include/initialization.h">
+<area shape="rect" id="node1" title="Initialization of Molecules." alt="" coords="128,5,295,32"/>
+<area shape="rect" id="node2" href="$initialization_8c.html" title="This file contains functions for computing edges, ligands, angles, and lone pairs in a molecule." alt="" coords="5,80,143,107"/>
+<area shape="rect" id="node3" href="$main_8c.html" title="Main program for generating cages for a specific substrate." alt="" coords="167,80,256,107"/>
+<area shape="rect" id="node4" href="$path_finding_test_8c.html" title="Path Finding Test." alt="" coords="281,80,443,107"/>
+</map>
