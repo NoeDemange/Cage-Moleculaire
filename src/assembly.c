@@ -11,20 +11,29 @@
  * 
  * @param moc Molecular cage being generated.
  * @param substrate Substrate molecule.
+ * @param path Path the atom is added to.
  * @param p  Point (atom) tested.
  * @return (int) 1 if not far enough, 0 otherwise.
  */
-int isHindered(Shell_t* moc, Molecule_t* sub, Point_t p) {
+int isHindered(Shell_t* moc, Molecule_t* sub, Path_t* path, Point_t p) {
 
 	for (int i = 0; i < size(moc); i++) {
-			Point_t A = coords(atom(moc, i));
-			if (dist(A, p) < DIST_GAP_CAGE)
-				return 1;
+		Point_t A = coords(atom(moc, i));
+		if (distInf(A, p, DIST_GAP_CAGE))
+			return 1;
 	}
 	for (int i = 0; i < size(sub); i++) {
 		Point_t A = coords(atom(sub, i));
-		if (dist(A, p) < DIST_GAP_SUBSTRATE) 
+		if (distInf(A, p, DIST_GAP_SUBSTRATE)) 
 			return 1;
+	}
+
+	for (int i = 2; i < path->size; i++) {
+		int size = (path->patternNum[i] == CYCLE_PATTERN) ? MAX_NB_ATOMS_PATTERN : 3;
+		for (int j = 0; j < size; j++) {
+			if (distInf(path->patterns[i][path->positionNum[i]][j], p, DIST_GAP_CAGE))
+				return 1;
+		}
 	}
 	return 0;
 }
@@ -52,17 +61,19 @@ int isHinderedSubstrate(Molecule_t* sub, Point_t p) {
 /**************************************/
 
 /**
- * @brief Adds an aromatic ring in the path.
+ * @brief Adds an aromatic ring in the path (cycle pattern).
  * 
  * @param processedMoc Molecular cage being generated.
  * @param path Path being generated in the cage.
  * @param substrate Substrate molecule.
  */
-void addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate) {
+int addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate) {
 
-	Point_t neighborStart = path->patterns[path->size - 2][path->positionNum[path->size - 2]];
-	Point_t start = path->patterns[path->size - 1][path->positionNum[path->size - 1]];
-	Point_t startCycle = path->patterns[path->size][path->positionNum[path->size]];
+	Point_t neighborStart = path->patterns[path->size - 2][path->positionNum[path->size - 2]][0];
+	Point_t start = path->patterns[path->size - 1][path->positionNum[path->size - 1]][0];
+	Point_t startCycle = path->patterns[path->size][path->positionNum[path->size]][0];
+
+	path->patterns[path->size][path->positionNum[path->size]][3] = startCycle;
 
 	// Look for a normal to position the ring.
 	Point_t normal = planNormal(startCycle, start, neighborStart);
@@ -70,6 +81,7 @@ void addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 
 	for (int i = 0; i < 4; i++) { // Test 4 different orientations of the ring.
 		
+		int k = 4;
 		Point_t newStart, newNeighbor, hydrogen, next;
 
 		normal = rotation(vector(startCycle, start),  45, normal);
@@ -78,9 +90,11 @@ void addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 		newStart = addPoint(startCycle, normalization(rotation(normal, -120, direction), SIMPLE_CYCLE));
 		neighborStart = startCycle;
 
-		if (isHindered(processedMoc, substrate, newStart)) {
+		if (isHindered(processedMoc, substrate, path, newStart)) {
 			continue;
 		}
+
+		path->patterns[path->size][path->positionNum[path->size]][k++] = newStart;
 
 		int wasHindered = 0;
 		for (int j = 0; j < 4; j++) {
@@ -93,10 +107,15 @@ void addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 				hydrogen = AX2E1(newStart, neighborStart, newNeighbor, DIST_SIMPLE);
 				next = hydrogen;
 			}
-			if (isHindered(processedMoc, substrate, newNeighbor) || isHindered(processedMoc, substrate, hydrogen)) {
+			if (isHindered(processedMoc, substrate, path, newNeighbor) || isHindered(processedMoc, substrate, path, hydrogen)) {
 				wasHindered = 1;
 				break;
 			}
+			if (j != 2) {
+				path->patterns[path->size][path->positionNum[path->size]][k++] = hydrogen;
+			}
+			path->patterns[path->size][path->positionNum[path->size]][k++] = newNeighbor;
+
 			neighborStart = newStart;
 			newStart = newNeighbor;
 		}
@@ -105,13 +124,14 @@ void addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 		}
 		hydrogen = AX2E1(newStart, neighborStart, startCycle, DIST_ATOM_H);
 		
-		if (isHindered(processedMoc, substrate, hydrogen)) {
+		if (isHindered(processedMoc, substrate, path, hydrogen)) {
 			continue;
 		}
-		path->patterns[path->size][path->positionNum[path->size]] = next;
-		path->orientations[path->size] = i;
-		return; // We arbitrarily choose to keep only the first valid cycle inserted. 
+		path->patterns[path->size][path->positionNum[path->size]][k] = hydrogen;
+		path->patterns[path->size][path->positionNum[path->size]][0] = next;
+		return 1; // We arbitrarily choose to keep only the first valid cycle inserted. 
 	}
+	return 0;
 }
 
 /**************************************/
@@ -121,8 +141,8 @@ void addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 // Projection for an atom with one neighbor. Gives multiple projections.
 void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate) {
 	
-	Point_t start = path->patterns[path->size - 1][path->positionNum[path->size - 1]];
-	Point_t startNeighbor = path->patterns[path->size - 2][path->positionNum[path->size - 2]];
+	Point_t start = path->patterns[path->size - 1][path->positionNum[path->size - 1]][0];
+	Point_t startNeighbor = path->patterns[path->size - 2][path->positionNum[path->size - 2]][0];
 	// Also works for a cycle because atoms on either sides of the cycle are in the same plane.
 
 	Point_t direction = vector(start, startNeighbor);
@@ -134,7 +154,7 @@ void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 	
 	List_s* positions = LSTs_init(); //TODO change for a buffer.
 
-	if (!isHindered(processedMoc, substrate, newStart) && !isHindered(processedMoc, substrate, hydrogen1) && !isHindered(processedMoc, substrate, hydrogen2)) {
+	if (!isHindered(processedMoc, substrate, path, newStart) && !isHindered(processedMoc, substrate, path, hydrogen1) && !isHindered(processedMoc, substrate, path, hydrogen2)) {
 		LSTs_addElement(positions, newStart);
 	}
 	
@@ -144,7 +164,7 @@ void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 		hydrogen1 = AX2E2(start, startNeighbor, newStart, DIST_ATOM_H);
 		hydrogen2 = AX3E1(start, startNeighbor, newStart, hydrogen1, DIST_ATOM_H);
 		
-		if (!isHindered(processedMoc, substrate, newStart) && !isHindered(processedMoc, substrate, hydrogen1) && !isHindered(processedMoc, substrate, hydrogen2)) {
+		if (!isHindered(processedMoc, substrate, path, newStart) && !isHindered(processedMoc, substrate, path, hydrogen1) && !isHindered(processedMoc, substrate, path, hydrogen2)) {
 			LSTs_addElement(positions, newStart); //path->positionsBuffer[i] = newStart;
 		}
 	}
@@ -152,7 +172,11 @@ void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate)
 	for (i = 0; i < NUMBER_POSITION_AX1E3 && positions->first; i++) { // Best placed position (min distance to the end)
 		//newStart = minDist_obstacle(positions, end,sub);
 		newStart = minDist(positions, coords(atom(processedMoc, path->idEnd)));
-		path->patterns[path->size][i] = newStart;
+		path->patterns[path->size][i][0] = newStart;
+		hydrogen1 = AX2E2(start, startNeighbor, newStart, DIST_ATOM_H);
+		hydrogen2 = AX3E1(start, startNeighbor, newStart, hydrogen1, DIST_ATOM_H);
+		path->patterns[path->size][i][1] = hydrogen1;
+		path->patterns[path->size][i][2] = hydrogen2;
 		LSTs_removeElement(positions, newStart);
 	}
 	path->maxPositions[path->size] = (i) ? i - 1 : -1;
@@ -233,8 +257,7 @@ void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* pro
 		int existsNewStart = (path->maxPositions[path->size] >= 0);
 
 		if (path->size >= 2 && path->patternNum[path->size] == CYCLE_PATTERN) {
-			addAromaticRing(processedMoc, path, substrate);
-			existsNewStart = (path->orientations[path->size] >= 0);
+			existsNewStart = addAromaticRing(processedMoc, path, substrate);
 		}
 		else if (path->size <= path->sizeMax && !existsNewStart) {
 			choosePositions(processedMoc, path, substrate);
@@ -242,11 +265,12 @@ void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* pro
 		}
 		int closeToTheEnd = 0;
 		if (existsNewStart) {
-			Point_t newStart = path->patterns[path->size][path->positionNum[path->size]];
+			
+			Point_t newStart = path->patterns[path->size][path->positionNum[path->size]][0];
 
 			if (dist(newStart, end) < DIST_SIMPLE + DIST_ERROR) {
 				closeToTheEnd = 1;
-				Point_t neighborNewStart = path->patterns[path->size - 1][path->positionNum[path->size - 1]];
+				Point_t neighborNewStart = path->patterns[path->size - 1][path->positionNum[path->size - 1]][0];
 				float beforeLastAngle = angle(newStart, end, neighborNewStart);
 				float lastAngle = angle(end, newStart, coordsNeighbor(processedMoc, path->idEnd, 0));
 				Point_t hydrogen1 = AX2E2(newStart, neighborNewStart, end, DIST_ATOM_H);
@@ -254,7 +278,7 @@ void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* pro
 				Point_t hydroEnd1 = AX2E2(end, coordsNeighbor(processedMoc, path->idEnd, 0), newStart, DIST_ATOM_H);
 				Point_t hydroEnd2 = AX3E1(end, coordsNeighbor(processedMoc, path->idEnd, 0), newStart, hydroEnd1, DIST_ATOM_H);
 				
-				if (!isHindered(processedMoc, substrate, hydrogen1) && !isHindered(processedMoc, substrate, hydrogen2) && !isHindered(processedMoc, substrate, hydroEnd1) && !isHindered(processedMoc, substrate, hydroEnd2)) {
+				if (!isHindered(processedMoc, substrate, path, hydrogen1) && !isHindered(processedMoc, substrate, path, hydrogen2) && !isHindered(processedMoc, substrate, path, hydroEnd1) && !isHindered(processedMoc, substrate, path, hydroEnd2)) {
 					if(beforeLastAngle >= (END_ANGLE - ANGLE_ERROR) && beforeLastAngle <= (END_ANGLE + ANGLE_ERROR) && lastAngle <= (END_ANGLE + ANGLE_ERROR) && lastAngle >= (END_ANGLE - ANGLE_ERROR)) {
 						if(!forceCycle || (forceCycle && PTH_countAroRings(path) > 0)) { // Only if there is a cycle in the path and we force the presence of a cycle.
 							Shell_t* moc = SHL_copy(processedMoc);
@@ -269,7 +293,6 @@ void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* pro
 			while (((path->patternNum[path->size] == CYCLE_PATTERN && path->positionNum[path->size] == path->maxPositions[path->size])
 							|| path->maxPositions[path->size] < 0) && existsPathInProgress) {
 				path->patternNum[path->size] = 0;
-				path->orientations[path->size] = -1;
 				path->positionNum[path->size] = 0;
 				path->maxPositions[path->size] = -1;
 				(path->size)--;
@@ -285,7 +308,6 @@ void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* pro
 				else {
 					(path->positionNum[path->size])++;
 					path->patternNum[path->size] = 0;
-					path->orientations[path->size] = -1;
 				}
 			}
 		}
@@ -314,11 +336,10 @@ int search(Shell_t* s, List_t* markedAtoms, int index1, int index2) {
 	LST_addElement(markedAtoms, index1);
 	
 	if (neighborhoodSize(a) == 0) {
-		printf("here (search)\n"); // TODO check this condition.
 		return 0;
 	}
 	else {
-		for (int i = 0; forEachNeighbor(a, i) /*i <  neighborhoodSize(a)*/; i++) {
+		for (int i = 0; forEachNeighbor(a, i); i++) {
 			
 			if (neighbor(a, i) == index2) {
 				return 1;
@@ -437,19 +458,8 @@ void generateWholeCages(Main_t* m, Options_t options) {
 	mStack_t* mocsInProgress = initMocsInProgress(m); // ! Take only the first moc.
 	static int countResults = 0;
 
-	// int i = 0;
-	// char name[100];
-
 	int pathelessMocSize = SHL_nbAtom(mocsInProgress->first->moc); // Allows to recover the size before the addition of the paths, only if we keep one moc line (TODO modify otherwise).
 	while (mocsInProgress->first) { // As long as there is a moc to process.	
-
-	// if (i % 100 == 0) {
-	// 	sprintf(name, "../results/YILLAG/motTest%d.mol2", i);
-	// 	SHL_writeMol2(name, mocsInProgress->first->moc);
-	// 	// PTH_printPath(path);
-	// 	// printf("i : %d\n", i);
-	// }
-	// i++;
 
 		Pair_t* startEndAtoms = chooseStartAndEndPairs(mocsInProgress->first->moc, substrat(m));
 		Pair_t* currentPair;
@@ -469,18 +479,18 @@ void generateWholeCages(Main_t* m, Options_t options) {
 			Shell_t* processedMoc = mocsInProgress->first->moc;
 			mocsInProgress->first->moc = NULL;
 			mSTK_removeFirst(mocsInProgress);
-			#pragma omp parallel
+			//#pragma omp parallel
 			{
 				currentPair = startEndAtoms;
-				#pragma omp single
+				//#pragma omp single
 				{
 					while (currentPair) { // For all pairs of atoms to connect.
-					#pragma omp task firstprivate(currentPair)
+					//#pragma omp task firstprivate(currentPair)
 					{
 						Path_t* path = PTH_init(options.sizeMax, currentPair);
-						path->patterns[0][0] = coordsNeighbor(processedMoc, path->idStart, 0);
+						path->patterns[0][0][0] = coordsNeighbor(processedMoc, path->idStart, 0);
 						(path->size)++;
-						path->patterns[1][0] = coords(atom(processedMoc, path->idStart));
+						path->patterns[1][0][0] = coords(atom(processedMoc, path->idStart));
 						path->maxPositions[1] = 0;
 
 						int forceCycle = 0;

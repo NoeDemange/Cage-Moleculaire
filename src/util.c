@@ -80,6 +80,10 @@ float dist(Point_t A, Point_t B) {
 	return sqrt(pow((A.x - B.x), 2) + pow((A.y - B.y), 2)	+ pow((A.z - B.z), 2)); //euclidian
 }
 
+int distInf(Point_t A, Point_t B, float dist) {
+	return (A.x - B.x)*(A.x - B.x) + (A.y - B.y)*(A.y - B.y) + (A.z - B.z)*(A.z - B.z) < dist*dist;
+}
+
 //Calcul de la distance de manhattan entre deux points.
 float dist_manhattan(Point_t A, Point_t B) {
 	return (fabs(A.x - B.x)+fabs(A.y - B.y)+fabs(A.z - B.z));//manhattan

@@ -59,6 +59,7 @@ A___/   \___B
 /***********************************************************************/
 
 // Path (in the cage)
+#define MAX_NB_ATOMS_PATTERN 13 // Maximum number of atoms in a pattern (number of atoms in cycle : 7 C + 6 H)
 #define NB_PATTERNS 2 // Number of patterns available to make a path
 #define CYCLE_PATTERN 1 // Cycle pattern corresponding number
 #define SIMPLE_PATTERN 0 // Simple pattern corresponding number (ie, a carbon atom)

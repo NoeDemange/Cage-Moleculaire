@@ -59,6 +59,10 @@ Point_t PT_div(Point_t A, float scal) {
 	return _new;
 }
 
+int PT_compare(Point_t A, Point_t B) {
+	return A.x == B.x && A.y == B.y && A.z == B.z;
+}
+
 float PT_distance(Point_t A, Point_t B) {
 
 	return sqrt(pow((A.x - B.x), 2) + pow((A.y - B.y), 2)	+ pow((A.z - B.z), 2));

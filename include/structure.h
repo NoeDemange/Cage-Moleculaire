@@ -242,8 +242,9 @@ typedef struct {
 	int idEnd;
 	int size; // Index on patterns.
 	int sizeMax;
-	Point_t** patterns;
+	Point_t*** patterns;
 	//Point_t* positionsBuffer;
+	Point_t* solution;
 	int* orientations; // Cycle orientation.
 	int* positionNum; // Position number in patterns.
 	int* patternNum; // Pattern number in patterns.
@@ -257,6 +258,7 @@ Path_t* PTH_init(int size, Pair_t* pair);
 void PTH_delete(Path_t*);
 int PTH_countAroRings(Path_t*);
 void PTH_addPath(Shell_t* moc, Path_t* path);
+int PTH_isHindered(Path_t* path, Point_t end, Point_t endNeighbor);
 void PTH_printPath(Path_t* path);
 
 //Point
@@ -266,6 +268,7 @@ Point_t PT_add(Point_t, Point_t);
 Point_t PT_sub(Point_t, Point_t);
 Point_t PT_mul(Point_t, float);
 Point_t PT_div(Point_t, float);
+int PT_compare(Point_t A, Point_t B);
 float PT_distance(Point_t, Point_t);
 
 //List
