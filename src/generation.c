@@ -2,6 +2,10 @@
 #include "util.h"
 #include "output.h"
 
+/**
+ * @file generation.c
+ * @brief This file contains functions for generating binding patterns in the envelope.
+ */
 
 /**
  * @brief Creation of the beginning of cages according to the dependencies.
@@ -399,6 +403,11 @@ void generateCycle(Shell_t* s) {
 	LST_delete(atomsInCycle);
 }
 
+/**
+ * @brief Generate pathless cages by adding aromatic rings and hydrogen patterns to the envelope.
+ * 
+ * @param m Grouping of the main structures (substrate and envelope).
+ */
 void generatePathlessCages(Main_t* m) {
 
 	envarom(m) = SHL_copy(envelope(m));

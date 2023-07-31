@@ -6,7 +6,21 @@
 #include <string.h>
 
 /**
-*/
+ * @file output.c
+ * @brief Functions for generating and writing output files.
+ *
+ * This file contains functions for creating directories, writing output files in various formats,
+ * and printing molecule and graph information to the console.
+ * The functions here are used for generating cages and storing the results.
+ *
+ */
+
+/**
+ * @brief Create a directory with the given input name in the "../results" folder.
+ *
+ * @param input The input filename.
+ * @return A dynamically allocated string representing the created directory name.
+ */
 char* createDir(char *input) {
   char* dirName = malloc (256 * sizeof(char));
   
@@ -17,6 +31,13 @@ char* createDir(char *input) {
   return dirName;
 }
 
+/**
+ * @brief Create a subdirectory with the given input name and motif number in the "../results" folder.
+ *
+ * @param input The input filename.
+ * @param nbmotif The motif number.
+ * @return A dynamically allocated string representing the created subdirectory name.
+ */
 char* createUnderDir(char *input, int nbmotif) {
   char* dirName = malloc (256 * sizeof(char));
   sprintf(dirName,"../results/%s/%d",input, nbmotif);
@@ -26,7 +47,11 @@ char* createUnderDir(char *input, int nbmotif) {
 }
 
 /**
-*/
+ * @brief Extract the basename from the given input string.
+ *
+ * @param in The input string.
+ * @return A dynamically allocated string representing the extracted basename.
+ */
 char* getBasename(char * in) {
   char* r = malloc (256 * sizeof (char) );  
   char *start;
@@ -42,7 +67,12 @@ char* getBasename(char * in) {
 }
 
 /**
-*/
+ * @brief Copy the input file to the specified directory with the given name.
+ *
+ * @param inputFile The input file to be copied.
+ * @param dirName The destination directory.
+ * @param name The name of the file to be copied.
+ */
 void copytoDir(char* inputFile, char* dirName, char* name) {
   char cmd[512];
 
@@ -53,6 +83,11 @@ void copytoDir(char* inputFile, char* dirName, char* name) {
   }
 }
 
+/**
+ * @brief Write the contents of a list to the console.
+ *
+ * @param l The list to be written.
+ */
 void LST_write(List_t* l) {
 
   int i;
@@ -64,6 +99,12 @@ void LST_write(List_t* l) {
   printf("\n");
 }
 
+/**
+ * @brief Write the information of an atom in a molecule to the console.
+ *
+ * @param a The atom to be written.
+ * @param cycle The cycle number of the atom.
+ */
 void MOL_writeAtom(Atom_t* a, unsigned cycle) {
   int i;
 
@@ -78,6 +119,11 @@ void MOL_writeAtom(Atom_t* a, unsigned cycle) {
   printf("\n");
 }
 
+/**
+ * @brief Write the information of a molecule to the console.
+ *
+ * @param m The molecule to be written.
+ */
 void MOL_write(Molecule_t* m) {
   int i;
 
@@ -89,6 +135,11 @@ void MOL_write(Molecule_t* m) {
   printf("\n");
 }
 
+/**
+ * @brief Write the information of an atom in a shell to the console.
+ *
+ * @param a The atom to be written.
+ */
 void SHL_writeAtom(AtomShl_t* a) {
   int i;
 
@@ -102,6 +153,11 @@ void SHL_writeAtom(AtomShl_t* a) {
   printf("\n");
 }
 
+/**
+ * @brief Write the information of a shell to the console.
+ *
+ * @param s The shell to be written.
+ */
 void SHL_write(Shell_t* s) {
   int i;
 
@@ -115,6 +171,11 @@ void SHL_write(Shell_t* s) {
   printf("\n");
 }
 
+/**
+ * @brief Write the neighbors of a vertex in a graph to the console.
+ *
+ * @param v The vertex to be written.
+ */
 void GPH_writeVertex(Vertex_t* v) {
 
   int i;
@@ -127,6 +188,11 @@ void GPH_writeVertex(Vertex_t* v) {
   printf("\n");
 }
 
+/**
+ * @brief Write the information of a graph to the console.
+ *
+ * @param g The graph to be written.
+ */
 void GPH_write(Graph_t* g) {
 
   int i;
@@ -141,6 +207,12 @@ void GPH_write(Graph_t* g) {
   }
 }
 
+/**
+ * @brief Write the contents of a molecule to a .mol2 file.
+ *
+ * @param output The name of the output file.
+ * @param m The molecule to be written.
+ */
 void MOL_writeMol2(char* output, Molecule_t* m) {
   FILE* filestream = NULL;
   int ret, i, j, l;
@@ -187,6 +259,12 @@ void MOL_writeMol2(char* output, Molecule_t* m) {
   fclose(filestream);
 }
 
+/**
+ * @brief Write the contents of a shell to a .mol2 file.
+ *
+ * @param output The name of the output file.
+ * @param s The shell to be written.
+ */
 void SHL_writeMol2(char* output, Shell_t* s) {
   FILE* filestream = NULL;
   int ret, i, j, l;
@@ -283,6 +361,13 @@ void SHL_writeMol2(char* output, Shell_t* s) {
   fclose(filestream);
 }
 
+/**
+ * @brief Write the output files for a given shell.
+ *
+ * @param inputFile The input file name.
+ * @param s The shell to be written.
+ * @param tailleMocInit The initial size of the cage.
+ */
 void writeShellOutput(char* inputFile, Shell_t* s, int tailleMocInit) {
 	char outputname[512];
 	char* name = getBasename (inputFile);
@@ -299,6 +384,12 @@ void writeShellOutput(char* inputFile, Shell_t* s, int tailleMocInit) {
 	i++;
 }
 
+/**
+ * @brief Write the main output files for a given main structure.
+ *
+ * @param inputFile The input file name.
+ * @param m The main structure to be written.
+ */
 void writeMainOutput(char* inputFile, Main_t* m) {
   char outputname[512];
   char* name = getBasename (inputFile);

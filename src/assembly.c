@@ -6,6 +6,10 @@
 #include <math.h>
 #include <omp.h>
 
+/**
+ * @file assembly.c
+ * @brief This file contains functions for generating connected cages.
+ */
 
 /**
  * @brief Checks if a point is far enough away from the other atoms 

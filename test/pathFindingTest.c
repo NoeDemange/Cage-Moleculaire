@@ -6,6 +6,19 @@
 #include "voxelization.h"
 #include "pathFinding.h"
 
+/**
+ * @file pathFindingTest.c
+ * @brief Path Finding Test
+ *
+ * This file contains the main function to test pathfinding using the A* algorithm on a voxel grid.
+ * The program performs multiple instances of A* pathfinding and calculates the mean distance traveled.
+ * The voxel grid is initialized and used for pathfinding.
+ */
+
+/**
+ * @def nb_instances
+ * The number of instances for A* pathfinding to perform.
+ */
 #define nb_instances 1000000
 
 int main(int argc, char** argv) {
@@ -24,17 +37,6 @@ int main(int argc, char** argv) {
 	printf("\nVoxel time : %d hour(s) %d minute(s) %ld second(s)\n\n", hours, minutes, seconds);
 	
 	Point3D st = {0,0,0}; Point3D Pend = {GRID_SIZE-1,GRID_SIZE-1, GRID_SIZE-1};
-
-	/*time_t startDij = time(NULL);
-	float Ddist = dijkstra(st, Pend, voxelGrid);
-	time_t endDij = time(NULL);
-	seconds = (long) difftime(endDij, startDij);	
-	hours = seconds / 3600;
-	seconds -= hours * 3600;
-	minutes = seconds / 60;
-	seconds -= minutes * 60;
-	printf("Dijkstra time : %d hour(s) %d minute(s) %ld second(s)\n", hours, minutes, seconds);
-	printf("dijkstra dist : %f\n\n",Ddist);*/
 
 	time_t startA = time(NULL);
 	VMap*** vMap = VMap_alloc();

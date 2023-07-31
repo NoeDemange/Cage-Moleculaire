@@ -5,6 +5,11 @@
 #include "output.h"
 
 /**
+ * @file expansion.c
+ * @brief This file contains functions related to the expansion of atomic steric groupings and the generation of the molecule's envelope.
+ */
+
+/**
  * Expansion of atomic steric grouping 2. 
  * Add a point in the envelope.
  * 

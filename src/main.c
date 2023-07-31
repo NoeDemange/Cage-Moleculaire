@@ -1,3 +1,10 @@
+/**
+ * @file main.c
+ * @brief Main program for generating cages for a specific substrate.
+ *
+ * This program reads a substrate molecule from an input .xyz file and generates cages.
+ */
+
 #include "structure.h"
 #include "initialization.h"
 #include "expansion.h"
@@ -16,6 +23,14 @@
 #include <getopt.h>
 #include <time.h>
 
+
+/**
+ * Main function to run the cage generation process.
+ *
+ * @param argc Number of command-line arguments.
+ * @param argv Array of command-line arguments.
+ * @return Exit status of the program.
+ */
 int main(int argc, char** argv) {
 
 	time_t start = time(NULL);
@@ -106,11 +121,19 @@ int main(int argc, char** argv) {
 	return EXIT_SUCCESS;
 }
 
+/**
+ * Print the usage of the program.
+ */
 void usage() {
 	fprintf(stderr, USAGE_FMT, DEFLT_ALPHA, DEFLT_SIZEMAX, DEFLT_MAX_RESULTS);
 	exit(EXIT_FAILURE);
 }
 
+/**
+ * Load and execute an R script file.
+ *
+ * @param name Name of the R script file to execute.
+ */
 void source(const char* name) {
 	SEXP e;
 	int errorOccurred;
@@ -125,6 +148,11 @@ void source(const char* name) {
   UNPROTECT(1);
 }
 
+/**
+ * Set the working directory for R scripts.
+ *
+ * @param dir Directory to set as the working directory.
+ */
 void setWorkingDirectory(char* dir) {
 	SEXP e;
 	int errorOccurred;

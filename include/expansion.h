@@ -3,6 +3,10 @@
 
 #include "structure.h"
 
+/** @file
+ *  @brief Functions for shell creation and expansion.
+ */
+
 Shell_t* createShell(Molecule_t* m, double alpha);
 void expansion(Molecule_t* m, Shell_t* s);
 

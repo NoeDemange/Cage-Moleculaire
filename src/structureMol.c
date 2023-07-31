@@ -1,15 +1,27 @@
 #include "structure.h"
 #include "util.h"
 
+/**
+ * @file structureMol.c
+ * @brief Molecule Operations
+ *
+ * This file contains functions related to molecule operations in the application.
+ * These operations involve creating, deleting, and managing
+ * molecules, atoms, and their properties.
+ */
+
 /**************************************/
 /* MOLECULE ***************************/
 /**************************************/
 
 /**
- * 	Ajoute l'identifiant d'un voisin à un atome.
- * 
- * 	@param 	a 	Pointeur de l'atome.
- *  @param	id 	Identifiant à rajouter.
+ * @brief Adds the identifier of a neighbor to an atom.
+ *
+ * This function adds the identifier of a neighbor to the neighborhood list of an atom.
+ * The identifier is added only if it does not already exist in the list.
+ *
+ * @param a Pointer to the Atom_t representing the atom.
+ * @param id Identifier of the neighbor to be added.
  */
 void MOL_addNeighbor(Atom_t* a, unsigned id) {
 
@@ -26,10 +38,13 @@ void MOL_addNeighbor(Atom_t* a, unsigned id) {
 }
 
 /**
- * 	Supprime un voisin d'un atome.
+ * @brief Removes a neighbor from an atom.
  *
- * 	@param 	a 	Pointeur de l'atome.
- *  @param	id 	Identifiant à retirer.
+ * This function removes a neighbor from the neighborhood list of an atom.
+ * If the neighbor with the given identifier does not exist in the list, nothing happens.
+ *
+ * @param a Pointer to the Atom_t representing the atom.
+ * @param id Identifier of the neighbor to be removed.
  */
 void MOL_removeNeighbor(Atom_t* a, unsigned id) {
 
@@ -40,10 +55,11 @@ void MOL_removeNeighbor(Atom_t* a, unsigned id) {
 }
 
 /**
- * 	Calcule le nombre de doublets liants d'un atome.
- *  Nombre de doublets liants = Nombre de voisins dans la molécule.
+ * @brief Calculates the number of ligands (doublets liants) of an atom.
  *
- *	@param 	a 	Pointeur de l'atome.
+ * The number of ligands of an atom is equal to the number of neighbors it has in the molecule.
+ *
+ * @param a Pointer to the Atom_t representing the atom.
  */
 void MOL_nbLigands(Atom_t* a) {
 	
@@ -57,12 +73,15 @@ void MOL_nbLigands(Atom_t* a) {
 }
 
 /**
- * 	Calcule le nombre de doublets non liants d'un atome.
+ * @brief Calculates the number of lone pairs (doublets non liants) of an atom.
  *
- * @param 	a 			Pointeur de l'atome.
- * @param	alpha 	Moyenne dans angles formés par les voisins de l'atome.
- * @param	stericNeighbor	Nombre de doublets du voisin de l'atome (pour le cas où il n'en possède qu'un seul.
- * @param	cycle 	Booléen qui indique si l'atome appartient à un cycle.
+ * This function calculates the number of lone pairs of an atom based on its properties,
+ * neighboring atoms' properties, and whether the atom belongs to a cycle.
+ *
+ * @param a Pointer to the Atom_t representing the atom.
+ * @param alpha Average angle formed by the neighbors of the atom.
+ * @param stericNeighbor Number of doublets of the neighbor of the atom (used when it has only one neighbor).
+ * @param cycle Boolean indicating if the atom belongs to a cycle.
  */
 void MOL_nbLonePairs(Atom_t* a, float alpha, int stericNeighbor, unsigned cycle) {
 
@@ -98,9 +117,12 @@ void MOL_nbLonePairs(Atom_t* a, float alpha, int stericNeighbor, unsigned cycle)
 }
 
 /**
- *  Trouve tous les sommets appartenant à un cycle d'une molécule.
+ * @brief Finds all vertices belonging to a cycle in a molecule.
  *
- *  @param	m 	Adresse de la molécule.
+ * This function finds all vertices (atoms) belonging to a cycle in a molecule
+ * and updates the molecule's cycle list accordingly.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule.
  */
 void MOL_seekCycle(Molecule_t* m) {
 
@@ -110,9 +132,13 @@ void MOL_seekCycle(Molecule_t* m) {
 }
 
 /**
- * Calcule le nombre d'arêtes (de liaisons) d'un molécule.
+ * @brief Calculates the number of edges (bonds) in a molecule.
  *
- * 	@param 	m 	Pointeur de la molécule.
+ * The number of edges (bonds) in a molecule is equal to half of the total number of ligands
+ * (doublets liants) in all atoms of the molecule.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule.
+ * @return The number of edges (bonds) in the molecule.
  */
 int MOL_nbEdges(Molecule_t* m) {
 	int cpt = 0;
@@ -124,11 +150,14 @@ int MOL_nbEdges(Molecule_t* m) {
 }
 
 /**
- * 	Fonction qui ajoute une arête entre deux sommets d'une molécule.
+ * @brief Adds an edge (bond) between two vertices (atoms) in a molecule.
  *
- * 	@param 	m 	Pointeur de la molécule.
- *  @param	id1	Identifiant du premier sommet.
- *  @param	id2	Identifiant du deuxième sommet.
+ * This function adds a bond between two vertices (atoms) in a molecule.
+ * The edge is added by updating the neighborhood lists of the two atoms to include each other.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule.
+ * @param id1 Identifier of the first vertex (atom).
+ * @param id2 Identifier of the second vertex (atom).
  */
 void MOL_addEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 	if (id1 != id2) {
@@ -138,11 +167,14 @@ void MOL_addEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 }
 
 /**
- * 	Supprime une arête entre deux sommets d'une molécule.
+ * @brief Removes an edge (bond) between two vertices (atoms) in a molecule.
  *
- * 	@param 	m 	Pointeur de la molécule.
- *  @param	id1	Identifiant du premier sommet.
- *  @param	id2	Identifiant du deuxième sommet.
+ * This function removes a bond between two vertices (atoms) in a molecule.
+ * The edge is removed by updating the neighborhood lists of the two atoms to exclude each other.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule.
+ * @param id1 Identifier of the first vertex (atom).
+ * @param id2 Identifier of the second vertex (atom).
  */
 void MOL_removeEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 	
@@ -151,9 +183,12 @@ void MOL_removeEdge(Molecule_t* m, unsigned id1, unsigned id2) {
 }
 
 /**
- * 	Initialise un nouvel atome.
- * 
- * 	@param 	a 	Pointeur de l'atome.
+ * @brief Initializes a new atom with default values.
+ *
+ * This function initializes a new atom by setting its symbol, radius, number of ligands,
+ * number of lone pairs, coordinates, and neighborhood list to default values.
+ *
+ * @param a Pointer to the Atom_t representing the atom to be initialized.
  */
 void MOL_createAtom(Atom_t* a) {
 
@@ -170,11 +205,12 @@ void MOL_createAtom(Atom_t* a) {
 }
 
 /**
- *  Crée le graphe de dépendance d'une molécule.
- *  Le graphe de dépendance regroupe les atomes de la molécule qui peut participer à une liaison hydrogène.
- *  Il y a une arête entre deux sommets s'ils ne peuvent pas participer à des liaisons hydrogènes en même temps.
+ * @brief Creates the dependency graph of a molecule.
  *
- * 	@param	m 	Molécule.
+ * The dependency graph groups atoms in the molecule that can participate in hydrogen bonds.
+ * An edge exists between two atoms if they cannot participate in hydrogen bonds simultaneously.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule.
  */
 void MOL_createBond(Molecule_t* m) {
 
@@ -209,6 +245,17 @@ void MOL_createBond(Molecule_t* m) {
 	}
 }
 
+/**
+ * @brief Finds the normal vector of a vertex (atom) in a molecule.
+ *
+ * This function finds the normal vector of a vertex (atom) in a molecule based on its neighbors.
+ * It recursively calculates the normal vector for the vertex if it has only one neighbor.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule.
+ * @param ida Identifier of the vertex (atom) for which to find the normal vector.
+ * @param dad Identifier of the parent vertex (atom) in the recursive search (used for atoms with one neighbor).
+ * @return The normal vector of the vertex (atom) in the molecule.
+ */
 Point_t MOL_seekNormal(Molecule_t* m, unsigned ida, unsigned dad){
 
 	Atom_t* a = atom(m,ida);
@@ -231,12 +278,15 @@ Point_t MOL_seekNormal(Molecule_t* m, unsigned ida, unsigned dad){
 					coords(atom(m,neighbor(a,1))));
 }
 
-/*
-*	Fonction qui crée et initialise une nouvelle molécule.
-*
-*	@param 	size 	Nombre de sommets de la molécule.
-* @return				Nouvelle molécule.
-*/
+/**
+ * @brief Creates and initializes a new molecule.
+ *
+ * This function creates and initializes a new molecule with the specified number of vertices (atoms).
+ * The atoms are created with default values, and the molecule's cycle and bond properties are set to NULL.
+ *
+ * @param size Number of vertices (atoms) in the molecule.
+ * @return Pointer to the newly created molecule.
+ */
 Molecule_t* MOL_create(unsigned size) {
 
 	Molecule_t *m = malloc(sizeof(Molecule_t));
@@ -255,10 +305,11 @@ Molecule_t* MOL_create(unsigned size) {
 }
 
 /**
- * 	Supprime un atome d'une molécule.
- *  Supprimer un atome revient à supprimer la liste de ses voisins.
+ * @brief Deletes an atom from a molecule.
  *
- * 	@param 	a 	Atome à supprimer.
+ * Deleting an atom involves freeing the memory used by its neighborhood list.
+ *
+ * @param a Atom to be deleted.
  */
 void MOC_deleteAtom(Atom_t* a) {
 
@@ -266,9 +317,11 @@ void MOC_deleteAtom(Atom_t* a) {
 }
 
 /**
- * 	Supprime une molécule.
+ * @brief Deletes a molecule and its associated elements.
  *
- * @param 	m 	Molécule à supprimer.
+ * Deleting a molecule involves freeing the memory used by its atoms, cycle list, and bond graph.
+ *
+ * @param m Pointer to the Molecule_t representing the molecule to be deleted.
  */
 void MOL_delete(Molecule_t* m) {
 

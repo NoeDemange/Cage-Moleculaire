@@ -3,6 +3,27 @@
 #include "constant.h"
 #include "output.h"
 
+/**
+ * @file voxelization.c
+ * @brief Functions for voxelization of a molecular structure and related operations.
+ *
+ * This file contains functions for voxelization of a molecular structure and related operations.
+ * Voxelization involves dividing the 3D space into small cubic cells (voxels) and marking the
+ * voxels that contain atoms from the molecular structure. The voxelized representation is useful
+ * for various computational operations and visualizations.
+ *
+ */
+
+/**
+ * @brief Check if a point is inside a sphere.
+ *
+ * This function checks whether a given point is inside a sphere defined by a center and radius.
+ *
+ * @param point The point to check.
+ * @param center The center of the sphere.
+ * @param radius The radius of the sphere.
+ * @return 1 if the point is inside the sphere, 0 otherwise.
+ */
 int isPointInsideSphere(Point_t point, Point_t center, float radius) {
     float dx = point.x - center.x;
     float dy = point.y - center.y;
@@ -13,6 +34,14 @@ int isPointInsideSphere(Point_t point, Point_t center, float radius) {
     return 0;
 }
 
+/**
+ * @brief Initialize a 3D voxel grid.
+ *
+ * This function initializes a 3D voxel grid by allocating memory for the grid and setting all
+ * voxels to zero.
+ *
+ * @return The initialized 3D voxel grid (VOXELGRID).
+ */
 VOXELGRID initVoxelGrid(){
     VOXELGRID voxelGrid = (int***)calloc(GRID_SIZE, sizeof(int**));
     if(voxelGrid == NULL){
@@ -28,6 +57,16 @@ VOXELGRID initVoxelGrid(){
     return voxelGrid;
 }
 
+/**
+ * @brief Perform voxelization of a molecular structure.
+ *
+ * This function performs voxelization of a given molecule by marking the voxels that contain
+ * atoms from the molecular structure. It uses the atom coordinates and radius to determine
+ * the voxelization.
+ *
+ * @param sub The Molecule_t pointer representing the molecular structure.
+ * @return The voxelized 3D grid (VOXELGRID) with voxels containing atoms marked as 1.
+ */
 VOXELGRID voxelization(Molecule_t* sub) {
     VOXELGRID voxelGrid = initVoxelGrid();
     for (int i = 0; i < size(sub); i++) {
@@ -50,7 +89,14 @@ VOXELGRID voxelization(Molecule_t* sub) {
     return voxelGrid;
 }
 
-
+/**
+ * @brief Print the voxel grid for visualization.
+ *
+ * This function creates a shell structure representing the voxel grid and writes it to a .mol2 file
+ * for visualization purposes.
+ *
+ * @param voxelGrid The voxelized 3D grid (VOXELGRID) to be visualized.
+ */
 void printVoxelGrid(VOXELGRID voxelGrid){
     Shell_t* voxelVisu = SHL_create();
     for(int x = 0; x<GRID_SIZE; x++){
@@ -66,6 +112,13 @@ void printVoxelGrid(VOXELGRID voxelGrid){
     SHL_writeMol2("voxelTest_neg.mol2",voxelVisu);
 }
 
+/**
+ * @brief Free the dynamically allocated memory of a voxel grid.
+ *
+ * This function frees the memory dynamically allocated for the voxel grid.
+ *
+ * @param voxelGrid The voxelized 3D grid (VOXELGRID) to be freed.
+ */
 void freeVoxelGrid(VOXELGRID voxelGrid){
     // Free the dynamically allocated memory
     for (int x = 0; x < GRID_SIZE; x++) {

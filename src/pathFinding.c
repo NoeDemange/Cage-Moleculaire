@@ -5,21 +5,47 @@
 #include "pathFinding.h"
 #include "util.h"
 
+/**
+ * @file pathFinding.c
+ * @brief Functions for pathfinding algorithms and heuristics.
+ *
+ * This file contains functions for performing pathfinding on a 3D voxel grid.
+ * It includes heuristics like Manhattan distance and voxel distance, as well as
+ * implementations of Dijkstra's algorithm and A* pathfinding algorithm.
+ * The functions here are used for finding paths between points in the voxel grid,
+ * considering obstacles.
+ *
+ */
+
 /**************************************/
 /* heuristics  ************************/
 /**************************************/
 
+/**
+ * @brief Calculate the Manhattan distance between two 3D points.
+ *
+ * @param a The first 3D point.
+ * @param b The second 3D point.
+ * @return The Manhattan distance between the two points.
+ */
 float manhattanDistance(Point3D a, Point3D b) {
     return fabs((START_GRID + a.x * LENGTH_GRID) - (START_GRID + b.x * LENGTH_GRID)) 
         + fabs((START_GRID + a.y * LENGTH_GRID) - (START_GRID + b.y * LENGTH_GRID)) 
         + fabs((START_GRID + a.z * LENGTH_GRID) - (START_GRID + b.z * LENGTH_GRID));
 }
 
-//src: The Jump Point Search Pathfinding System in 3D
-/*The three-dimensional distance between a node n and node n′ on a 26-connected grid is composed of distances ∆x,∆y and ∆z 
-in each respective axis. Let dmax=max(∆x,∆y,∆z), dmin=min(∆x,∆y,∆z), and dmid={∆x,∆y,∆z}\{dmax,dmin}.
-  The voxel distance between nodes n and n′ is subsequently calculated as:h(n,n′) = (√3−√2)dmin+ (√2−1)dmid+dmax
-*/
+/**
+ * @brief Calculate the voxel distance between two 3D points on a 26-connected grid.
+ *
+ * The voxel distance is composed of distances ∆x, ∆y, and ∆z in each respective axis.
+ * It is calculated as: h(n, n′) = (√3−√2) * dmin + (√2−1) * dmid + dmax
+ * where dmax = max(∆x, ∆y, ∆z), dmin = min(∆x, ∆y, ∆z), and dmid = {∆x, ∆y, ∆z} \ {dmax, dmin}.
+ * src: The Jump Point Search Pathfinding System in 3D.
+ *
+ * @param a The first 3D point.
+ * @param b The second 3D point.
+ * @return The voxel distance between the two points.
+ */
 float voxelDist(Point3D a, Point3D b) {
     float deltaX = fabs((START_GRID + a.x * LENGTH_GRID) - (START_GRID + b.x * LENGTH_GRID));
     float deltaY = fabs((START_GRID + a.y * LENGTH_GRID) - (START_GRID + b.y * LENGTH_GRID));
@@ -37,6 +63,16 @@ float voxelDist(Point3D a, Point3D b) {
 
 
 //peu performant
+/**
+ * @brief Perform Dijkstra's algorithm on the voxel grid to find the shortest path.
+ *
+ * @param start The starting point.
+ * @param goal The goal point.
+ * @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
+ * @return The distance of the shortest path from the start to the goal, or -1 if no path is found.
+ */
 float dijkstra(Point3D start, Point3D goal, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap){
     nodeHeap.size = 0;
     Node node;
@@ -97,6 +133,16 @@ float dijkstra(Point3D start, Point3D goal, VOXELGRID voxelGrid, VMap*** vMap, N
     return -1; // Return -1 if path not found
 }
 
+/**
+ * @brief Perform A* pathfinding on the voxel grid to find the shortest path.
+ *
+ * @param start The starting point.
+ * @param goal The goal point.
+ * @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
+ * @return The distance of the shortest path from the start to the goal, or -1 if no path is found.
+ */
 float aStarPathfinding(Point3D start, Point3D goal, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap){ //soit on déclare vMap et nodeheap dans la fonction mais trop de malloc sinon on déclare une seule fois mais on ne peut plus paralléliser facilement
     nodeHeap.size = 0;
     Node node;
@@ -164,6 +210,20 @@ float aStarPathfinding(Point3D start, Point3D goal, VOXELGRID voxelGrid, VMap***
 /* Util  ******************************/
 /**************************************/
 
+/**
+ * @brief Compute the distance between two points considering obstacles.
+ *
+ * This function calculates the distance between the start and end points, considering obstacles
+ * in the voxel grid using A* pathfinding algorithm. It uses voxel distance heuristics to compute
+ * the path distance.
+ *
+ * @param startPos The starting position.
+ * @param endPos The ending position.
+ * @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
+ * @return The computed distance between the start and end points, considering obstacles.
+ */
 float distWithObstacles(Point_t startPos, Point_t endPos, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap){
     Point3D endPoint = createPoint3D(endPos);
 	float EndDist = dist(endPos, createPoint_t(endPoint));

@@ -2,12 +2,27 @@
 #include "util.h"
 #include "output.h"
 
+/**
+ * @file structureShl.c
+ * @brief Shell Data Structure Implementation
+ *
+ * This file contains the implementation of the Shell data structure and related operations.
+ * The Shell data structure represents a cage or a molecular shell with atoms and their connections.
+ */
+
 /**************************************/
 /* SHELL ******************************/
 /**************************************/
 
 //#define SHL_addVertex(s, id) GPH_addVertex(bond(s), id)
 
+/**
+ * @brief Initializes an AtomShl_t with default values.
+ *
+ * This function initializes an AtomShl_t with default values for its attributes.
+ *
+ * @param a Pointer to the AtomShl_t to be initialized.
+ */
 void SHL_initAtom(AtomShl_t* a) {
 
 	flag(a) = NOT_DEF_F;
@@ -21,31 +36,82 @@ void SHL_initAtom(AtomShl_t* a) {
 	neighborhood(a) = LST_create();
 }
 
+/**
+ * @brief Gets the number of neighbors in the neighborhood of an AtomShl_t.
+ *
+ * This function returns the number of neighbors in the neighborhood of the given AtomShl_t.
+ *
+ * @param a Pointer to the AtomShl_t.
+ * @return The number of neighbors in the AtomShl_t's neighborhood.
+ */
 int SHL_nbNeighborhood(AtomShl_t* a) {
 
 	return LST_nbElements(neighborhood(a));
 }
 
+/**
+ * @brief Gets the index of a free neighbor in the neighborhood of an AtomShl_t.
+ *
+ * This function returns the index of a free neighbor in the neighborhood of the given AtomShl_t.
+ *
+ * @param a Pointer to the AtomShl_t.
+ * @return The index of a free neighbor in the AtomShl_t's neighborhood.
+ */
 int SHL_getIndiceFreeNeighbor(AtomShl_t* a) {
 
 	return LST_getIndiceFree(a->neighborhood);
 }
 
+/**
+ * @brief Get the index of an atom in the neighborhood list.
+ *
+ * This function retrieves the index of an atom with the given ID in the neighborhood list
+ * of the specified AtomShl_t structure.
+ *
+ * @param a Pointer to the AtomShl_t structure.
+ * @param id The ID of the atom to search for in the neighborhood list.
+ * @return The index of the atom in the neighborhood list, or -1 if not found.
+ */
 int SHL_getIndice(AtomShl_t* a, unsigned id) {
 
 	return LST_getIndice(a->neighborhood, id);
 }
 
+/**
+ * @brief Add a neighbor to the atom's neighborhood.
+ *
+ * This function adds a neighbor with the given ID to the neighborhood list of the specified AtomShl_t structure.
+ *
+ * @param a Pointer to the AtomShl_t structure.
+ * @param id The ID of the neighbor atom to add to the neighborhood list.
+ */
 void SHL_addNeighbor(AtomShl_t* a, unsigned id) {
 
 	LST_addElement(a->neighborhood, id);
 }
 
+/**
+ * @brief Remove a neighbor from the atom's neighborhood.
+ *
+ * This function removes a neighbor with the given ID from the neighborhood list of the specified AtomShl_t structure.
+ *
+ * @param a Pointer to the AtomShl_t structure.
+ * @param id The ID of the neighbor atom to remove from the neighborhood list.
+ */
 void SHL_removeNeighbor(AtomShl_t* a, unsigned id) {
 	
 	LST_removeElement(a->neighborhood, id);
 }
 
+/**
+ * @brief Allocate and add new atoms to the Shell structure.
+ *
+ * This function allocates memory for new AtomShl_t structures and adds them to the Shell structure.
+ * It dynamically reallocates memory for the atoms array in the Shell structure to accommodate the new atoms.
+ * If memory reallocation fails, the function prints an error message and exits the program.
+ *
+ * @param s Pointer to the Shell_t structure.
+ */
 void SHL_addAllocAtom(Shell_t* s) {
 
 	AtomShl_t* tmp = realloc(s->atoms, (size(s) + REALLOCSIZE) * sizeof(AtomShl_t));
@@ -64,6 +130,14 @@ void SHL_addAllocAtom(Shell_t* s) {
 	size(s) += REALLOCSIZE;
 }
 
+/**
+ * @brief Get the number of atoms in the Shell structure.
+ *
+ * This function returns the number of atoms in the specified Shell_t structure.
+ *
+ * @param s Pointer to the Shell_t structure.
+ * @return The number of atoms in the Shell structure.
+ */
 int SHL_nbAtom(Shell_t* s) {
 	int i, cpt = 0;
 
@@ -74,6 +148,14 @@ int SHL_nbAtom(Shell_t* s) {
 	return cpt;
 }
 
+/**
+ * @brief Get the number of edges in the Shell structure.
+ *
+ * This function returns the number of edges (connections between atoms) in the specified Shell_t structure.
+ *
+ * @param s Pointer to the Shell_t structure.
+ * @return The number of edges in the Shell structure.
+ */
 int SHL_nbEdges(Shell_t* s) {
 	int i, cpt = 0;
 
@@ -83,6 +165,15 @@ int SHL_nbEdges(Shell_t* s) {
 	return cpt/2;
 }
 
+/**
+ * @brief Get the index of a free atom in the Shell structure.
+ *
+ * This function searches for a free (not defined) atom in the specified Shell_t structure and returns its index.
+ * If no free atom is found, it allocates new atoms using SHL_addAllocAtom and returns the index of the first newly added atom.
+ *
+ * @param s Pointer to the Shell_t structure.
+ * @return The index of the free atom in the Shell structure.
+ */
 int SHL_getIndiceFreeAtom(Shell_t* s) {
 	int i;
 
@@ -94,26 +185,71 @@ int SHL_getIndiceFreeAtom(Shell_t* s) {
 	return i;
 }
 
+/**
+ * @brief Adds a vertex to the Shell with the specified ID.
+ *
+ * This function adds a vertex with the given ID to the Shell data structure.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id The ID of the vertex to be added.
+ * @return The ID of the added vertex.
+ */
 unsigned SHL_addVertex(Shell_t* s, unsigned id) {
 
 	return GPH_addVertex(bond(s), id);
 }
 
+/**
+ * @brief Removes a vertex from the Shell with the specified ID.
+ *
+ * This function removes a vertex with the given ID from the Shell data structure.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id The ID of the vertex to be removed.
+ */
 void SHL_removeVertex(Shell_t* s, unsigned id) {
 
 	GPH_removeVertex(bond(s), id);
 }
 
+/**
+ * @brief Adds a bond between two vertices with the specified IDs.
+ *
+ * This function adds a bond between two vertices (atoms) with the given IDs to the Shell data structure.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id1 The ID of the first vertex (atom).
+ * @param id2 The ID of the second vertex (atom).
+ */
 void SHL_addBond(Shell_t* s, unsigned id1, unsigned id2) {
 
 	GPH_addEdge(bond(s), id1, id2);
 }
 
+/**
+ * @brief Removes a bond between two vertices with the specified IDs.
+ *
+ * This function removes a bond between two vertices (atoms) with the given IDs from the Shell data structure.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id1 The ID of the first vertex (atom).
+ * @param id2 The ID of the second vertex (atom).
+ */
 void SHL_removeBond(Shell_t* s, unsigned id1, unsigned id2) {
 
 	GPH_removeEdge(bond(s), id1, id2);
 }
 
+/**
+ * @brief Adds an edge (bond) between two vertices with the specified IDs.
+ *
+ * This function adds an edge (bond) between two vertices (atoms) with the given IDs to the Shell data structure.
+ * It also adds the reverse edge to create an undirected graph representation.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id1 The ID of the first vertex (atom).
+ * @param id2 The ID of the second vertex (atom).
+ */
 void SHL_addEdge(Shell_t* s, unsigned id1, unsigned id2) {
 
 	if (id1 < size(s) && id2 <size(s) && id1 != id2) {
@@ -123,6 +259,16 @@ void SHL_addEdge(Shell_t* s, unsigned id1, unsigned id2) {
 	}
 }
 
+/**
+ * @brief Removes an edge (bond) between two vertices with the specified IDs.
+ *
+ * This function removes an edge (bond) between two vertices (atoms) with the given IDs from the Shell data structure.
+ * It also removes the reverse edge to maintain the undirected graph representation.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id1 The ID of the first vertex (atom).
+ * @param id2 The ID of the second vertex (atom).
+ */
 void SHL_removeEdge(Shell_t* s, unsigned id1, unsigned id2) {
 
 	if (id1 < size(s) && id2 <size(s)) {
@@ -132,6 +278,17 @@ void SHL_removeEdge(Shell_t* s, unsigned id1, unsigned id2) {
 	}
 }
 
+/**
+ * @brief Adds a new atom to the Shell with the specified coordinates and parent atom ID.
+ *
+ * This function adds a new atom to the Shell data structure with the specified coordinates and parent atom ID.
+ * It also assigns a unique ID (indice) to the new atom.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param coords The coordinates (Point_t) of the new atom.
+ * @param parent The ID of the parent atom for the new atom.
+ * @return The unique ID (indice) assigned to the newly added atom.
+ */
 unsigned SHL_addAtom(Shell_t* s, Point_t coords, unsigned parent) {
 
 	unsigned indice = SHL_getIndiceFreeAtom(s);
@@ -143,6 +300,15 @@ unsigned SHL_addAtom(Shell_t* s, Point_t coords, unsigned parent) {
 	return indice;
 }
 
+/**
+ * @brief Removes an atom from the Shell with the specified ID.
+ *
+ * This function removes an atom with the given ID from the Shell data structure.
+ * It also updates the neighborhood and other properties accordingly.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id The ID of the atom to be removed.
+ */
 void SHL_removeAtom(Shell_t* s, unsigned id) {
 
 	int i;
@@ -190,6 +356,16 @@ void SHL_removeAtom(Shell_t* s, unsigned id) {
 	}
 }*/
 
+/**
+ * @brief Seeks the border atoms in the Shell for a given atom ID.
+ *
+ * This function seeks the border atoms in the Shell for a given atom ID and returns them as a list.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param in Pointer to the input list.
+ * @param id The ID of the atom to start seeking from.
+ * @return A list of border atoms (border of the Shell) starting from the specified atom ID.
+ */
 List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 
 	int i;
@@ -239,12 +415,30 @@ List_t* SHL_seekBorder(Shell_t* s, List_t* in, unsigned id) {
 	LST_delete(border);
 }*/
 
-
+/**
+ * @brief Adds a cycle to the Shell with the specified atom ID.
+ *
+ * This function adds a cycle to the Shell data structure with the specified atom ID.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param id The ID of the atom to be added to the cycle.
+ */
 void SHL_addCycle(Shell_t* s, unsigned id) {
 
 	LST_addElement(s->cycle, id);
 }
 
+/**
+ * @brief Merges two atoms in the Shell.
+ *
+ * This function merges (combines) two atoms in the Shell data structure.
+ * It moves all the edges and properties from the eaten atom to the eater atom,
+ * and then removes the eaten atom from the Shell.
+ *
+ * @param s Pointer to the Shell data structure.
+ * @param eater The ID of the atom that will "eat" (absorb) the other atom.
+ * @param eaten The ID of the atom that will be "eaten" (absorbed) by the other atom.
+ */
 void SHL_mergeAtom(Shell_t* s, unsigned eater, unsigned eaten) {
 
 	int i;
@@ -294,6 +488,13 @@ void SHL_mergeAtom(Shell_t* s, unsigned eater, unsigned eaten) {
 	}
 }*/
 
+/**
+ * @brief Creates a new Shell data structure.
+ *
+ * This function creates and initializes a new Shell data structure.
+ *
+ * @return A pointer to the newly created Shell data structure.
+ */
 Shell_t* SHL_create() {
 
 	Shell_t *a = malloc(sizeof(Shell_t));
@@ -306,6 +507,14 @@ Shell_t* SHL_create() {
 	return a;
 }
 
+/**
+ * @brief Creates a deep copy of a Shell data structure.
+ *
+ * This function creates a deep copy of the given Shell data structure.
+ *
+ * @param s Pointer to the original Shell data structure to be copied.
+ * @return A pointer to the newly created deep copy of the Shell data structure.
+ */
 Shell_t* SHL_copy(Shell_t* s) {
 
 	int i;
@@ -329,11 +538,12 @@ Shell_t* SHL_copy(Shell_t* s) {
 }
 
 /**
- * @brief Copies a shell by removing unused atoms or
- * atoms belonging to the envelope.
- * 
- * @param s Cage with unused atoms.
- * @return (Shell_t*) Trimmed cage.
+ * @brief Creates a trimmed copy of a Shell data structure.
+ *
+ * This function creates a trimmed copy of the given Shell data structure by removing unused atoms or atoms belonging to the envelope.
+ *
+ * @param s Pointer to the original Shell data structure containing unused atoms.
+ * @return A pointer to the newly created trimmed copy of the Shell data structure.
  */
 Shell_t* SHL_copyCageAtoms(Shell_t* s) {
 
@@ -456,11 +666,25 @@ int i, j;
 	}
 }*/
 
+/**
+ * @brief Deletes an atom in the Shell.
+ *
+ * This function deletes an atom (node) in the Shell data structure.
+ *
+ * @param a Pointer to the atom to be deleted.
+ */
 void SHL_deleteAtom(AtomShl_t* a) {
 
 	LST_delete(neighborhood(a));
 }
 
+/**
+ * @brief Deletes a Shell data structure.
+ *
+ * This function deletes the entire Shell data structure, including all atoms and the graph representation.
+ *
+ * @param s Pointer to the Shell data structure to be deleted.
+ */
 void SHL_delete(Shell_t* s) {
 	
 	int i;

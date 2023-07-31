@@ -32,7 +32,8 @@ dir:
 
 .PHONY: clean mrproper all
 
-pathfinding:  #-DDEBUGAstar -DDEBUGDij
+#Rule for testing the pathfinding algorithm, use : -DDEBUGAstar
+pathfinding:
 	$(CC) $(INCPATH) $(INCDIR) -o test/initialization.o -c src/initialization.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/input.o -c src/input.c $(CFLAGS)
 	$(CC) $(INCPATH) $(INCDIR) -o test/output.o -c src/output.c $(CFLAGS)
