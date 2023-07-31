@@ -1,15 +1,37 @@
 #include "structure.h"
 #include "util.h"
+#include "pathFinding.h"
 #include <limits.h>
+
+/**
+ * @file structureLst.c
+ * @brief List operations functions for manipulating linked lists.
+ *
+ * This file contains functions for creating, manipulating, and checking linked lists.
+ */
 
 /**************************************/
 /* LIST *******************************/
 /**************************************/
+/**
+ * @brief Initializes a new list.
+ *
+ * This function initializes a new list by setting its elements to NULL and size to 0.
+ *
+ * @param l Pointer to the list to initialize.
+ */
 void LST_init(List_t* l) {
 	l->elts = NULL;
 	l->size = 0;
 }
 
+/**
+ * @brief Adds allocated memory to the list.
+ *
+ * This function adds allocated memory to the list to accommodate new elements.
+ *
+ * @param l Pointer to the list to which memory is added.
+ */
 void LST_addAlloc(List_t* l) {
 	int i;
 
@@ -21,6 +43,14 @@ void LST_addAlloc(List_t* l) {
 	size(l) += REALLOCSIZE;
 }
 
+/**
+ * @brief Returns the number of elements in the list.
+ *
+ * This function returns the number of elements in the list.
+ *
+ * @param l Pointer to the list.
+ * @return The number of elements in the list.
+ */
 unsigned LST_nbElements(List_t* l) {
 	int cpt;
 
@@ -29,6 +59,15 @@ unsigned LST_nbElements(List_t* l) {
 	return cpt;
 }
 
+/**
+ * @brief Returns the index of the first available free element in the list.
+ *
+ * This function returns the index of the first available free element in the list.
+ * If no free element is available, it adds and allocates memory for more elements.
+ *
+ * @param l Pointer to the list.
+ * @return The index of the first available free element in the list.
+ */
 unsigned LST_getIndiceFree(List_t* l) {
 	int i;
 
@@ -40,6 +79,15 @@ unsigned LST_getIndiceFree(List_t* l) {
 	return i;
 }
 
+/**
+ * @brief Returns the index of the element with the specified identifier in the list.
+ *
+ * This function returns the index of the element with the specified identifier in the list.
+ *
+ * @param l Pointer to the list.
+ * @param id Identifier of the element to search for.
+ * @return The index of the element with the specified identifier, or -1 if not found.
+ */
 unsigned LST_getIndice(List_t* l, unsigned id) {
 	int i;
 
@@ -50,6 +98,15 @@ unsigned LST_getIndice(List_t* l, unsigned id) {
 	return -1;
 }
 
+/**
+ * @brief Checks if an element with the specified identifier exists in the list.
+ *
+ * This function checks if an element with the specified identifier exists in the list.
+ *
+ * @param l Pointer to the list.
+ * @param id Identifier of the element to check for.
+ * @return 1 if the element with the specified identifier exists, 0 otherwise.
+ */
 unsigned LST_check(List_t* l, unsigned id) {
 
 	if (LST_getIndice(l,id) == -1)
@@ -57,6 +114,14 @@ unsigned LST_check(List_t* l, unsigned id) {
 	return 1;
 }
 
+/**
+ * @brief Adds an element to the list if it does not exist.
+ *
+ * This function adds an element to the list if it does not already exist.
+ *
+ * @param l Pointer to the list.
+ * @param id Identifier of the element to be added.
+ */
 void LST_addElement(List_t* l, unsigned id) {
 	
 	int i;
@@ -66,6 +131,14 @@ void LST_addElement(List_t* l, unsigned id) {
 	}
 }
 
+/**
+ * @brief Removes an element with the specified identifier from the list.
+ *
+ * This function removes an element with the specified identifier from the list.
+ *
+ * @param l Pointer to the list.
+ * @param id Identifier of the element to be removed.
+ */
 void LST_removeElement(List_t* l, unsigned id) {
 
 	int i = LST_getIndice(l,id);
@@ -79,7 +152,13 @@ void LST_removeElement(List_t* l, unsigned id) {
 	}
 }
 
-
+/**
+ * @brief Creates a new integer list.
+ *
+ * This function allocates memory for a new integer list and initializes its fields.
+ *
+ * @return Pointer to the newly allocated integer list.
+ */
 List_t* LST_create() {
 
 	List_t* l = malloc(sizeof(List_t));
@@ -88,6 +167,14 @@ List_t* LST_create() {
 	return l;
 }
 
+/**
+ * @brief Creates a copy of an integer list.
+ *
+ * This function creates a copy of an integer list by copying its elements.
+ *
+ * @param l Pointer to the integer list to be copied.
+ * @return Pointer to the newly created copy of the integer list.
+ */
 List_t* LST_copy(List_t* l) {
 
 	int i;
@@ -104,8 +191,8 @@ List_t* LST_copy(List_t* l) {
 }
 
 /**
- * @brief Copies the list with offset of the numbering of elements 
- * according to the value of the array passed in argument.
+ * @brief Copies the list with an offset of the numbering of elements 
+ * according to the value of the array passed as an argument.
  * 
  * @param l List to copy.
  * @param shifts Array of offsets.
@@ -126,6 +213,16 @@ List_t* LST_copyWithShift(List_t* l, int* shifts) {
 	return copy;
 }
 
+/**
+ * @brief Merges two integer lists.
+ *
+ * This function merges two integer lists, adding elements from the second list to the first.
+ * The function then deletes both input lists and returns the merged list.
+ *
+ * @param l1 First integer list.
+ * @param l2 Second integer list.
+ * @return Merged integer list.
+ */
 List_t* LST_addList(List_t* l1, List_t* l2) {
 
 	int i;
@@ -140,6 +237,13 @@ List_t* LST_addList(List_t* l1, List_t* l2) {
 	return out;
 }
 
+/**
+ * @brief Deletes an integer list and frees the associated memory.
+ *
+ * This function deletes an integer list and frees the memory associated with its elements.
+ *
+ * @param l Pointer to the integer list to be deleted.
+ */
 void LST_delete(List_t* l) {
 
 	free(l->elts);
@@ -147,6 +251,13 @@ void LST_delete(List_t* l) {
 }
 
 /**************************************/
+/**
+ * @brief Initializes a new Element list.
+ *
+ * This function initializes a new Element list by setting its first element to NULL.
+ *
+ * @return Pointer to the newly allocated Element list.
+ */
 /* PAIR *******************************/
 /**************************************/
 Pair_t* PR_init(void) {
@@ -156,7 +267,15 @@ Pair_t* PR_init(void) {
 	return list;
 }
 
-// Add at the beginning
+/**
+ * @brief Adds an Element to the beginning of the list.
+ *
+ * This function adds an Element to the beginning of the list.
+ *
+ * @param list Pointer to the Element list.
+ * @param start Start index of the element to add.
+ * @param end End index of the element to add.
+ */
 void PR_addElement(Pair_t** list, int start, int end) {
 	
 	Pair_t* elem = malloc(sizeof(Pair_t));
@@ -169,35 +288,32 @@ void PR_addElement(Pair_t** list, int start, int end) {
 
 /**
  * @brief Adds the pairs of atoms to connect by sorting them 
- * by ascending euclidean distance.
+ * by ascending A* distance.
  * 
  * @param s Cage in progress.
  * @param list List of pairs of atoms to connect.
  * @param start Index of the starting atom of the path in the cage.
  * @param end Index of the ending atom of the path in the cage.
+ * @param voxelGrid Grid of voxelization.
  */
-void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end) {
-	
-	float distPair = dist(coords(atom(s, start)), coords(atom(s, end)));
-	float distOtherPair;
+void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
+	Point_t endPos = coords(atom(s, end));
+	Point_t startPos = coords(atom(s, start));
+	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
 	Pair_t* currentElem = *list;
 	Pair_t* previousElem = NULL;
-
-	if (currentElem) { // If the list is not empty.
-		distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
-
-		while (currentElem && distPair > distOtherPair) {
+	while(currentElem){
+		if(currentElem->distance < computedDist){
 			previousElem = currentElem;
 			currentElem = currentElem->next;
-			if (currentElem) {
-				distOtherPair = dist(coords(atom(s, currentElem->start)), coords(atom(s, currentElem->end)));
-			}
 		}
+		else{break;}
 	}
 
 	Pair_t* elem = malloc(sizeof(Pair_t));
 	elem->start = start;
 	elem->end = end;
+	elem->distance = computedDist;
 	elem->next = currentElem;
 	if (previousElem) {
 		previousElem->next = elem;
@@ -207,6 +323,13 @@ void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end) {
 	}
 }
 
+/**
+ * @brief Removes the first Element from the list.
+ *
+ * This function removes the first Element from the list and frees the associated memory.
+ *
+ * @param list Pointer to the Element list.
+ */
 void PR_removeFirst(Pair_t* list) {
 	
 	if (list) {
@@ -219,6 +342,13 @@ void PR_removeFirst(Pair_t* list) {
 	}
 }
 
+/**
+ * @brief Deletes the Element list and frees the associated memory.
+ *
+ * This function deletes the Element list and frees the memory associated with its elements.
+ *
+ * @param list Pointer to the Element list to be deleted.
+ */
 void PR_delete(Pair_t* list) {
 
 	if (list) {
@@ -237,6 +367,13 @@ void PR_delete(Pair_t* list) {
 /* MOC STACK **************************/
 /**************************************/
 
+/**
+ * @brief Initializes a new List_m (Shell_t) list.
+ *
+ * This function initializes a new List_m (used with Shell_t elements) by setting its first element to NULL.
+ *
+ * @return Pointer to the newly allocated List_m.
+ */
 mStack_t* mSTK_init() {
 	
 	mStack_t* list = malloc(sizeof(mStack_t));
@@ -245,7 +382,14 @@ mStack_t* mSTK_init() {
 	return list;
 }
 
-// Add at the begining.
+/**
+ * @brief Adds a Shell_t element at the beginning of the list.
+ *
+ * This function adds a Shell_t element to the list.
+ *
+ * @param list Pointer to the list.
+ * @param moc Pointer to the Shell_t element to add.
+ */
 void mSTK_addElement(mStack_t* list, Shell_t* moc) {
 	
 	Elem* elem = malloc(sizeof(Elem));
@@ -256,6 +400,13 @@ void mSTK_addElement(mStack_t* list, Shell_t* moc) {
 	list->first = elem;
 }
 
+/**
+ * @brief Removes the first Shell_t element from the list.
+ *
+ * This function removes the first Shell_t element from the list and frees the associated memory.
+ *
+ * @param list Pointer to the list.
+ */
 void mSTK_removeFirst(mStack_t* list) {
 	
 	Elem* suppr = list->first;
@@ -264,6 +415,13 @@ void mSTK_removeFirst(mStack_t* list) {
 	free(suppr);
 }
 
+/**
+ * @brief Deletes the List_m list and frees the associated memory.
+ *
+ * This function deletes the List_m list and frees the memory associated with its elements.
+ *
+ * @param list Pointer to the List_m list to be deleted.
+ */
 void mSTK_delete(mStack_t* list) {
 
 	while (list->first)
@@ -275,6 +433,13 @@ void mSTK_delete(mStack_t* list) {
 
 /******************************/
 
+/**
+ * @brief Initializes a new List_s (Point_t) list.
+ *
+ * This function initializes a new List_s (used with Point_t elements) by setting its first element to NULL.
+ *
+ * @return Pointer to the newly allocated List_s.
+ */
 List_s* LSTs_init() {
 	
 	List_s* list = malloc(sizeof(List_s));
@@ -284,6 +449,14 @@ List_s* LSTs_init() {
 }
 
 // Ajout au début
+/**
+ * @brief Adds a Point_t element at the beginning of the List_s (Point_t) list.
+ *
+ * This function adds a Point_t element to the List_s (Point_t) list.
+ *
+ * @param list Pointer to the List_s (Point_t) list.
+ * @param sommet Point_t element to add.
+ */
 void LSTs_addElement(List_s* list, Point_t sommet) {
 	
 	Elem_s* elem = malloc(sizeof(Elem_s));
@@ -296,6 +469,47 @@ void LSTs_addElement(List_s* list, Point_t sommet) {
 	list->first = elem;
 }
 
+/**
+ * @brief Adds a Point_t element to the List_s (Point_t) list in ascending order of A* distance.
+ *
+ * This function adds a Point_t element to the List_s (Point_t) list in ascending order of A* distance.
+ *
+ * @param list Pointer to the List_s (Point_t) list.
+ * @param startPos Position of the atom.
+ * @param endPos Position of the objective atom.
+ * @param voxelGrid Grid of voxelization.
+ */
+void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
+	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
+	Elem_s* currentElem = list->first;
+	Elem_s* previousElem = NULL;
+	while(currentElem){
+		if(currentElem->distance < computedDist){
+			previousElem = currentElem;
+			currentElem = currentElem->next;
+		}
+		else{break;}
+	}
+
+	Elem_s* elem = malloc(sizeof(Elem_s));
+	elem->position = startPos;
+	elem->distance = computedDist;
+	elem->next = currentElem;
+	if (previousElem) {
+		previousElem->next = elem;
+	}
+	else {
+		list->first = elem;
+	}
+}
+
+/**
+ * @brief Removes the first Point_t element from the List_s (Point_t) list.
+ *
+ * This function removes the first Point_t element from the List_s (Point_t) list and frees the associated memory.
+ *
+ * @param list Pointer to the List_s (Point_t) list.
+ */
 void LSTs_removeFirst(List_s* list) {
 	
 	Elem_s* suppr = list->first;
@@ -303,6 +517,13 @@ void LSTs_removeFirst(List_s* list) {
 	free(suppr);
 }
 
+/**
+ * @brief Deletes the List_s (Point_t) list and frees the associated memory.
+ *
+ * This function deletes the List_s (Point_t) list and frees the memory associated with its elements.
+ *
+ * @param list Pointer to the List_s (Point_t) list to be deleted.
+ */
 void LSTs_delete(List_s* list) {
 
 	while (list->first)
@@ -312,6 +533,14 @@ void LSTs_delete(List_s* list) {
 	free(list);
 }
 
+/**
+ * @brief Removes a Point_t element from the List_s (Point_t) list.
+ *
+ * This function removes a Point_t element from the List_s (Point_t) list.
+ *
+ * @param list Pointer to the List_s (Point_t) list.
+ * @param p Point_t element to be removed.
+ */
 void LSTs_removeElement(List_s* list, Point_t p) {
 	
 	Elem_s* cursor = list->first;
@@ -342,9 +571,9 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 	}
 }
 
-// Retourne le point de la liste le plus proche du point en argument
+/*// Retourne le point de la liste le plus proche du point en argument
 Point_t minDist(List_s* list, Point_t p) {
-	Point_t min = PT_init();
+	Point_t min = PT_init(0);
 	float minDist = __FLT_MAX__; //si déclarer comme un int permet un choix entre le plus optimal et un sous-opitmal (marche mieux que float pour l'instant)
 	float computedDist;
 	Elem_s* l = list->first;

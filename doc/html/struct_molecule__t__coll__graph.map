@@ -1,0 +1,9 @@
+<map id="Molecule_t" name="Molecule_t">
+<area shape="rect" id="node1" title="Represents a molecule." alt="" coords="99,273,192,300"/>
+<area shape="rect" id="node2" href="$struct_list__t.html" title="Represents a list of integers." alt="" coords="117,5,174,32"/>
+<area shape="rect" id="node3" href="$struct_atom__t.html" title="Represents an atom in a molecule." alt="" coords="231,95,300,121"/>
+<area shape="rect" id="node7" href="$struct_vertex__t.html" title="Represents a vertex in the graph." alt="" coords="5,95,83,121"/>
+<area shape="rect" id="node4" href="$struct_chemical_info__t.html" title="Represents information about a chemical element." alt="" coords="253,5,373,32"/>
+<area shape="rect" id="node5" href="$struct_point__t.html" title="Represents a 3D point with floating&#45;point coordinates." alt="" coords="397,5,464,32"/>
+<area shape="rect" id="node6" href="$struct_graph__t.html" title="Represents a graph." alt="" coords="25,184,98,211"/>
+</map>

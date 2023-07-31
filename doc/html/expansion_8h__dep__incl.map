@@ -1,0 +1,5 @@
+<map id="include/expansion.h" name="include/expansion.h">
+<area shape="rect" id="node1" title="Functions for shell creation and expansion." alt="" coords="56,5,208,32"/>
+<area shape="rect" id="node2" href="$expansion_8c.html" title="This file contains functions related to the expansion of atomic steric groupings and the generation o..." alt="" coords="5,80,128,107"/>
+<area shape="rect" id="node3" href="$main_8c.html" title="Main program for generating cages for a specific substrate." alt="" coords="153,80,242,107"/>
+</map>

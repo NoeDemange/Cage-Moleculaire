@@ -1,5 +1,23 @@
 #include "structure.h"
 
+/**
+ * @file structureGph.c
+ * @brief Graph operations functions for allocating, manipulating, and checking a graph.
+ *
+ * This file contains functions for creating, manipulating, and checking a graph data structure.
+ * A graph is represented by a collection of vertices and edges, and the functions here allow for
+ * the addition, removal, and copying of vertices and edges. It also includes functions for checking
+ * whether a vertex or edge exists in the graph and for determining cycles within the graph.
+ * 
+ */
+
+/**
+ * @brief Initializes a new vertex in the graph.
+ *
+ * This function allocates memory for the neighborhood of the new vertex in the graph and initializes its fields.
+ *
+ * @param v Pointer to the vertex to initialize.
+ */
 void GPH_initVertex(Vertex_t* v) {
 
 	v->id = -1;
@@ -8,23 +26,54 @@ void GPH_initVertex(Vertex_t* v) {
 	nbNeighbors(v) = 0;
 }
 
+/**
+ * @brief Adds a neighbor to a vertex in the graph.
+ *
+ * This function adds a neighbor to a specified vertex in the graph.
+ *
+ * @param v Pointer to the vertex to which the neighbor is to be added.
+ * @param id Identifier of the neighbor vertex to be added.
+ */
 void GPH_addNeighbor(Vertex_t* v, unsigned id) {
 
 	LST_addElement(neighborhood(v), id);
 	nbNeighbors(v)++;
 }
 
+/**
+ * @brief Removes a neighbor from a vertex in the graph.
+ *
+ * This function removes a neighbor from a specified vertex in the graph.
+ *
+ * @param v Pointer to the vertex from which the neighbor is to be removed.
+ * @param id Identifier of the neighbor vertex to be removed.
+ */
 void GPH_removeNeighbor(Vertex_t* v, unsigned id) {
 
 	LST_removeElement(neighborhood(v), id);
 	nbNeighbors(v)--;
 }
 
+/**
+ * @brief Deletes a vertex from the graph.
+ *
+ * This function frees the memory used by a vertex in the graph.
+ *
+ * @param v Pointer to the vertex to be deleted.
+ */
 void GPH_deleteVertex(Vertex_t* v) {
 
 	LST_delete(neighborhood(v));
 }
 
+/**
+ * @brief Returns the number of vertices in the graph.
+ *
+ * This function returns the number of vertices in the graph.
+ *
+ * @param g Pointer to the graph.
+ * @return The number of vertices in the graph.
+ */
 int GPH_nbVertex(Graph_t* g) {
 
 	int i, cpt = 0;
@@ -35,6 +84,14 @@ int GPH_nbVertex(Graph_t* g) {
 	return cpt;
 }
 
+/**
+ * @brief Adds and allocates memory for a specified number of vertices in the graph.
+ *
+ * This function adds and allocates memory for a specified number of vertices in the graph.
+ *
+ * @param g Pointer to the graph to which the vertices are to be added.
+ * @param size Number of vertices to be added.
+ */
 void GPH_addAlloc(Graph_t* g, unsigned size) {
 
 	int i;
@@ -47,6 +104,15 @@ void GPH_addAlloc(Graph_t* g, unsigned size) {
 	size(g) += size;
 }
 
+/**
+ * @brief Returns the index of the first available free vertex in the graph.
+ *
+ * This function returns the index of the first available free vertex in the graph.
+ * If no free vertex is available, it adds and allocates memory for more vertices.
+ *
+ * @param g Pointer to the graph.
+ * @return The index of the first available free vertex in the graph.
+ */
 int GPH_getIndiceFree(Graph_t* g) {
 
 	int i;
@@ -59,6 +125,15 @@ int GPH_getIndiceFree(Graph_t* g) {
 	return i;
 }
 
+/**
+ * @brief Returns the index of the vertex with the specified identifier in the graph.
+ *
+ * This function returns the index of the vertex with the specified identifier in the graph.
+ *
+ * @param g Pointer to the graph.
+ * @param id Identifier of the vertex.
+ * @return The index of the vertex with the specified identifier, or -1 if not found.
+ */
 int GPH_getIndice(Graph_t* g, unsigned id) {
 
 	int i;
@@ -70,6 +145,16 @@ int GPH_getIndice(Graph_t* g, unsigned id) {
 	return -1;
 }
 
+/**
+ * @brief Adds a vertex with the specified identifier to the graph if it does not exist.
+ *
+ * This function adds a vertex with the specified identifier to the graph if it does not exist.
+ * If the vertex already exists, it returns the index of the existing vertex.
+ *
+ * @param g Pointer to the graph.
+ * @param id Identifier of the vertex to be added.
+ * @return The index of the newly added vertex or the index of the existing vertex.
+ */
 unsigned GPH_addVertex(Graph_t* g, unsigned id) {
 
 	unsigned indice = GPH_getIndice(g, id);
@@ -83,6 +168,14 @@ unsigned GPH_addVertex(Graph_t* g, unsigned id) {
 	return indice;
 }
 
+/**
+ * @brief Removes a vertex with the specified identifier from the graph.
+ *
+ * This function removes a vertex with the specified identifier from the graph.
+ *
+ * @param g Pointer to the graph.
+ * @param id Identifier of the vertex to be removed.
+ */
 void GPH_removeVertex(Graph_t* g, unsigned id) {
 
 	int i, indice = GPH_getIndice(g, id);
@@ -99,6 +192,15 @@ void GPH_removeVertex(Graph_t* g, unsigned id) {
 	}
 }
 
+/**
+ * @brief Adds an edge between two vertices in the graph.
+ *
+ * This function adds an edge between two vertices in the graph.
+ *
+ * @param g Pointer to the graph.
+ * @param id1 Identifier of the first vertex.
+ * @param id2 Identifier of the second vertex.
+ */
 void GPH_addEdge(Graph_t* g, unsigned id1, unsigned id2) {
 
 	int indice1 = GPH_getIndice(g, id1), indice2 = GPH_getIndice(g, id2);
@@ -109,6 +211,15 @@ void GPH_addEdge(Graph_t* g, unsigned id1, unsigned id2) {
 	}
 }
 
+/**
+ * @brief Removes an edge between two vertices in the graph.
+ *
+ * This function removes an edge between two vertices in the graph.
+ *
+ * @param g Pointer to the graph.
+ * @param id1 Identifier of the first vertex.
+ * @param id2 Identifier of the second vertex.
+ */
 void GPH_removeEdge(Graph_t* g, unsigned id1, unsigned id2) {
 
 	int indice1 = GPH_getIndice(g, id1), indice2 = GPH_getIndice(g, id2);
@@ -120,15 +231,17 @@ void GPH_removeEdge(Graph_t* g, unsigned id1, unsigned id2) {
 }
 
 /**
- * Détermine récursivement si un sommet donné appartient à un cycle.
- * Le cycle ne doit pas contenir plus de 6 atomes.
- * 
- * @param g Le graphe auquel appartient le sommet id.
- * @param l La liste des sommets visités au cours de la récursion.
- * @param id Le numéro du sommet traité dans le graphe.
- * @param idP Le numéro du sommet précédemment traité.
- * @return (booléen) 1 si le sommet appartient à un cycle, 0 sinon. 
-*/
+ * @brief Determines recursively if a given vertex belongs to a cycle in the graph.
+ *
+ * This function determines recursively if a given vertex belongs to a cycle in the graph.
+ * The cycle must not contain more than 6 vertices.
+ *
+ * @param g Pointer to the graph to which the vertex belongs.
+ * @param l Pointer to the list of visited vertices during the recursion.
+ * @param id Identifier of the vertex being processed.
+ * @param idP Identifier of the previously processed vertex.
+ * @return 1 if the vertex belongs to a cycle, 0 otherwise.
+ */
 int GPH_cycle(Graph_t* g, List_t* l, unsigned id, unsigned idP) {
 
 	int i, tmp = 0;
@@ -153,12 +266,14 @@ int GPH_cycle(Graph_t* g, List_t* l, unsigned id, unsigned idP) {
 }
 
 /**
- * Détermine quels sont les sommets d'un graphe appartenant à un cycle.
- * Le cycle ne peut pas faire plus de 6 sommets.
+ * @brief Determines the vertices in the graph that belong to a cycle.
  *
- * @param g Le graphe dans lequel on cherche des cycles.
- * @return La liste des sommets de g appartenant à un cycle.
-*/
+ * This function determines the vertices in the graph that belong to a cycle.
+ * The cycle must not contain more than 6 vertices.
+ *
+ * @param g Pointer to the graph in which cycles are sought.
+ * @return List of vertices belonging to a cycle in the graph.
+ */
 List_t* GPH_seekCycle(Graph_t* g) {
 
 	/********** Réduction du graphe ************/
@@ -193,6 +308,15 @@ List_t* GPH_seekCycle(Graph_t* g) {
 	return out;
 }
 
+/**
+ * @brief Checks if a vertex with the specified identifier exists in the graph.
+ *
+ * This function checks if a vertex with the specified identifier exists in the graph.
+ *
+ * @param g Pointer to the graph.
+ * @param id Identifier of the vertex.
+ * @return 1 if the vertex with the specified identifier exists, 0 otherwise.
+ */
 unsigned GPH_checkVertex(Graph_t* g, unsigned id) {
 
 	int i;
@@ -204,11 +328,28 @@ unsigned GPH_checkVertex(Graph_t* g, unsigned id) {
 	return 0;
 }
 
+/**
+ * @brief Checks if an edge between two vertices exists in the graph.
+ *
+ * This function checks if an edge between two vertices exists in the graph.
+ *
+ * @param g Pointer to the graph.
+ * @param id1 Identifier of the first vertex.
+ * @param id2 Identifier of the second vertex.
+ * @return 1 if the edge exists, 0 otherwise.
+ */
 unsigned GPH_checkBond(Graph_t* g, unsigned id1, unsigned id2) {
 
 	return LST_check(neighborhood(vertex(g, GPH_getIndice(g, id1))), id2);
 }
 
+/**
+ * @brief Creates a new graph.
+ *
+ * This function allocates memory for a new graph and initializes its fields.
+ *
+ * @return Pointer to the newly allocated graph.
+ */
 Graph_t* GPH_create() {
 
 	Graph_t* g = malloc(sizeof(Graph_t));
@@ -219,6 +360,13 @@ Graph_t* GPH_create() {
 	return g;
 }
 
+/**
+ * @brief Deletes a graph and frees the associated memory.
+ *
+ * This function deletes a graph and frees the memory associated with its vertices and edges.
+ *
+ * @param g Pointer to the graph to be deleted.
+ */
 void GPH_delete(Graph_t* g) {
 
 	int i;
@@ -230,6 +378,14 @@ void GPH_delete(Graph_t* g) {
 	free(g);
 }
 
+/**
+ * @brief Creates a copy of a graph.
+ *
+ * This function creates a copy of a graph by copying its vertices and edges.
+ *
+ * @param g Pointer to the graph to be copied.
+ * @return Pointer to the newly created copy of the graph.
+ */
 Graph_t* GPH_copy(Graph_t* g) {
 
 	int i;

@@ -1,0 +1,9 @@
+<map id="src/input.c" name="src/input.c">
+<area shape="rect" id="node1" title="This file contains functions that handle the reading of molecule data from input files." alt="" coords="245,5,334,32"/>
+<area shape="rect" id="node2" href="$input_8h.html" title="Input Handling." alt="" coords="221,80,288,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="307,229,378,256"/>
+<area shape="rect" id="node3" href="$structure_8h.html" title="Structure Header File." alt="" coords="191,155,283,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,229,72,256"/>
+<area shape="rect" id="node5" title=" " alt="" coords="97,229,167,256"/>
+<area shape="rect" id="node7" href="$constant_8h.html" title="Constants and options for the program." alt="" coords="192,229,283,256"/>
+</map>

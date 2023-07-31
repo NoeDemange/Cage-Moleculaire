@@ -2,6 +2,10 @@
 #include "util.h"
 #include "output.h"
 
+/**
+ * @file generation.c
+ * @brief This file contains functions for generating binding patterns in the envelope.
+ */
 
 /**
  * @brief Creation of the beginning of cages according to the dependencies.
@@ -89,7 +93,7 @@ void insertAcceptor1(Shell_t* m, unsigned idcenter, Point_t normal, Point_t dir)
 	List_t* l = LST_create();
 
 	flag(center) = HYDRO_PATTERN_F;
-	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
+	dir = PT_sub(PT_init(0), normalization(dir, DIST_SIMPLE));
 
 	// Remove the edges between center and its neighbors and add them to the list.
 	while (neighbor(center,0) != -1) {
@@ -98,9 +102,9 @@ void insertAcceptor1(Shell_t* m, unsigned idcenter, Point_t normal, Point_t dir)
 	}
 
 	//Position du deuxième
-	x1 = addPoint(coords(center), rotation(normal, 120, dir));
+	x1 = PT_add(coords(center), rotation(normal, 120, dir));
 	//Position du troisième
-	x2 = addPoint(coords(center), rotation(normal, -120, dir));
+	x2 = PT_add(coords(center), rotation(normal, -120, dir));
 
 	for (int i = 0; i < size(m); i++) {
 		if ((flag(atom(m, i)) != NOT_DEF_F) && (flag(atom(m,i)) != SHELL_F) 
@@ -156,12 +160,12 @@ void insertDonor1(Shell_t* m, unsigned idhydro, Point_t normal, Point_t dir) {
 	//Position du deuxième sommet : centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, DIST_ATOM_H);
-	center = addPoint(coords(hydro), dir);
+	center = PT_add(coords(hydro), dir);
 	//Position du deuxième :
-	dir = subPoint(initPoint(0), normalization(dir, DIST_SIMPLE));
-	x1 = addPoint(center, rotation(normal, 120, dir));
+	dir = PT_sub(PT_init(0), normalization(dir, DIST_SIMPLE));
+	x1 = PT_add(center, rotation(normal, 120, dir));
 	//Position du troisième :
-	x2 = addPoint(center, rotation(normal, -120, dir));
+	x2 = PT_add(center, rotation(normal, -120, dir));
 
 
 	for (int i = 0; i < size(m); i++) {
@@ -227,7 +231,7 @@ void insertDonor2(Shell_t* m, unsigned idhydro, Point_t normal, Point_t dir) {
 	//Position du centre du motif
 	//Hydrogène+taille d'une liaison simple moyenne.
 	dir = normalization(dir, DIST_ATOM_H);
-	center = addPoint(x1, dir);
+	center = PT_add(x1, dir);
 	//Deuxième sommet du tétraèdre
 	normal = planNormal(center, x1, normal);
 	normal = normalization(normal,1);
@@ -399,6 +403,11 @@ void generateCycle(Shell_t* s) {
 	LST_delete(atomsInCycle);
 }
 
+/**
+ * @brief Generate pathless cages by adding aromatic rings and hydrogen patterns to the envelope.
+ * 
+ * @param m Grouping of the main structures (substrate and envelope).
+ */
 void generatePathlessCages(Main_t* m) {
 
 	envarom(m) = SHL_copy(envelope(m));

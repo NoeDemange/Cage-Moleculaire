@@ -1,0 +1,12 @@
+<map id="src/initialization.c" name="src/initialization.c">
+<area shape="rect" id="node1" title="This file contains functions for computing edges, ligands, angles, and lone pairs in a molecule." alt="" coords="151,5,289,32"/>
+<area shape="rect" id="node2" href="$initialization_8h.html" title="Initialization of Molecules." alt="" coords="5,80,120,107"/>
+<area shape="rect" id="node8" href="$input_8h.html" title="Input Handling." alt="" coords="144,80,211,107"/>
+<area shape="rect" id="node9" href="$util_8h.html" title="Utility Functions Header File." alt="" coords="235,80,290,107"/>
+<area shape="rect" id="node10" href="$output_8h.html" title="Output Header File." alt="" coords="314,80,390,107"/>
+<area shape="rect" id="node3" href="$structure_8h.html" title="Structure Header File." alt="" coords="174,155,266,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="47,229,113,256"/>
+<area shape="rect" id="node5" title=" " alt="" coords="138,229,209,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="233,229,303,256"/>
+<area shape="rect" id="node7" href="$constant_8h.html" title="Constants and options for the program." alt="" coords="328,229,419,256"/>
+</map>

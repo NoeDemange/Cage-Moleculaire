@@ -1,6 +1,11 @@
 #include "input.h"
 #include <string.h>
 
+/**
+ * @file input.c
+ * @brief This file contains functions that handle the reading of molecule data from input files.
+ */
+
 /**************************************/
 /* INITIALISATION MOLÉCULE ************/
 /**************************************/

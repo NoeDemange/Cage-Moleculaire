@@ -6,6 +6,11 @@
 #include <Rembedded.h>
 
 /**
+ * @file interface.c
+ * @brief This file contain function to interface with R function.
+ */
+
+/**
  * Call to R.
  *
  * @param s 		 Envelope that already has a cloud of points.
@@ -67,35 +72,4 @@ Ashape_t* Cashape3d(Shell_t* s, double alpha) {
 
 	free(data);
 	return as3d;
-}
-
-int* Cinashape3d(Ashape_t* as3d, double* points, int nb_points) {
-	SEXP triang;
-	PROTECT(triang = allocVector(REALSXP, as3d->nb_triang));
-	memcpy (REAL(triang), as3d->triang, as3d->nb_triang*sizeof(double));
-
-	SEXP x;
-	PROTECT(x = allocVector(REALSXP, as3d->nb_x));
-	memcpy (REAL(x), as3d->x, as3d->nb_x*sizeof(double));
-
-	SEXP alpha;
-	PROTECT(alpha = allocVector(REALSXP, as3d->nb_alpha));
-	memcpy (REAL(alpha), as3d->alpha, as3d->nb_alpha*sizeof(double));
-
-	SEXP point;
-	PROTECT(point = allocVector(REALSXP, nb_points));
-	memcpy (REAL(point), points, nb_points*sizeof(double));
-
-	//Configuration de la fonction R pour l'appel.
-	SEXP Rinashape3d_call;
-	PROTECT (Rinashape3d_call = lang5(install("Rinashape3d"), triang, x, alpha, point));
-	//Execution de la fonction R
-	int errorOccurred;
-	SEXP ret = R_tryEval(Rinashape3d_call, R_GlobalEnv, &errorOccurred);
-
-	if (!errorOccurred) {
-	}
-
-	UNPROTECT(5);
-	return LOGICAL(ret);
 }

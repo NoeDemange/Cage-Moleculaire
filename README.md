@@ -23,7 +23,7 @@ make
 ## Utilisation
 
 ### Démo
-Pour lancer une démo sur le substrat adénosine :
+Pour lancer une démo sur le substrat YILLAG :
 ```sh
 make demo
 ```
@@ -59,6 +59,16 @@ make mrproper
 ### Visualisation
 
 Pour visualiser les résultats vous pouvez utiliser Pymol ou tout autres logiciels de visualisation moléculaire.
+
+## Documentation 
+
+Ouvrir avec un navigateur web le fichier index.html, se trouvant dans doc/html. [Documentation](./doc/html/index.html)
+
+## À faire
+
+pathfinding : implémenter l'algorithme JPS (article : The Jump Point Search Pathfinding System in 3D)
+
+optimisation de l'ensemble
 
 ## publications
 

@@ -1,13 +1,23 @@
 #include "structure.h"
 
+/**
+ * @file structureAsp.c
+ * @brief Ashape_t functions for allocating and deallocating memory.
+ *
+ * This file contains functions for allocating and deallocating memory for an Ashape_t structure.
+ */
+
 /**************************************/
 /* ASHAPE3D ***************************/
 /**************************************/
 
 /**
-* Fonction qui alloue un nouveau Ashape.
-*
-*/
+ * @brief Allocates memory for a new Ashape_t structure.
+ *
+ * This function allocates memory for a new Ashape_t structure and initializes its fields.
+ *
+ * @return A pointer to the newly allocated Ashape_t structure.
+ */
 Ashape_t* ASP_create() {
 	Ashape_t* as3d = malloc(sizeof(Ashape_t));
 
@@ -27,10 +37,12 @@ Ashape_t* ASP_create() {
 }
 
 /**
-* Fonction qui libère la mémoire utilisé par l'ashape.
-*
-* @param		as3d 		Adresse de l'ashape à détruire.
-*/
+ * @brief Frees memory used by the Ashape_t structure.
+ *
+ * This function frees the memory used by the Ashape_t structure and its associated arrays.
+ *
+ * @param as3d Pointer to the Ashape_t structure to be destroyed.
+ */
 void ASP_delete(Ashape_t* as3d) {
 
 	if (as3d != NULL) {

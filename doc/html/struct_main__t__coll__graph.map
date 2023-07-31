@@ -1,0 +1,12 @@
+<map id="Main_t" name="Main_t">
+<area shape="rect" id="node1" title="Represents the main structures of the application." alt="" coords="135,392,202,419"/>
+<area shape="rect" id="node2" href="$struct_molecule__t.html" title="Represents a molecule." alt="" coords="199,273,292,300"/>
+<area shape="rect" id="node3" href="$struct_list__t.html" title="Represents a list of integers." alt="" coords="130,5,188,32"/>
+<area shape="rect" id="node4" href="$struct_atom__t.html" title="Represents an atom in a molecule." alt="" coords="396,95,466,121"/>
+<area shape="rect" id="node8" href="$struct_vertex__t.html" title="Represents a vertex in the graph." alt="" coords="28,95,106,121"/>
+<area shape="rect" id="node9" href="$struct_shell__t.html" title="Represents a shell." alt="" coords="83,273,150,300"/>
+<area shape="rect" id="node10" href="$struct_atom_shl__t.html" title="Represents an atom in a shell." alt="" coords="145,95,234,121"/>
+<area shape="rect" id="node5" href="$struct_chemical_info__t.html" title="Represents information about a chemical element." alt="" coords="538,5,658,32"/>
+<area shape="rect" id="node6" href="$struct_point__t.html" title="Represents a 3D point with floating&#45;point coordinates." alt="" coords="427,5,494,32"/>
+<area shape="rect" id="node7" href="$struct_graph__t.html" title="Represents a graph." alt="" coords="30,184,104,211"/>
+</map>

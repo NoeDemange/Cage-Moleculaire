@@ -1,0 +1,5 @@
+<map id="AtomShl_t" name="AtomShl_t">
+<area shape="rect" id="node1" title="Represents an atom in a shell." alt="" coords="51,95,140,121"/>
+<area shape="rect" id="node2" href="$struct_list__t.html" title="Represents a list of integers." alt="" coords="5,5,63,32"/>
+<area shape="rect" id="node3" href="$struct_point__t.html" title="Represents a 3D point with floating&#45;point coordinates." alt="" coords="125,5,191,32"/>
+</map>

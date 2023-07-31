@@ -1,0 +1,10 @@
+var searchData=
+[
+  ['nh_5fextractmin_571',['NH_extractMin',['../structure_8h.html#aff791f9cf9ef1ebec50fbb4f28277435',1,'NH_extractMin(NodeHeap *, VMap ***):&#160;structureNH.c'],['../structure_n_h_8c.html#a06264e26d30766371d43bc578564fa4e',1,'NH_extractMin(NodeHeap *nodeHeap, VMap ***vMap):&#160;structureNH.c']]],
+  ['nh_5ffree_572',['NH_free',['../structure_8h.html#a3ff0df79741fbbdc578aec97ad54e6b0',1,'NH_free(NodeHeap):&#160;structureNH.c'],['../structure_n_h_8c.html#a99b38c84acecf4e484f6bd970edecf0c',1,'NH_free(NodeHeap nodeHeap):&#160;structureNH.c']]],
+  ['nh_5fincrease_5fpriority_573',['NH_increase_priority',['../structure_8h.html#ae6bce9b07ade7d77ba8b16bf04e8ca5d',1,'NH_increase_priority(NodeHeap *nodeHeap, VMap ***vMap, Point3D point, float distG):&#160;structureNH.c'],['../structure_n_h_8c.html#ae6bce9b07ade7d77ba8b16bf04e8ca5d',1,'NH_increase_priority(NodeHeap *nodeHeap, VMap ***vMap, Point3D point, float distG):&#160;structureNH.c']]],
+  ['nh_5finitalloc_574',['NH_initAlloc',['../structure_8h.html#ab9e8339e0f9a52690f26825ca3f56619',1,'NH_initAlloc():&#160;structureNH.c'],['../structure_n_h_8c.html#ab9e8339e0f9a52690f26825ca3f56619',1,'NH_initAlloc():&#160;structureNH.c']]],
+  ['nh_5finsert_575',['NH_insert',['../structure_8h.html#a1c7da5e1dc44f7c9f022a18e9e026376',1,'NH_insert(NodeHeap *, Node, VMap ***):&#160;structureNH.c'],['../structure_n_h_8c.html#a7d08362e2af39eb4823c126afffc1b8e',1,'NH_insert(NodeHeap *nodeHeap, Node p, VMap ***vMap):&#160;structureNH.c']]],
+  ['nh_5fprint_576',['NH_print',['../structure_8h.html#a941653332f3146b7fdebd793ccef0602',1,'NH_print(NodeHeap):&#160;structureNH.c'],['../structure_n_h_8c.html#a3f8f744468e7806c8bdc99f578b23751',1,'NH_print(NodeHeap nodeHeap):&#160;structureNH.c']]],
+  ['normalization_577',['normalization',['../util_8h.html#aba811b39e766aac603591e3da8215b09',1,'normalization(Point_t, float):&#160;util.c'],['../util_8c.html#a89d9bf30729337d2e3a20e7ed8311282',1,'normalization(Point_t normal, float length):&#160;util.c']]]
+];

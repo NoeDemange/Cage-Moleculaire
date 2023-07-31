@@ -4,6 +4,11 @@
 #include "output.h"
 
 /**
+ * @file initialization.c
+ * @brief This file contains functions for computing edges, ligands, angles, and lone pairs in a molecule.
+ */
+
+/**
  * Compute the edges of the molecule from the atoms' coordinates and their covalent radius.
  *
  * @param m Molecule.

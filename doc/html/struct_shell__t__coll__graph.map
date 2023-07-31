@@ -1,0 +1,8 @@
+<map id="Shell_t" name="Shell_t">
+<area shape="rect" id="node1" title="Represents a shell." alt="" coords="208,273,275,300"/>
+<area shape="rect" id="node2" href="$struct_list__t.html" title="Represents a list of integers." alt="" coords="213,5,270,32"/>
+<area shape="rect" id="node3" href="$struct_atom_shl__t.html" title="Represents an atom in a shell." alt="" coords="73,95,162,121"/>
+<area shape="rect" id="node6" href="$struct_vertex__t.html" title="Represents a vertex in the graph." alt="" coords="203,95,280,121"/>
+<area shape="rect" id="node4" href="$struct_point__t.html" title="Represents a 3D point with floating&#45;point coordinates." alt="" coords="5,5,72,32"/>
+<area shape="rect" id="node5" href="$struct_graph__t.html" title="Represents a graph." alt="" coords="205,184,278,211"/>
+</map>
