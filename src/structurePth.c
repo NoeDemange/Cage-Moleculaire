@@ -1,6 +1,13 @@
 #include "structure.h"
 #include "util.h"
 
+/**
+ * @file structurePth.c
+ * @brief Grouping of functions used for manipulating Path_t.
+ *
+ * This file contains functions for creating, manipulating, and printing Path_t element.
+ */
+
 /*  
 Example - for 2 kept positions.                  atoms in cycle number
 
@@ -47,11 +54,11 @@ patterns      | nei |start|C0.0 |C1.0 |C2.0 |     |
 */
 
 /**
- * @brief Create a path object.
+ * @brief Initializes a new Path_t.
  * 
  * @param size Maximum number of patterns in a path.
  * @param pair Pair of starting and ending atoms positions.
- * @return (Path_t*) Initialized path.
+ * @return (Path_t*) Pointer to the new path.
  */
 Path_t* PTH_init(int size, Pair_t* pair) {
   Path_t* path = malloc(sizeof(Path_t));
@@ -69,7 +76,7 @@ Path_t* PTH_init(int size, Pair_t* pair) {
     for (int j = 0; j < sizePosition; j++) {
       path->patterns[i][j] = malloc(MAX_NB_ATOMS_PATTERN * sizeof(Point_t));
       for (int k = 0; k <  MAX_NB_ATOMS_PATTERN; k++) {
-        path->patterns[i][j][k] = PT_init();
+        path->patterns[i][j][k] = PT_init(0);
       }
     }
     path->positionNum[i] = 0;
@@ -84,6 +91,11 @@ Path_t* PTH_init(int size, Pair_t* pair) {
   return path;
 }
 
+/**
+ * @brief Deletes the path and frees the associated memory.
+ * 
+ * @param path Pointer to the path to be deleted.
+ */
 void PTH_delete(Path_t* path) {
 
   if (path) {
@@ -104,9 +116,15 @@ void PTH_delete(Path_t* path) {
   }
 }
 
+/**
+ * @brief Counts the number of aromatic rings in the path.
+ * 
+ * @param path Pointer to the path.
+ * @return (int) the number of aromatic rings.
+ */
 int PTH_countAroRings(Path_t* path) {
   int counter = 0;
-  for (int i = 0; i <= path->sizeMax; i++) {
+  for (int i = 0; i <= path->size; i++) {
     if (path->patternNum[i] == CYCLE_PATTERN) {
       counter++;
     }
@@ -114,7 +132,16 @@ int PTH_countAroRings(Path_t* path) {
   return counter;
 }
 
-
+/**
+ * @brief Adds the atoms of the path to the Shell_t element.
+ * 
+ * This function adds to the cage the atoms stored in the Path_t object,
+ * as well as their flag and the edges connecting them.
+ * The path contains the positions of the atoms in each pattern. 
+ * 
+ * @param moc Pointer to the cage.
+ * @param path Pointer to the path.
+ */
 void PTH_addPath(Shell_t* moc, Path_t* path) {
 
   flag(atom(moc, path->idStart)) = CARBON_F;
@@ -201,6 +228,11 @@ void PTH_addPath(Shell_t* moc, Path_t* path) {
 	flag(atom(moc, path->idEnd)) = CARBON_F;
 }
 
+/**
+ * @brief Prints the horizontal edge of an array.
+ * 
+ * @param size Size of the array.
+ */
 void PTH_printTopBottom(int size) {
   printf("+");
   for (int i = 0; i < size; i++) {
@@ -209,6 +241,13 @@ void PTH_printTopBottom(int size) {
    printf("\n");
 }
 
+/**
+ * @brief Prints an array of integers to the console.
+ * 
+ * @param array Array to be printed.
+ * @param size Size of the array.
+ * @param name Name of the array.
+ */
 void PTH_printPointers(int* array, int size, char* name) {
   
   printf("%s\n", name);
@@ -225,6 +264,11 @@ void PTH_printPointers(int* array, int size, char* name) {
   PTH_printTopBottom(size);
 }
 
+/**
+ * @brief Prints the buffer of patterns of the path.
+ * 
+ * @param path Pointer to the path.
+ */
 void PTH_printPatterns(Path_t* path) {
   
   printf("Patterns\n");
@@ -258,6 +302,11 @@ void PTH_printPatterns(Path_t* path) {
   }
 }
 
+/**
+ * @brief Prints the path.
+ * 
+ * @param path Pointer to the path.
+ */
 void PTH_printPath(Path_t* path) {
 
   PTH_printPointers(path->positionNum, path->sizeMax + 1, "Position number");

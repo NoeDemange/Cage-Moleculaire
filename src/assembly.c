@@ -93,7 +93,7 @@ int addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate) 
 		normal = rotation(vector(startCycle, start),  45, normal);
 
 		Point_t direction = vector(startCycle, start);
-		newStart = addPoint(startCycle, normalization(rotation(normal, -120, direction), SIMPLE_CYCLE));
+		newStart = PT_add(startCycle, normalization(rotation(normal, -120, direction), SIMPLE_CYCLE));
 		neighborStart = startCycle;
 
 		if (isHindered(processedMoc, substrate, path, newStart)) {
@@ -144,7 +144,19 @@ int addAromaticRing(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate) 
 /******** Projections location ********/
 /**************************************/
 
-// Projection for an atom with one neighbor. Gives multiple projections.
+/**
+ * @brief Computes the positions of the new neighbor atom from an atom with one neighbor. 
+ * 
+ * This function computes the positions of the new startings points in the path. The positions
+ * can be kept to add only one atom, or used to add an aromatic ring. 
+ * 
+ * @param processedMoc The cage being generated.
+ * @param path The path storing the new positions.
+ * @param substrate The substrate Molecule.
+ * @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
+ */
 void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 	
 	Point_t start = path->patterns[path->size - 1][path->positionNum[path->size - 1]][0];
@@ -161,8 +173,7 @@ void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate,
 	List_s* positions = LSTs_init(); //TODO change for a buffer.
 
 	if (!isHindered(processedMoc, substrate, path, newStart) && !isHindered(processedMoc, substrate, path, hydrogen1) && !isHindered(processedMoc, substrate, path, hydrogen2)) {
-		//LSTs_addElement(positions, newStart);
-			LSTs_addElementInOrder(positions, newStartPos, endPos, voxelGrid, vMap, nodeHeap);
+		LSTs_addElementInOrder(positions, newStart, coords(atom(processedMoc, path->idEnd)), voxelGrid, vMap, nodeHeap);
 	}
 	
 	for (int i = 0; i < (360 / ROTATION_ANGLE_AX1E3) - 1; i++) { // 360° rotation.
@@ -172,8 +183,8 @@ void projectionAX1E3(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate,
 		hydrogen2 = AX3E1(start, startNeighbor, newStart, hydrogen1, DIST_ATOM_H);
 		
 		if (!isHindered(processedMoc, substrate, path, newStart) && !isHindered(processedMoc, substrate, path, hydrogen1) && !isHindered(processedMoc, substrate, path, hydrogen2)) {
-			LSTs_addElement(positions, newStart); //path->positionsBuffer[i] = newStart;
-			LSTs_addElementInOrder(positions, newStartPos, endPos, voxelGrid, vMap, nodeHeap);
+			//path->positionsBuffer[i] = newStart;
+			LSTs_addElementInOrder(positions, newStart, coords(atom(processedMoc, path->idEnd)), voxelGrid, vMap, nodeHeap);
 		}
 	}
 	int i;
@@ -227,10 +238,22 @@ void projectionAX3E1(Shell_t* processedMoc, Path_t* path, Molecule_t* sub) {
 /**************************************/
 
 
+/**
+ * @brief Computes the positions of the next atoms in the path depending of the last added atom number of neighbor.
+ * 
+ * ! For the time being, only the AX1E3 projection is used.
+ * 
+ * @param processedMoc The cage being generated.
+ * @param path The path storing the new positions.
+ * @param substrate The substrate Molecule.
+ * @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
+ */
 void choosePositions(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 
 	if (path->size > 2) {
-		projectionAX1E3(processedMoc, path, substrate);
+		projectionAX1E3(processedMoc, path, substrate, voxelGrid, vMap, nodeHeap);
 	}
 	else {
 		int startNbNeighbors = LST_nbElements(neighborhood(atom(processedMoc, path->idStart)));
@@ -249,11 +272,14 @@ void choosePositions(Shell_t* processedMoc, Path_t* path, Molecule_t* substrate,
 /**
  * @brief Generates paths between two grouping of bonding patterns.
  * 
- * @param substrate Substrate molecule.
- * @param mocsInProgress Stack of cages in construction to be processed.
- * @param processedMoc Molecular cage being generated.
- * @param path Structure of buffers to store the patterns of the path.
+ * @param substrate the substrate molecule.
+ * @param mocsInProgress The stack of cages in construction to be processed.
+ * @param processedMoc The cage being generated.
+ * @param path The path to store the patterns.
  * @param forceCycle Forces the presence of a cycle in the path if true. 
+ * @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
  */
 void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* processedMoc, Path_t* path, int forceCycle, VOXELGRID voxelGrid,  VMap*** vMap, NodeHeap nodeHeap) {
 	
@@ -268,7 +294,7 @@ void generatePaths(Molecule_t* substrate, mStack_t* mocsInProgress, Shell_t* pro
 			existsNewStart = addAromaticRing(processedMoc, path, substrate);
 		}
 		else if (path->size <= path->sizeMax && !existsNewStart) {
-			choosePositions(processedMoc, path, substrate);
+			choosePositions(processedMoc, path, substrate, voxelGrid, vMap, nodeHeap);
 			existsNewStart = (path->maxPositions[path->size] >= 0);
 		}
 		int closeToTheEnd = 0;
@@ -391,7 +417,9 @@ int checkExistsPath(Shell_t* s, int index1, int index2) {
  * 
  * @param s Cage without any added paths.
  * @param sub Substrate molecule.
- * @param voxelGrid Grid of voxel.
+* @param voxelGrid The 3D voxel grid.
+ * @param vMap The voxel map for storing distances and index heap information.
+ * @param nodeHeap The node heap for storing nodes during the algorithm.
  * @return (Pair_t*) List of pair of atoms to be connected.
  */
 Pair_t* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
@@ -412,8 +440,8 @@ Pair_t* chooseStartAndEndPairs(Shell_t* s, Molecule_t* sub, VOXELGRID voxelGrid,
 			for (int j = i + 1; j < size(s); j++) {
 				if (flag(atom(s, j)) == LINKABLE_F && !isHindered[j]) {
 					if (!checkExistsPath(s, i, j)) {
-						LST_pairs_addElementInOrder(s, &startEndAtoms, i, j, voxelGrid, vMap, nodeHeap);
-						//LST_pairs_addElement(&startEndAtoms, i, j);
+						PR_addElementInOrder(s, &startEndAtoms, i, j, voxelGrid, vMap, nodeHeap);
+						//PR_addElement(&startEndAtoms, i, j);
 					}
 				}
 			}

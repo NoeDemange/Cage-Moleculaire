@@ -251,15 +251,16 @@ void LST_delete(List_t* l) {
 }
 
 /**************************************/
-/**
- * @brief Initializes a new Element list.
- *
- * This function initializes a new Element list by setting its first element to NULL.
- *
- * @return Pointer to the newly allocated Element list.
- */
 /* PAIR *******************************/
 /**************************************/
+
+/**
+ * @brief Initializes a new Pair_t.
+ *
+ * This function initializes a new Pair_t by setting its first element to NULL.
+ *
+ * @return Pointer to the newly allocated Pair_t.
+ */
 Pair_t* PR_init(void) {
 
 	Pair_t* list = malloc(sizeof(Pair_t));
@@ -268,11 +269,11 @@ Pair_t* PR_init(void) {
 }
 
 /**
- * @brief Adds an Element to the beginning of the list.
+ * @brief Adds a pair to the beginning of the list.
  *
- * This function adds an Element to the beginning of the list.
+ * This function adds a pair to the beginning of the list.
  *
- * @param list Pointer to the Element list.
+ * @param list Pointer to the Pair_t list.
  * @param start Start index of the element to add.
  * @param end End index of the element to add.
  */
@@ -297,6 +298,7 @@ void PR_addElement(Pair_t** list, int start, int end) {
  * @param voxelGrid Grid of voxelization.
  */
 void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
+	
 	Point_t endPos = coords(atom(s, end));
 	Point_t startPos = coords(atom(s, start));
 	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
@@ -307,9 +309,10 @@ void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end, VOXELGR
 			previousElem = currentElem;
 			currentElem = currentElem->next;
 		}
-		else{break;}
+		else{
+			break;
+		}
 	}
-
 	Pair_t* elem = malloc(sizeof(Pair_t));
 	elem->start = start;
 	elem->end = end;
@@ -324,11 +327,11 @@ void PR_addElementInOrder(Shell_t* s, Pair_t** list, int start, int end, VOXELGR
 }
 
 /**
- * @brief Removes the first Element from the list.
+ * @brief Removes the first pair from the list.
  *
- * This function removes the first Element from the list and frees the associated memory.
+ * This function removes the first pair from the list and frees the associated memory.
  *
- * @param list Pointer to the Element list.
+ * @param list Pointer to the Pair_t list.
  */
 void PR_removeFirst(Pair_t* list) {
 	
@@ -343,11 +346,11 @@ void PR_removeFirst(Pair_t* list) {
 }
 
 /**
- * @brief Deletes the Element list and frees the associated memory.
+ * @brief Deletes the pairs list and frees the associated memory.
  *
- * This function deletes the Element list and frees the memory associated with its elements.
+ * This function deletes the pairs list and frees the memory associated with its elements.
  *
- * @param list Pointer to the Element list to be deleted.
+ * @param list Pointer to the Pair_t list to be deleted.
  */
 void PR_delete(Pair_t* list) {
 
@@ -368,11 +371,11 @@ void PR_delete(Pair_t* list) {
 /**************************************/
 
 /**
- * @brief Initializes a new List_m (Shell_t) list.
+ * @brief Initializes a new mStack_t, a stack of Shell_t.
  *
- * This function initializes a new List_m (used with Shell_t elements) by setting its first element to NULL.
+ * This function initializes a new mStack_t (used with Shell_t elements) by setting its first element to NULL.
  *
- * @return Pointer to the newly allocated List_m.
+ * @return Pointer to the newly allocated mStack_t.
  */
 mStack_t* mSTK_init() {
 	
@@ -383,11 +386,11 @@ mStack_t* mSTK_init() {
 }
 
 /**
- * @brief Adds a Shell_t element at the beginning of the list.
+ * @brief Adds a Shell_t element at the beginning of the stack.
  *
- * This function adds a Shell_t element to the list.
+ * This function adds a Shell_t element to the stack.
  *
- * @param list Pointer to the list.
+ * @param list Pointer to the stack.
  * @param moc Pointer to the Shell_t element to add.
  */
 void mSTK_addElement(mStack_t* list, Shell_t* moc) {
@@ -401,11 +404,11 @@ void mSTK_addElement(mStack_t* list, Shell_t* moc) {
 }
 
 /**
- * @brief Removes the first Shell_t element from the list.
+ * @brief Removes the first Shell_t element from the stack.
  *
- * This function removes the first Shell_t element from the list and frees the associated memory.
+ * This function removes the first Shell_t element from the stack and frees the associated memory.
  *
- * @param list Pointer to the list.
+ * @param list Pointer to the stack.
  */
 void mSTK_removeFirst(mStack_t* list) {
 	
@@ -416,11 +419,11 @@ void mSTK_removeFirst(mStack_t* list) {
 }
 
 /**
- * @brief Deletes the List_m list and frees the associated memory.
+ * @brief Deletes the mStack_t list and frees the associated memory.
  *
- * This function deletes the List_m list and frees the memory associated with its elements.
+ * This function deletes the mStack_t stack and frees the memory associated with its elements.
  *
- * @param list Pointer to the List_m list to be deleted.
+ * @param list Pointer to the mStack_t list to be deleted.
  */
 void mSTK_delete(mStack_t* list) {
 
@@ -434,7 +437,7 @@ void mSTK_delete(mStack_t* list) {
 /******************************/
 
 /**
- * @brief Initializes a new List_s (Point_t) list.
+ * @brief Initializes a new List_s, a list of Point_t.
  *
  * This function initializes a new List_s (used with Point_t elements) by setting its first element to NULL.
  *
@@ -480,17 +483,19 @@ void LSTs_addElement(List_s* list, Point_t sommet) {
  * @param voxelGrid Grid of voxelization.
  */
 void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
+	
 	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
 	Elem_s* currentElem = list->first;
 	Elem_s* previousElem = NULL;
-	while(currentElem){
-		if(currentElem->distance < computedDist){
+	while(currentElem) {
+		if(currentElem->distance < computedDist) {
 			previousElem = currentElem;
 			currentElem = currentElem->next;
 		}
-		else{break;}
+		else{
+			break;
+		}
 	}
-
 	Elem_s* elem = malloc(sizeof(Elem_s));
 	elem->position = startPos;
 	elem->distance = computedDist;
@@ -571,23 +576,7 @@ void LSTs_removeElement(List_s* list, Point_t p) {
 	}
 }
 
-/*// Retourne le point de la liste le plus proche du point en argument
-Point_t minDist(List_s* list, Point_t p) {
-	Point_t min = PT_init(0);
-	float minDist = __FLT_MAX__; //si déclarer comme un int permet un choix entre le plus optimal et un sous-opitmal (marche mieux que float pour l'instant)
-	float computedDist;
-	Elem_s* l = list->first;
-	while (l) {
-		computedDist = dist(l->position, p);
-		if (computedDist < minDist) {
-			min = l->position;
-			minDist = computedDist;
-		}
-		l = l->next;
-	}
-	return min;
-}
-
+/*
 // Retourne le point de la liste le plus proche du point en argument
 Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
 	Point_t min = PT_init();
@@ -604,4 +593,4 @@ Point_t minDist_obstacle(List_s* list, Point_t p, Molecule_t* sub) {
 		l = l->next;
 	}
 	return min;
-}
+}*/

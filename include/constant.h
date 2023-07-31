@@ -146,12 +146,12 @@
 /** @def NUMBER_POSITION_AX1E3
  *  @brief Number of positions to keep to make a path.
  */
-#define NUMBER_POSITION_AX1E3 2
+#define NUMBER_POSITION_AX1E3 3
 
 /** @def ROTATION_ANGLE_AX1E3
  *  @brief Rotation angle to generate position (in degrees).
  */
-#define ROTATION_ANGLE_AX1E3 30
+#define ROTATION_ANGLE_AX1E3 15
 
 /********* not to be modified (the incremental order must be preserved) */
 
@@ -197,9 +197,18 @@
 #define CYCLE_PATTERN 1
 
 // Path (in the cage)
-#define MAX_NB_ATOMS_PATTERN 13 // Maximum number of atoms in a pattern (number of atoms in cycle : 7 C + 6 H)
 
-#define SIMPLE_PATTERN 0 // Simple pattern corresponding number (ie, a carbon atom)
+/**
+ * @def MAX_NB_ATOMS_PATTERN
+ * @brief Maximum number of atoms in a pattern (number of atoms in cycle : 7 C + 6 H).
+ */
+#define MAX_NB_ATOMS_PATTERN 13
+
+/**
+ * @def SIMPLE_PATTERN
+ * @brief Number for the simple pattern, a carbon.
+ */
+#define SIMPLE_PATTERN 0
 
 // Flags atoms in paths, ! must be different of flags in the envelope
 
