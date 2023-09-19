@@ -66,9 +66,11 @@ Ouvrir avec un navigateur web le fichier index.html, se trouvant dans doc/html. 
 
 ## À faire
 
-pathfinding : implémenter l'algorithme JPS (article : The Jump Point Search Pathfinding System in 3D)
+Pathfinding : implémenter l'algorithme JPS (article : The Jump Point Search Pathfinding System in 3D) pour essayer de remplacer A*
 
-optimisation de l'ensemble
+Pour convenir aux chimistes : avoir des chemins qui se ressemble au maximum "symétrie" (améliore la création de la cage), avoir des motifs avec 3 chemins pour tridimensionner la cage
+
+Optimisation de l'ensemble
 
 ## publications
 

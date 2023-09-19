@@ -484,7 +484,7 @@ void LSTs_addElement(List_s* list, Point_t sommet) {
  */
 void LSTs_addElementInOrder(List_s* list, Point_t startPos, Point_t endPos, VOXELGRID voxelGrid, VMap*** vMap, NodeHeap nodeHeap) {
 	
-	float computedDist = distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
+	float computedDist = /*dist(startPos,endPos);*/distWithObstacles(startPos,endPos,voxelGrid,vMap,nodeHeap);
 	Elem_s* currentElem = list->first;
 	Elem_s* previousElem = NULL;
 	while(currentElem) {
