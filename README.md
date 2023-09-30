@@ -87,7 +87,7 @@ Pour visualiser les résultats vous pouvez utiliser Pymol ou tout autres logicie
 
 ## Contributeurs
 <div align="center">
-  <b>Anne DUVEAU &emsp; Rafael PREAULT &emsp; Alexis GUIGAL ([@AlexisGGFR](https://github.com/AlexisGGFR))</b>
+  <b>Anne DUVEAU &emsp; Rafael PREAULT &emsp; Alexis GUIGAL Github: [@AlexisGGFR](https://github.com/AlexisGGFR) </b>
 </div>
 
 ### Chimiste
