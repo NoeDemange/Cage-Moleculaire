@@ -3,6 +3,7 @@ var structure_p_t_8c =
     [ "createPoint3D", "structure_p_t_8c.html#acce9ae508048590e68104e38b3887e41", null ],
     [ "createPoint_t", "structure_p_t_8c.html#abc28f7ea8d88880487acc8a89b043d0a", null ],
     [ "PT_add", "structure_p_t_8c.html#a45fbaeb11fe264188b10e3ff5d238cbf", null ],
+    [ "PT_compare", "structure_p_t_8c.html#a280a43e3943608cada8a970ea568bef4", null ],
     [ "PT_div", "structure_p_t_8c.html#a43c3facc8439065f40e670ea0c2914a0", null ],
     [ "PT_equal", "structure_p_t_8c.html#aea1e8a2b851adf94daa6537225d699a2", null ],
     [ "PT_init", "structure_p_t_8c.html#a15d15697580b9f2ebe7ecc1ce671104b", null ],

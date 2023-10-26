@@ -128,6 +128,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a43c3facc8439065f40e670ea0c2914a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_point__t.html">Point_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structure_p_t_8c.html#a43c3facc8439065f40e670ea0c2914a0">PT_div</a> (<a class="el" href="struct_point__t.html">Point_t</a> A, float scal)</td></tr>
 <tr class="memdesc:a43c3facc8439065f40e670ea0c2914a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divides a <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a> by a scalar value and returns the result.  <a href="structure_p_t_8c.html#a43c3facc8439065f40e670ea0c2914a0">More...</a><br /></td></tr>
 <tr class="separator:a43c3facc8439065f40e670ea0c2914a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a280a43e3943608cada8a970ea568bef4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structure_p_t_8c.html#a280a43e3943608cada8a970ea568bef4">PT_compare</a> (<a class="el" href="struct_point__t.html">Point_t</a> A, <a class="el" href="struct_point__t.html">Point_t</a> B)</td></tr>
+<tr class="separator:a280a43e3943608cada8a970ea568bef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeddb8ad3a4069dfade02bbb0ed2a7586"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_point__t.html">Point_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structure_p_t_8c.html#aeddb8ad3a4069dfade02bbb0ed2a7586">PT_merge</a> (<a class="el" href="struct_point__t.html">Point_t</a> A, <a class="el" href="struct_point__t.html">Point_t</a> B)</td></tr>
 <tr class="memdesc:aeddb8ad3a4069dfade02bbb0ed2a7586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges two <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a> by taking their average and returns the result.  <a href="structure_p_t_8c.html#aeddb8ad3a4069dfade02bbb0ed2a7586">More...</a><br /></td></tr>
 <tr class="separator:aeddb8ad3a4069dfade02bbb0ed2a7586"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,7 +175,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The created <a class="el" href="struct_point3_d.html" title="Represents a 3D point with integer coordinates.">Point3D</a> with integer indices. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00153">153</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00157">157</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
 
 </div>
 </div>
@@ -203,7 +205,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The created <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a> with float coordinates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00194">194</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00198">198</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
 
 </div>
 </div>
@@ -245,6 +247,36 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The result of the addition operation as a new <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a>. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00039">39</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
+
+</div>
+</div>
+<a id="a280a43e3943608cada8a970ea568bef4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a280a43e3943608cada8a970ea568bef4">&#9670;&nbsp;</a></span>PT_compare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PT_compare </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="struct_point__t.html">Point_t</a>&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_point__t.html">Point_t</a>&#160;</td>
+          <td class="paramname"><em>B</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00110">110</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
 
 </div>
 </div>
@@ -326,7 +358,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>1 if <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a> A and <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a> B are equal; otherwise, 0. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00139">139</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00143">143</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
 
 </div>
 </div>
@@ -397,7 +429,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The result of the merging operation as a new <a class="el" href="struct_point__t.html" title="Represents a 3D point with floating-point coordinates.">Point_t</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00119">119</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="structure_p_t_8c_source.html#l00123">123</a> of file <a class="el" href="structure_p_t_8c_source.html">structurePT.c</a>.</p>
 
 </div>
 </div>

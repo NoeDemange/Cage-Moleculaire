@@ -22,6 +22,7 @@ var constant_8h =
     [ "HYDROGEN_F", "constant_8h.html#a99a9541c4aecad9ef64fa6939ed92dff", null ],
     [ "LENGTH_GRID", "constant_8h.html#a4a9d7ebcfb7163f3b761d68ceb530c7b", null ],
     [ "LINKABLE_F", "constant_8h.html#a4d3a45fb8be71b71c1ac907fe4e3e547", null ],
+    [ "MAX_NB_ATOMS_PATTERN", "constant_8h.html#acad3eb59ad74962eecc26b2ddf68c1ed", null ],
     [ "MAXDIS_CYCLE", "constant_8h.html#a3e508a633d37c595dde298770eb0fce4", null ],
     [ "MINDIS", "constant_8h.html#a4dbcd0a6c12f1018462d560d8274096d", null ],
     [ "MINDIS_CYCLE", "constant_8h.html#ab902e125e65a64ab39ccf2cea748d686", null ],
@@ -37,6 +38,7 @@ var constant_8h =
     [ "ROTATION_ANGLE_AX1E3", "constant_8h.html#a7a658496b9d089d3802bd4d5ad80bbad", null ],
     [ "SHELL_F", "constant_8h.html#a6f8aa1daf7722b27de44d45e5c21fcd5", null ],
     [ "SIMPLE_CYCLE", "constant_8h.html#a507dfb506f2eedb283b2a66fd6e73676", null ],
+    [ "SIMPLE_PATTERN", "constant_8h.html#a505de9814e6bca2fa3973f3a45b50215", null ],
     [ "START_GRID", "constant_8h.html#ab6bde2dad7b39dd8639b34b0fbe802b4", null ],
     [ "USAGE_FMT", "constant_8h.html#a35141b1ca3a126d7e30c4224e2081837", null ]
 ];

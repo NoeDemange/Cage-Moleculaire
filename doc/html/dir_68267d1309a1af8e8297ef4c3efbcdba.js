@@ -17,6 +17,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "structureMol.c", "structure_mol_8c.html", "structure_mol_8c" ],
     [ "structureNH.c", "structure_n_h_8c.html", "structure_n_h_8c" ],
     [ "structurePT.c", "structure_p_t_8c.html", "structure_p_t_8c" ],
+    [ "structurePth.c", "structure_pth_8c.html", "structure_pth_8c" ],
     [ "structureShl.c", "structure_shl_8c.html", "structure_shl_8c" ],
     [ "util.c", "util_8c.html", "util_8c" ],
     [ "voxelization.c", "voxelization_8c.html", "voxelization_8c" ]

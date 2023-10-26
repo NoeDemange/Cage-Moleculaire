@@ -152,9 +152,9 @@ $(document).ready(function(){initNavTree('constant_8h_source.html',''); initResi
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="comment">// Path choice</span></div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno"><a class="line" href="constant_8h.html#a03fdaf9937d6d35c7546230aa8a9b0ba">  149</a></span>&#160;<span class="preprocessor">#define NUMBER_POSITION_AX1E3 2</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno"><a class="line" href="constant_8h.html#a03fdaf9937d6d35c7546230aa8a9b0ba">  149</a></span>&#160;<span class="preprocessor">#define NUMBER_POSITION_AX1E3 3</span></div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="constant_8h.html#a7a658496b9d089d3802bd4d5ad80bbad">  154</a></span>&#160;<span class="preprocessor">#define ROTATION_ANGLE_AX1E3 30</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="constant_8h.html#a7a658496b9d089d3802bd4d5ad80bbad">  154</a></span>&#160;<span class="preprocessor">#define ROTATION_ANGLE_AX1E3 15</span></div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment">/********* not to be modified (the incremental order must be preserved) */</span></div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
@@ -178,25 +178,31 @@ $(document).ready(function(){initNavTree('constant_8h_source.html',''); initResi
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
 <div class="line"><a name="l00197"></a><span class="lineno"><a class="line" href="constant_8h.html#a34afd1d65498e44e9ba4d0f22db45ba7">  197</a></span>&#160;<span class="preprocessor">#define CYCLE_PATTERN 1</span></div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">// Flags atoms in paths, ! must be different of flags in the envelope</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">// Path (in the cage)</span></div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno"><a class="line" href="constant_8h.html#afe5cfbfa3e2d62bf347ecdcf328e472b">  204</a></span>&#160;<span class="preprocessor">#define CARBON_F 6</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00209"></a><span class="lineno"><a class="line" href="constant_8h.html#a45228b55a8152956364c2c331eea8bba">  209</a></span>&#160;<span class="preprocessor">#define NITROGEN_F 5</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="constant_8h.html#abd18bc83c44414742dc18be38551a5e6">  214</a></span>&#160;<span class="preprocessor">#define OXYGEN_F 4</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
-<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="constant_8h.html#a99a9541c4aecad9ef64fa6939ed92dff">  219</a></span>&#160;<span class="preprocessor">#define HYDROGEN_F 7</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment">// Voxelization</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno"><a class="line" href="constant_8h.html#a08246606c233e7785a497c09672f366f">  226</a></span>&#160;<span class="preprocessor">#define GRID_SIZE 51</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
-<div class="line"><a name="l00231"></a><span class="lineno"><a class="line" href="constant_8h.html#ab6bde2dad7b39dd8639b34b0fbe802b4">  231</a></span>&#160;<span class="preprocessor">#define START_GRID -30.0</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno"><a class="line" href="constant_8h.html#a4a9d7ebcfb7163f3b761d68ceb530c7b">  236</a></span>&#160;<span class="preprocessor">#define LENGTH_GRID (-START_GRID*2)/GRID_SIZE</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno"><a class="line" href="constant_8h.html#acad3eb59ad74962eecc26b2ddf68c1ed">  205</a></span>&#160;<span class="preprocessor">#define MAX_NB_ATOMS_PATTERN 13</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00211"></a><span class="lineno"><a class="line" href="constant_8h.html#a505de9814e6bca2fa3973f3a45b50215">  211</a></span>&#160;<span class="preprocessor">#define SIMPLE_PATTERN 0</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment">// Flags atoms in paths, ! must be different of flags in the envelope</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno"><a class="line" href="constant_8h.html#afe5cfbfa3e2d62bf347ecdcf328e472b">  218</a></span>&#160;<span class="preprocessor">#define CARBON_F 6</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="constant_8h.html#a45228b55a8152956364c2c331eea8bba">  223</a></span>&#160;<span class="preprocessor">#define NITROGEN_F 5</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
+<div class="line"><a name="l00228"></a><span class="lineno"><a class="line" href="constant_8h.html#abd18bc83c44414742dc18be38551a5e6">  228</a></span>&#160;<span class="preprocessor">#define OXYGEN_F 4</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno"><a class="line" href="constant_8h.html#a99a9541c4aecad9ef64fa6939ed92dff">  233</a></span>&#160;<span class="preprocessor">#define HYDROGEN_F 7</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="comment">// Voxelization</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno"><a class="line" href="constant_8h.html#a08246606c233e7785a497c09672f366f">  240</a></span>&#160;<span class="preprocessor">#define GRID_SIZE 51</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
+<div class="line"><a name="l00245"></a><span class="lineno"><a class="line" href="constant_8h.html#ab6bde2dad7b39dd8639b34b0fbe802b4">  245</a></span>&#160;<span class="preprocessor">#define START_GRID -30.0</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
+<div class="line"><a name="l00250"></a><span class="lineno"><a class="line" href="constant_8h.html#a4a9d7ebcfb7163f3b761d68ceb530c7b">  250</a></span>&#160;<span class="preprocessor">#define LENGTH_GRID (-START_GRID*2)/GRID_SIZE</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

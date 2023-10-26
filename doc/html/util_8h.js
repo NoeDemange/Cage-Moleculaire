@@ -11,6 +11,7 @@ var util_8h =
     [ "degreToRadian", "util_8h.html#a1e1ce9e88416dedab9b3aacf3250b455", null ],
     [ "dist", "util_8h.html#a4335b09cfa079a6ade2d737b884c4446", null ],
     [ "dist_manhattan", "util_8h.html#a65a4013195869e3a67586be6150c2371", null ],
+    [ "distInf", "util_8h.html#a46abb53e73fbd3ac38645c06d33cb4fa", null ],
     [ "normalization", "util_8h.html#aba811b39e766aac603591e3da8215b09", null ],
     [ "planNormal", "util_8h.html#a7b3a8427896f07768d6d81bf48eb8ce5", null ],
     [ "radianToDegre", "util_8h.html#a08ad007deb525137a835a2467dbe7376", null ],

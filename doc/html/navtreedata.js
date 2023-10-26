@@ -49,8 +49,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"struct_atom_shl__t.html#adf916204820072417ed73a32de1cefcf",
-"structure_gph_8c.html#afaf58e3e3fed98e7f7bca3aaa33c812f"
+"struct_chemical_info__t.html",
+"structure_gph_8c.html#a395066b121b055c04ea9aa8b5ae2c528"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
