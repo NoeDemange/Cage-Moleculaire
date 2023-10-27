@@ -3,6 +3,7 @@
 #include "output.h"
 #include "constant.h"
 #include "voxelization.h"
+#include "pathFinding.h"
 #include <math.h>
 #include <omp.h>
 
@@ -532,7 +533,7 @@ void generateWholeCages(Main_t* m, Options_t options) {
 						path->maxPositions[1] = 0;
 
 						int forceCycle = 0;
-						float startEndDist = dist(coords(atom(processedMoc, path->idStart)),coords(atom(processedMoc, path->idEnd))); //change for use distancewith obstacle
+						float startEndDist = dist(coords(atom(processedMoc, path->idStart)),coords(atom(processedMoc, path->idEnd)));//distWithObstacles(coords(atom(processedMoc, path->idStart)),coords(atom(processedMoc, path->idEnd)),voxelGrid,vMap,nodeHeap); //change for use distancewith obstacle
 						if (startEndDist <= DIST_SIMPLE_PATTERN * options.sizeMax + DIST_SIMPLE + DIST_ERROR) {
 							if (startEndDist <= DIST_SIMPLE_PATTERN * (options.sizeMax - 1/*NB_ATOMS_IN_CYCLE*/) + DIST_CYCLE_PATTERN + DIST_SIMPLE + DIST_ERROR
 									&& startEndDist > DIST_CYCLE_PATTERN + (1 * DIST_SIMPLE_PATTERN) + DIST_SIMPLE + DIST_ERROR) {

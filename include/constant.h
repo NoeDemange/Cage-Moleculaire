@@ -86,7 +86,7 @@
 /** @def DIST_GAP_SUBSTRATE
  *  @brief Distance between an atom of the cage and an atom of the substrate (at least a hydrogen bond size by trial).
  */
-#define DIST_GAP_SUBSTRATE 1.8
+#define DIST_GAP_SUBSTRATE 1.7
 
 /** @def DIST_SIMPLE_PATTERN
  *  @brief AC/2, with ABC a triangle where each of its vertex is an atom of the path involved in a simple pattern,
